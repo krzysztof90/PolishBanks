@@ -345,8 +345,8 @@ namespace BankService.Bank_GetinBank
         protected override string CleanFastTransferUrl(string transferId)
         {
             string newTransferId = transferId
-                .Replace("pbl/payment/new/", String.Empty)
-                .Replace("pbl/#index/index/", String.Empty);
+                .Replace("https://secure.getinbank.pl/pbl/payment/new/", String.Empty)
+                .Replace("https://secure.getinbank.pl/pbl/#index/index/", String.Empty);
 
             if (newTransferId.Length != 64)
             {
