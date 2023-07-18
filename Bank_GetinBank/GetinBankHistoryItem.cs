@@ -30,6 +30,10 @@ namespace BankService.Bank_GetinBank
 
         public override bool IsTransfer => Type == OperationType.Transfer;
         public override string TransferTypeName => Type.GetEnumDescription();
+        public override bool CompareTitle(string title)
+        {
+            return Title == title;
+        }
 
         public GetinBankHistoryItem(HtmlNode node)
         {

@@ -7,16 +7,16 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.UI.WebControls;
 
 namespace BankService
 {
-    //TODO nazwa
     public abstract class BankBaseBase : IDisposable
     {
         //TODO bez PLN na sztywno, pokazywanie waluty
 
         private bool logged;
-        private bool Logged
+        public bool Logged
         {
             get { return logged; }
             set
@@ -24,17 +24,20 @@ namespace BankService
                 logged = value;
                 if (!logged)
                     DisposeElements();
-                OnLogged?.Invoke(logged);
+                OnLogged?.Invoke();
             }
         }
 
+        public event Func<List<(string name, string value, string path, string domain)>> OnGetCookies;
+        public event Action<(string name, string value, string path, string domain)> OnSetCookie;
+        public event Action<(string name, string path, string domain)> OnRemoveCookie;
         public event Action<string> OnMessage;
         public event Func<string, string, bool> OnPromptYesNo;
         public event Func<string, string, bool> OnPromptOKCancel;
         public event Func<string, string, string> OnPromptString;
         public event Func<string, IEnumerable<PrepaidOperatorComboBoxItemBase>, PrepaidOperatorComboBoxItemBase> OnPromptComboBox;
 
-        public event Action<bool> OnLogged;
+        public event Action OnLogged;
         public event Action OnLogging;
 
         public event Action OnAvailableFundsClear;
@@ -51,14 +54,14 @@ namespace BankService
         public abstract bool PrepaidTransferMandatoryRecipient { get; }
         protected abstract string BaseAddress { get; }
         protected abstract bool LoginRequest(string login, string password);
-        protected abstract bool LoginRequestForFastTransfer(string login, string password, string transferId, /*Browser browser,*/ string cookie);
+        protected abstract bool LoginRequestForFastTransfer(string login, string password, string transferId, string cookie);
         protected abstract bool LogoutRequest();
         protected abstract int HeartbeatInterval { get; }
         protected abstract bool TryExtendSession();
         public abstract (string accountNumber, double availableFunds) GetAccountData();
         protected abstract string CleanFastTransferUrl(string transferId);
         public abstract bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount);
-        protected abstract string MakeFastTransfer(string transferId, /*Browser browser,*/ string cookie);
+        protected abstract string MakeFastTransfer(string transferId, string cookie);
         protected abstract bool MakePrepaidTransfer(string recipient, string phoneNumber, double amount);
         public abstract List<HistoryItem> GetHistory(HistoryFilter filter = null);
         public abstract HistoryFilter CreateHistoryFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact);
@@ -69,6 +72,14 @@ namespace BankService
             logged = false;
         }
 
+        protected void SaveCookie((string name, string value, string path, string domain) cookie)
+        {
+            OnSetCookie?.Invoke(cookie);
+        }
+        protected void RemoveSavedCookie((string name, string path, string domain) cookie)
+        {
+            OnRemoveCookie?.Invoke(cookie);
+        }
         protected void Message(string text)
         {
             OnMessage?.Invoke(text);
@@ -98,7 +109,7 @@ namespace BankService
             OnAvailableFundsClear?.Invoke();
         }
 
-        private void InitClient()
+        private void InitClient(bool includeCookies)
         {
             Cookies = new CookieContainer();
             httpClient = new HttpClient(new WebRequestHandler
@@ -107,6 +118,15 @@ namespace BankService
                 CookieContainer = Cookies
             });
             httpClient.BaseAddress = new Uri(BaseAddress);
+
+            if (includeCookies)
+            {
+                List<(string name, string value, string path, string domain)> cookies = OnGetCookies?.Invoke() ?? new List<(string name, string value, string path, string domain)>();
+                foreach ((string name, string value, string path, string domain) cookie in cookies)
+                {
+                    Cookies.Add(new Cookie(cookie.name, cookie.value, cookie.path, cookie.domain));
+                }
+            }
         }
 
         public bool Login(string login, string password)
@@ -116,12 +136,9 @@ namespace BankService
                 return CheckFailed("Niepoprawny login i hasło");
             }
 
-            InitClient();
+            InitClient(true);
 
-            if (!LoginRequest(login, password))
-                return false;
-
-            if (!PostLoginRequest())
+            if (!PerformLogin(login, password))
                 return false;
 
             heartbeatTimer = new System.Threading.Timer((state) =>
@@ -137,6 +154,17 @@ namespace BankService
             }, null, 0, HeartbeatInterval * 1000);
 
             Logged = true;
+            return true;
+        }
+
+        protected bool PerformLogin(string login, string password)
+        {
+            if (!LoginRequest(login, password))
+                return false;
+
+            if (!PostLoginRequest())
+                return false;
+
             return true;
         }
 
@@ -189,32 +217,34 @@ namespace BankService
         {
         }
 
-        public bool PerformFastTransfer(string login, string password, string transferId, /*Browser browser,*/ string cookie)
+        public bool PerformFastTransfer(string login, string password, string transferId, string cookie)
         {
             if (FastTransferMandatoryTransferId)
             {
                 if (transferId == null)
-                    return false;
+                    return CheckFailed("Wymagany numer przelewu");
                 transferId = CleanFastTransferUrl(transferId);
                 if (transferId == null)
                 {
                     return CheckFailed("Niepoprawny numer");
                 }
             }
+            if (FastTransferMandatoryCookie && cookie == null)
+                return CheckFailed("Wymagana wartość ciasteczka");
 
             if (String.IsNullOrEmpty(login) || String.IsNullOrEmpty(password))
             {
                 return CheckFailed("Niepoprawny login i hasło");
             }
 
-            InitClient();
+            InitClient(true);
 
             OnLogging?.Invoke();
 
-            if (!LoginRequestForFastTransfer(login, password, transferId, /*browser,*/ cookie))
+            if (!LoginRequestForFastTransfer(login, password, transferId, cookie))
                 return false;
 
-            string redirectAddress = MakeFastTransfer(transferId, /*browser,*/ cookie);
+            string redirectAddress = MakeFastTransfer(transferId, cookie);
             if (redirectAddress == null)
                 return false;
 
@@ -271,7 +301,7 @@ namespace BankService
             if (items == null)
                 return false;
 
-            HistoryItem operation = items.Where(o => o.IsTransfer && AccountNumberTools.CompareAccountNumbers(o.ToAccountNumber, accountNumber) && (title == null || o.Title == title)).FirstOrDefault();
+            HistoryItem operation = items.Where(o => o.IsTransfer && AccountNumberTools.CompareAccountNumbers(o.ToAccountNumber, accountNumber) && (title == null || o.CompareTitle(title))).FirstOrDefault();
             if (operation != null)
             {
                 return CheckFailed($"Wykonano wcześniej ({operation.OrderDate.ToString("dd.MM.yyyy", CultureInfo.CreateSpecificCulture("es-ES"))})");

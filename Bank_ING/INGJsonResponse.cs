@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.Serialization;
 using Tools;
+using static Tools.SerializableStringDictionary;
 
 namespace BankService.Bank_ING
 {
@@ -52,7 +54,7 @@ namespace BankService.Bank_ING
         }
 
         [DataContract]
-        public class INGJsonResponseLoginPasswordData
+        public class INGJsonResponseLoginPasswordData: INGJsonResponsePaymentConfirmableData
         {
             [DataMember]
             public string token { get; set; }
@@ -175,6 +177,12 @@ namespace BankService.Bank_ING
             public string visible { get; set; }
             [DataMember]
             public INGJsonResponseLoginPasswordDataDataMenuEntry[] entries { get; set; }
+
+            public INGJsonResponseNoYes? VisibleValue
+            {
+                get { return visible.GetEnumByJsonValue<INGJsonResponseNoYes>(); }
+                set { visible = value.GetEnumJsonValue<INGJsonResponseNoYes>(); }
+            }
         }
 
         [DataContract]
@@ -347,6 +355,74 @@ namespace BankService.Bank_ING
         }
 
         [DataContract]
+        public class INGJsonResponseAccountsPBL : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponseAccountsPBLData data { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAccountsPBLData
+        {
+            [DataMember]
+            public List<INGJsonResponseAccountsPBLDataAccount> cur { get; set; }
+            [DataMember]
+            public List<INGJsonResponseAccountsPBLDataAccount> sav { get; set; }
+            [DataMember]
+            public List<INGJsonResponseAccountsPBLDataAccount> loan { get; set; }
+            [DataMember]
+            public List<INGJsonResponseAccountsPBLDataAccount> vat { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAccountsPBLDataAccount
+    {
+            [DataMember]
+            public string acct { get; set; }
+            [DataMember]
+            public string type { get; set; }
+            [DataMember]
+            public string name { get; set; }
+            [DataMember]
+            public double avbal { get; set; }
+            [DataMember]
+            public string curr { get; set; }
+            [DataMember]
+            public string opndate { get; set; }
+            [DataMember]
+            public bool def { get; set; }
+            [DataMember]
+            public int priority { get; set; }
+            [DataMember]
+            public string atrs { get; set; }
+            [DataMember]
+            public string ctx { get; set; }
+            [DataMember]
+            public INGJsonResponseAccountsPBLDataAccountGInfo ginfo { get; set; }
+
+            public INGJsonResponseAccountsDataAcctAcct CreateAccountsDataAcctAcct()
+            {
+                INGJsonResponseAccountsDataAcctAcct result = new INGJsonResponseAccountsDataAcctAcct();
+                result.acct = acct;
+                result.atrs = atrs;
+                result.avbal = avbal;
+                result.curr = curr;
+                result.name= name;
+                result.type = type;
+                return result;
+            }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAccountsPBLDataAccountGInfo
+        {
+            [DataMember]
+            public string allowed { get; set; }
+            [DataMember]
+            public string exists { get; set; }
+        }
+
+        [DataContract]
         public class INGJsonResponseAccountsDataAcct
         {
             [DataMember]
@@ -374,13 +450,13 @@ namespace BankService.Bank_ING
         public class INGJsonResponseAccountsDataAcctCur
         {
             [DataMember]
-            public INGJsonResponseAccountsDataAcctCurAcct[] accts { get; set; }
+            public INGJsonResponseAccountsDataAcctAcct[] accts { get; set; }
             [DataMember]
             public INGJsonResponseAccountsDataTotal[] total { get; set; }
         }
 
         [DataContract]
-        public class INGJsonResponseAccountsDataAcctCurAcct
+        public class INGJsonResponseAccountsDataAcctAcct
         {
             [DataMember]
             public string type { get; set; }
@@ -398,13 +474,19 @@ namespace BankService.Bank_ING
             public string atrs { get; set; }
             [DataMember]
             public string visible { get; set; }
+
+            public INGJsonResponseNoYes? VisibleValue
+            {
+                get { return visible.GetEnumByJsonValue<INGJsonResponseNoYes>(); }
+                set { visible = value.GetEnumJsonValue<INGJsonResponseNoYes>(); }
+            }
         }
 
         [DataContract]
         public class INGJsonResponseAccountsDataAcctSav
         {
             [DataMember]
-            public string[] accts { get; set; }
+            public INGJsonResponseAccountsDataAcctAcct[] accts { get; set; }
         }
 
         [DataContract]
@@ -445,7 +527,20 @@ namespace BankService.Bank_ING
         public class INGJsonResponseAccountsDataInsurances
         {
             [DataMember]
-            public string[] insurances { get; set; }
+            public INGJsonResponseAccountsDataInsurancesInsurance[] insurances { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAccountsDataInsurancesInsurance
+        {
+            [DataMember]
+            public long number { get; set; }
+            [DataMember]
+            public string name { get; set; }
+            [DataMember]
+            public string prdName { get; set; }
+            [DataMember]
+            public bool emuInsurance { get; set; }
         }
 
         [DataContract]
@@ -478,12 +573,23 @@ namespace BankService.Bank_ING
             public string docId { get; set; }
             [DataMember]
             public string mode { get; set; }
+            [DataMember(Name = "ref")]
+            public string refValue { get; set; }
+            [DataMember]
+            public string authorizationReference { get; set; }
 
             public INGJsonResponseOrderMode? ModeValue
             {
                 get { return mode.GetEnumByJsonValue<INGJsonResponseOrderMode>(); }
                 set { mode = value.GetEnumJsonValue<INGJsonResponseOrderMode>(); }
             }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthGetData : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponseAuthConfirmData data { get; set; }
         }
 
         [DataContract]
@@ -500,6 +606,96 @@ namespace BankService.Bank_ING
             public string trnsts { get; set; }
             [DataMember]
             public string trnmsg { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferAuthConfirm : INGJsonResponseBase
+        {
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthConfirm : INGJsonResponseAuthGetData
+        {
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthConfirmData
+        {
+            [DataMember(Name = "ref")]
+            public string refValue { get; set; }
+            [DataMember]
+            public bool finished { get; set; }
+            [DataMember]
+            public string confirmURN { get; set; }
+            [DataMember]
+            public string factor { get; set; }
+            [DataMember]
+            public INGJsonResponseAuthConfirmDataChallenge challenge { get; set; }
+            [DataMember]
+            public List<string> alternativeFactors { get; set; }
+            [DataMember]
+            public string token { get; set; }
+            [DataMember]
+            public string pdfSignRefs { get; set; }
+            [DataMember]
+            public int expirySeconds { get; set; }
+            [DataMember]
+            public string title { get; set; }
+            [DataMember]
+            public int messageId { get; set; }
+            [DataMember]
+            public string message { get; set; }
+
+            public INGJsonResponseAuthFactor? FactorValue
+            {
+                get { return factor.GetEnumByJsonValue<INGJsonResponseAuthFactor>(); }
+                set { factor = value.GetEnumJsonValue<INGJsonResponseAuthFactor>(); }
+            }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthConfirmDataChallenge
+        {
+            [DataMember]
+            public string salt { get; set; }
+            [DataMember]
+            public string key { get; set; }
+            [DataMember]
+            public string mask { get; set; }
+            [DataMember]
+            public string pdfPrint { get; set; }
+            [DataMember]
+            public string pdfSign { get; set; }
+            [DataMember]
+            public string questions { get; set; }
+            [DataMember]
+            public bool acceptNewBrowsers { get; set; }
+            [DataMember]
+            public string tripwires { get; set; }
+            [DataMember]
+            public string webAuthToken { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthAutoConfirmConfirm : INGJsonResponseAuthGetData
+        {
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthSMSConfirm : INGJsonResponseAuthGetData
+        {
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthAddBrowserConfirm : INGJsonResponseAuthGetData
+        {
+        }
+
+        [DataContract]
+        public class INGJsonResponseAuthFinished : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponseLoginPasswordData data { get; set; }
         }
 
         [DataContract]
@@ -535,6 +731,151 @@ namespace BankService.Bank_ING
             public string shopacct { get; set; }
             [DataMember]
             public string shoployal { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdata : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponseFastTransferPolapiauthdataData data { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPBL : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponseFastTransferPBLData data{ get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPBLData
+        {
+            [DataMember]
+            public string shopid { get; set; }
+            [DataMember]
+            public string trnref { get; set; }
+            [DataMember]
+            public double amount { get; set; }
+            [DataMember]
+            public string trntm { get; set; }
+            [DataMember]
+            public string title { get; set; }
+            [DataMember]
+            public string merchant { get; set; }
+            [DataMember]
+            public string shopname { get; set; }
+            [DataMember]
+            public string shopacct { get; set; }
+            [DataMember]
+            public string shoployal { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdataData
+        {
+            [DataMember]
+            public string tppName { get; set; }
+            [DataMember]
+            public string authType { get; set; }
+            [DataMember]
+            public string scopeTimeLimit { get; set; }
+            [DataMember]
+            public INGJsonResponseFastTransferPolapiauthdataDataTransfer transfer { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferDataConfirm : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponseFastTransferConfirmableData data { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferConfirmableData
+        {
+            [DataMember]
+            public string docId { get; set; }
+            [DataMember]
+            public string mode { get; set; }
+
+            public INGJsonResponseOrderMode? ModeValue
+            {
+                get { return mode.GetEnumByJsonValue<INGJsonResponseOrderMode>(); }
+                set { mode = value.GetEnumJsonValue<INGJsonResponseOrderMode>(); }
+            }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdataDataTransfer
+        {
+            [DataMember]
+            public INGJsonResponseFastTransferPolapiauthdataDataTransferRecipient recipient { get; set; }
+            [DataMember]
+            public INGJsonResponseFastTransferPolapiauthdataDataTransferDetail detail { get; set; }
+            [DataMember]
+            public INGJsonResponseFastTransferPolapiauthdataDataTransferMoreDetail moredetail { get; set; }
+            [DataMember]
+            public List<INGJsonResponseFastTransferPolapiauthdataDataTransferAccount> accounts { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdataDataTransferRecipient
+        {
+            [DataMember]
+            public string accountNumber { get; set; }
+            [DataMember]
+            public string creditAccountBankInfo { get; set; }
+            [DataMember]
+            public string nameAddress1 { get; set; }
+            [DataMember]
+            public string nameAddress2 { get; set; }
+            [DataMember]
+            public string nameAddress3 { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdataDataTransferDetail
+        {
+            [DataMember]
+            public double amount { get; set; }
+            [DataMember]
+            public string currency { get; set; }
+            [DataMember]
+            public string description1 { get; set; }
+            [DataMember]
+            public string description2 { get; set; }
+            [DataMember]
+            public string executionDate { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdataDataTransferMoreDetail
+        {
+            [DataMember]
+            public string deliveryMode { get; set; }
+            [DataMember]
+            public string system { get; set; }
+            [DataMember]
+            public string executionMode { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponseFastTransferPolapiauthdataDataTransferAccount
+        {
+            [DataMember]
+            public string authType { get; set; }
+            [DataMember]
+            public string name { get; set; }
+            [DataMember]
+            public string accountNumber { get; set; }
+            [DataMember]
+            public string type { get; set; }
+            [DataMember]
+            public double availableBal { get; set; }
+            [DataMember]
+            public string currency { get; set; }
+            [DataMember]
+            public string context { get; set; }
         }
 
         [DataContract]
@@ -752,6 +1093,13 @@ namespace BankService.Bank_ING
 
         [DataContract]
         public class INGJsonResponsePaymentCheckAccount : INGJsonResponseBase
+        {
+            [DataMember]
+            public INGJsonResponsePaymentCheckAccountData data { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonResponsePaymentCheckAccountData : INGJsonResponseBase
         {
             [DataMember]
             public string name { get; set; }

@@ -8,9 +8,27 @@ namespace BankService.Bank_ING
         [JsonValueInt(1)]
         [Description("Przelew - obciążenie")]
         TransferCharge,
+        [JsonValueInt(4)]
+        [Description("Przelew - uznanie")]
+        TransferCredit,
         [JsonValueInt(5)]
         [Description("Uznanie Elixir")]
         CreditElixir,
+        [JsonValueInt(20)]
+        [Description("BLIK TR ZAKUPU INTERNETOWA")]
+        BlikInternet,
+        [JsonValueInt(24)]
+        [Description("Zwrot płatności kartą")]
+        CardReturn,
+        [JsonValueInt(51)]
+        [Description("Zdjęcie Blokady")]
+        BlockRelease,
+        [JsonValueInt(110)]
+        [Description("Przelew własny")]
+        OwnTransfer,
+        [JsonValueInt(112)]
+        [Description("Przelew własny +")]
+        OwnTransferPlus,
         [JsonValueInt(117)]
         [Description("Przelew Internet")]
         TransferInternet,
@@ -22,6 +40,12 @@ namespace BankService.Bank_ING
         PayUPayment,
         [JsonValueInt(180)]
         [Description("Prowizje i opłaty")]
-        CommissionsAndFees
+        CommissionsAndFees,
+        [JsonValueInt(200)]
+        [Description("Blokada kartowa")]
+        Block,
+        [JsonValueInt(222)]
+        [Description("Płatość kartą")]
+        CardPayment
     }
 }

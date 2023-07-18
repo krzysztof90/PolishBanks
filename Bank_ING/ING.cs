@@ -7,10 +7,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
+using static BankService.Bank_GetinBank.GetinBankJsonResponse;
 using static BankService.Bank_ING.INGJsonRequest;
 using static BankService.Bank_ING.INGJsonResponse;
+using static Tools.HttpOperations;
 
 namespace BankService.Bank_ING
 {
@@ -18,6 +21,7 @@ namespace BankService.Bank_ING
     public class ING : BankBase<INGHistoryItem, INGHistoryFilter>
     {
         private const string hexTable = "0123456789abcdef";
+        private const int maxRowLength = 35;
 
         private INGJsonResponseAccounts accountsDetails;
         private INGJsonResponseAccounts AccountsDetails
@@ -33,7 +37,7 @@ namespace BankService.Bank_ING
         private string Token;
         private string LogoutUrl;
 
-        public override bool FastTransferMandatoryTransferId => false;
+        public override bool FastTransferMandatoryTransferId => true;
         public override bool FastTransferMandatoryBrowserCookies => false;
         public override bool FastTransferMandatoryCookie => true;
         public override bool TransferMandatoryTitle => true;
@@ -43,30 +47,47 @@ namespace BankService.Bank_ING
 
         protected override bool LoginRequest(string login, string password)
         {
+            return LoginRequest(login, password, null);
+        }
+
+        private bool LoginRequest(string login, string password, string transferId)
+        {
+            (FastTransferType? type, string paData, string pblData) fastTransferData = GetDataFromFastTransfer(transferId);
+
             Token = null;
 
-            (INGJsonResponseLogin jsonResponseLogin, bool requestProcessed) loginReqest = PerformRequest<INGJsonResponseLogin>(
+            (INGJsonResponseLogin response, bool requestProcessed) loginResponse = PerformRequest<INGJsonResponseLogin>(
                 "renchecklogin", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestLogin.Create(login)),
                 "Niepoprawny login",
                 true, null, null);
-            if (!loginReqest.requestProcessed)
+            if (!loginResponse.requestProcessed)
                 return false;
 
-            string pwdHash = CreatePwdHash(loginReqest.jsonResponseLogin.data.salt, loginReqest.jsonResponseLogin.data.mask, loginReqest.jsonResponseLogin.data.key, password);
+            string pwdHash = CreatePwdHash(loginResponse.response.data.salt, loginResponse.response.data.mask, loginResponse.response.data.key, password);
             if (pwdHash == null)
                 return false;
 
-            (INGJsonResponseLoginPassword jsonResponseLoginPassword, bool requestProcessed) passwordReqest = PerformRequest<INGJsonResponseLoginPassword>(
+            (INGJsonResponseLoginPassword response, bool requestProcessed) passwordResponse = PerformRequest<INGJsonResponseLoginPassword>(
                 "renlogin", HttpMethod.Post,
-                JsonConvert.SerializeObject(INGJsonRequestLoginPassword.Create(pwdHash, login)),
+                JsonConvert.SerializeObject(INGJsonRequestLoginPassword.Create(pwdHash, login, fastTransferData.type == FastTransferType.PA ? fastTransferData.paData : null)),
                 null, true, null, null);
-            if (!passwordReqest.requestProcessed)
+            if (!passwordResponse.requestProcessed)
                 return false;
 
-            Token = passwordReqest.jsonResponseLoginPassword.data.token;
+            bool success = true;
 
-            return true;
+            if (String.IsNullOrEmpty(passwordResponse.response.data.token))
+            {
+                RemoveSavedCookie(("TBN4VFFiLdynGrcM3aq", "/mojeing", "login.ingbank.pl"));
+                success = Confirm(passwordResponse.response.data, null);
+            }
+            else
+            {
+                Token = passwordResponse.response.data.token;
+            }
+
+            return success;
         }
 
         private string CreatePwdHash(string salt, string mask, string key, string password)
@@ -79,7 +100,7 @@ namespace BankService.Bank_ING
 
         private string MixSaltAndMaskData(string salt, string mask, string password)
         {
-            if (mask.LastIndexOf('*') > password.Length + 1)
+            if (mask.LastIndexOf('*') > password.Length - 1)
             {
                 CheckFailed("Niepoprawne hasło");
                 return null;
@@ -89,6 +110,51 @@ namespace BankService.Bank_ING
                 if (mask[i] == '*')
                     result[i] = password[i];
             return result.ToString();
+        }
+
+        private string[] SplitDescription(params string[] descriptions)
+        {
+            int maxNumberOfRows = 4;
+            List<string> lines = new List<string>();
+            foreach (string description in descriptions)
+            {
+                FillLinesFromDescription(description, lines);
+            }
+
+            if (lines.Count > maxNumberOfRows)
+            {
+                string description = String.Join(" ", descriptions);
+                lines = new List<string>();
+                FillLinesFromDescription(description, lines);
+            }
+
+            string[] result = new string[maxNumberOfRows];
+            for (int i = 0; i < maxNumberOfRows; i++)
+            {
+                if (i < lines.Count)
+                    result[i] = lines[i];
+                else
+                    result[i] = String.Empty;
+            }
+
+            return result;
+        }
+
+        private void FillLinesFromDescription(string description, List<string> lines)
+        {
+            string[] words = description.Split(' ');
+            List<string> lineWords = new List<string>();
+            foreach (string word in words)
+            {
+                if (lineWords.Sum(w => w.Length) + lineWords.Count + word.Length > maxRowLength)
+                {
+                    lines.Add(String.Join(" ", lineWords));
+                    lineWords = new List<string>();
+                }
+                lineWords.Add(word);
+            }
+            if (lineWords.Count != 0)
+                lines.Add(String.Join(" ", lineWords));
         }
 
         protected override bool PostLoginRequest()
@@ -103,16 +169,23 @@ namespace BankService.Bank_ING
             return result;
         }
 
+        protected bool PostPBLLoginRequest()
+        {
+            AccountsDetails = GetAccountsDetails(true);
+
+            return true;
+        }
+
         protected override bool LogoutRequest()
         {
-            (INGJsonResponseLogout jsonResponseLogout, bool requestProcessed) logoutReqest = PerformRequest<INGJsonResponseLogout>(
+            (INGJsonResponseLogout response, bool requestProcessed) logoutResponse = PerformRequest<INGJsonResponseLogout>(
                 "renlogout", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestLogout.Create()),
                 null, true, null, null);
-            if (!logoutReqest.requestProcessed)
+            if (!logoutResponse.requestProcessed)
                 return false;
 
-            LogoutUrl = logoutReqest.jsonResponseLogout.data.url;
+            LogoutUrl = logoutResponse.response.data.url;
             return true;
         }
 
@@ -126,50 +199,68 @@ namespace BankService.Bank_ING
 
         protected override bool TryExtendSession()
         {
-            (INGJsonResponsePing jsonResponsePing, bool requestProcessed) extendReqest = PerformRequest<INGJsonResponsePing>(
+            (INGJsonResponsePing response, bool requestProcessed) extendResponse = PerformRequest<INGJsonResponsePing>(
                 "renping", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestPing.Create(Token)),
                 null, true, null, null);
 
-            return extendReqest.requestProcessed;
+            return extendResponse.requestProcessed;
         }
 
-        private INGJsonResponseAccounts GetAccountsDetails()
+        private INGJsonResponseAccounts GetAccountsDetails(bool pbl = false)
         {
-            (INGJsonResponseAccounts jsonResponseLogoutAccounts, bool requestProcessed) accountsReqest = PerformRequest<INGJsonResponseAccounts>(
-                "rengetallingprds", HttpMethod.Post,
-                JsonConvert.SerializeObject(INGJsonRequestAccounts.Create(Token)),
-                null, true, null, null);
-            if (!accountsReqest.requestProcessed)
-                throw new NotImplementedException();
+            if (!pbl)
+            {
+                (INGJsonResponseAccounts response, bool requestProcessed) accountsResponse = PerformRequest<INGJsonResponseAccounts>(
+                    "rengetallingprds", HttpMethod.Post,
+                    JsonConvert.SerializeObject(INGJsonRequestAccounts.Create(Token)),
+                    null, true, null, null);
+                if (!accountsResponse.requestProcessed)
+                    throw new NotImplementedException();
 
-            return accountsReqest.jsonResponseLogoutAccounts;
+                return accountsResponse.response;
+            }
+            else
+            {
+                (INGJsonResponseAccountsPBL response, bool requestProcessed) accountsResponse = PerformRequest<INGJsonResponseAccountsPBL>(
+                    "rengetallaccounts", HttpMethod.Post,
+                    JsonConvert.SerializeObject(INGJsonRequestAccounts.Create(Token)),
+                    null, true, null, null);
+                if (!accountsResponse.requestProcessed)
+                    throw new NotImplementedException();
+
+                //TODO inaczej
+                return new INGJsonResponseAccounts() { data = new INGJsonResponseAccountsData() { accts = new INGJsonResponseAccountsDataAcct() { cur = new INGJsonResponseAccountsDataAcctCur() { accts = accountsResponse.response.data.cur.Select(c => c.CreateAccountsDataAcctAcct()).ToArray() }, sav = new INGJsonResponseAccountsDataAcctSav() { accts = accountsResponse.response.data.sav.Select(c => c.CreateAccountsDataAcctAcct()).ToArray() } } } };
+            }
         }
 
-        //TODO kilka rachunków, do wyboru, Suma wszystkich
+        //TODO kilka rachunków, do wyboru, Suma wszystkich. To samo w VeloBank
         public override (string accountNumber, double availableFunds) GetAccountData()
         {
-            return (AccountsDetails.data.accts.cur.accts.Single().acct, AccountsDetails.data.accts.cur.accts.Single().plnbal);
+            INGJsonResponseAccountsDataAcctAcct account = AccountsDetails.data.accts.cur.accts.First();
+            return (account.acct, account.plnbal);
         }
 
         public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
-            (INGJsonResponsePaymentCheckAccount jsonResponseCheckAccount, bool requestProcessed) transferReqest = PerformRequest<INGJsonResponsePaymentCheckAccount>(
+            (INGJsonResponsePaymentCheckAccount response, bool requestProcessed) transferResponse = PerformRequest<INGJsonResponsePaymentCheckAccount>(
                 "rengetacttkirinfo", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestCheckAccount.Create(Token, accountNumber.SimplifyAccountNumber())),
                 null, true, null, null);
-            if (!transferReqest.requestProcessed)
+            if (!transferResponse.requestProcessed)
                 return false;
 
-            //TODO długość pól
-            (INGJsonResponsePaymentConfirmable jsonResponsePaymentOrder, bool requestProcessed) paymentOrderRequest = PerformRequest<INGJsonResponsePaymentConfirmable>(
+            string[] benefname = SplitDescription(recipient, address);
+            string[] details = SplitDescription(title);
+
+            (INGJsonResponsePaymentConfirmable response, bool requestProcessed) paymentOrderResponse = PerformRequest<INGJsonResponsePaymentConfirmable>(
                 "renpayord", HttpMethod.Post,
-                JsonConvert.SerializeObject(INGJsonRequestPaymentOrder.Create(Token, amount, recipient, address, "", "", accountNumber.SimplifyAccountNumber(), GetAccountData().accountNumber.SimplifyAccountNumber(), title, "", "", "", "S")),
+                JsonConvert.SerializeObject(INGJsonRequestPaymentOrder.Create(Token, amount, benefname[0], benefname[1], benefname[2], benefname[3], accountNumber.SimplifyAccountNumber(), GetAccountData().accountNumber.SimplifyAccountNumber(), details[0], details[1], details[2], details[3], "S")),
                 null, true, null, null);
-            if (!paymentOrderRequest.requestProcessed)
+            if (!paymentOrderResponse.requestProcessed)
                 return false;
 
-            return Confirm(paymentOrderRequest.jsonResponsePaymentOrder.data);
+            return Confirm(paymentOrderResponse.response.data, amount);
         }
 
         protected override void PostTransfer()
@@ -180,35 +271,69 @@ namespace BankService.Bank_ING
 
         protected override string CleanFastTransferUrl(string transferId)
         {
-            return transferId;
+            string newTransferId = transferId
+                .Replace("https://login.ingbank.pl/mojeing/app/?#select/", String.Empty)
+
+                .Replace("https://login.ingbank.pl/mojeing/paybylink/#login/ctxid=", String.Empty);
+
+            (FastTransferType? type, string paData, string pblData) fastTransferData = GetDataFromFastTransfer(newTransferId);
+
+            if (fastTransferData.type == null)
+                return null;
+
+            return newTransferId;
         }
 
-        protected override bool LoginRequestForFastTransfer(string login, string password, string transferId, /*Browser browser,*/ string cookie)
+        protected override bool LoginRequestForFastTransfer(string login, string password, string transferId, string cookie)
         {
+            (FastTransferType? type, string paData, string pblData) fastTransferData = GetDataFromFastTransfer(transferId);
+
             Cookies.Add(new Cookie("JSESSIONID", cookie, "/mojeing", "login.ingbank.pl"));
-
-            return LoginRequest(login, password) && PostLoginRequest();
+            return LoginRequest(login, password, transferId) && (fastTransferData.type == FastTransferType.PA ? PostLoginRequest() : PostPBLLoginRequest());
         }
 
-        protected override string MakeFastTransfer(string transferId, /*Browser browser,*/ string cookie)
+        protected override string MakeFastTransfer(string transferId, string cookie)
         {
-            //TODO potwierdzanie danych przelewu
-            (INGJsonResponseFastTransfer jsonResponseFastTransfer, bool requestProcessed) fastTransferRequest = PerformRequest<INGJsonResponseFastTransfer>(
-                "rengetdirtrndata", HttpMethod.Post,
-                JsonConvert.SerializeObject(INGJsonRequestFastTransfer.Create(Token)),
-                null, true, null, null);
-            if (!fastTransferRequest.requestProcessed)
-                return null;
+            (FastTransferType? type, string paData, string pblData) fastTransferData = GetDataFromFastTransfer(transferId);
 
-            (INGJsonResponsePaymentConfirmable jsonResponsePaymentDirt, bool requestProcessed) paymentDirtRequest = PerformRequest<INGJsonResponsePaymentConfirmable>(
-                "renpaydirtrn", HttpMethod.Post,
-                JsonConvert.SerializeObject(INGJsonRequestPaymentDirt.Create(Token, GetAccountData().accountNumber.SimplifyAccountNumber())),
-                null, true, null, null);
-            if (!paymentDirtRequest.requestProcessed)
-                return null;
+            if (fastTransferData.type == FastTransferType.PA)
+            {
+                (INGJsonResponseFastTransferPolapiauthdata response, bool requestProcessed) fastTransferPolapiauthdataResponse = PerformRequest<INGJsonResponseFastTransferPolapiauthdata>(
+                    "rengetpolapiauthdata", HttpMethod.Post,
+                    JsonConvert.SerializeObject(INGJsonRequestFastTransfer.Create(Token)),
+                    null, true, null, null);
 
-            if (!Confirm(paymentDirtRequest.jsonResponsePaymentDirt.data))
-                return null;
+                if (!fastTransferPolapiauthdataResponse.requestProcessed)
+                    return null;
+
+                (INGJsonResponseFastTransferDataConfirm response, bool requestProcessed) fastTransferPolapiauthdataConfirmResponse = PerformRequest<INGJsonResponseFastTransferDataConfirm>(
+                    "renpolapiauthconfirm", HttpMethod.Post,
+                    JsonConvert.SerializeObject(INGJsonRequestFastTransferConfirm.Create(Token, GetAccountData().accountNumber.SimplifyAccountNumber())),
+                    null, true, null, null);
+
+                if (!ConfirmFastTransfer(fastTransferPolapiauthdataConfirmResponse.response.data, fastTransferPolapiauthdataResponse.response.data.transfer.detail.amount))
+                    return null;
+            }
+            else if (fastTransferData.type == FastTransferType.PayByLink)
+            {
+                (INGJsonResponseFastTransferPBL response, bool requestProcessed) fastTransferPBLResponse = PerformRequest<INGJsonResponseFastTransferPBL>(
+                    "rengetdirtrndata", HttpMethod.Post,
+                    JsonConvert.SerializeObject(INGJsonRequestFastTransferPBL.Create(Token, fastTransferData.pblData)),
+                    null, true, null, null);
+
+                if (!fastTransferPBLResponse.requestProcessed)
+                    return null;
+
+                (INGJsonResponseFastTransferDataConfirm response, bool requestProcessed) fastTransferPBLDataConfirmResponse = PerformRequest<INGJsonResponseFastTransferDataConfirm>(
+                    "renpaydirtrn", HttpMethod.Post,
+                    JsonConvert.SerializeObject(INGJsonRequestFastTransferPBLDataConfirm.Create(Token, fastTransferData.pblData, GetAccountData().accountNumber)),
+                    null, true, null, null);
+
+                if (!ConfirmFastTransfer(fastTransferPBLDataConfirmResponse.response.data, fastTransferPBLResponse.response.data.amount))
+                    return null;
+            }
+            else
+                throw new NotImplementedException();
 
             Logout();
             return LogoutUrl;
@@ -222,21 +347,19 @@ namespace BankService.Bank_ING
 
         protected override bool MakePrepaidTransfer(string recipient, string phoneNumber, double amount)
         {
-            //TODO niepoprawny numer telefonu
-
             if (amount != Math.Truncate(amount))
             {
                 return CheckFailed("Kwota nie może zawierać miejsc po przecinku");
             }
 
-            (INGJsonResponseGsmOperators jsonResponseGsmOperators, bool requestProcessed) gsmOperatorsRequest = PerformRequest<INGJsonResponseGsmOperators>(
+            (INGJsonResponseGsmOperators response, bool requestProcessed) gsmOperatorsResponse = PerformRequest<INGJsonResponseGsmOperators>(
                 "rengetgsmppopr", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestGsmOperators.Create(Token)),
                 null, true, null, null);
-            if (!gsmOperatorsRequest.requestProcessed)
+            if (!gsmOperatorsResponse.requestProcessed)
                 return false;
 
-            (string name, INGJsonResponseGsmOperatorsDataOperator data) operatorItem = PromptComboBox<INGJsonResponseGsmOperatorsDataOperator>("Operator", gsmOperatorsRequest.jsonResponseGsmOperators.data.opers.Where(o => o.VisibleValue == INGJsonResponseNoYes.Yes).Select(o => new PrepaidOperatorComboBoxItem<INGJsonResponseGsmOperatorsDataOperator>(o.name, o)));
+            (string name, INGJsonResponseGsmOperatorsDataOperator data) operatorItem = PromptComboBox<INGJsonResponseGsmOperatorsDataOperator>("Operator", gsmOperatorsResponse.response.data.opers.Where(o => o.VisibleValue == INGJsonResponseNoYes.Yes).Select(o => new PrepaidOperatorComboBoxItem<INGJsonResponseGsmOperatorsDataOperator>(o.name, o)));
             if (operatorItem.data == null)
                 return false;
 
@@ -244,28 +367,25 @@ namespace BankService.Bank_ING
             {
                 case INGJsonResponseRange.Borders:
                     if (amount < operatorItem.data.minAmount || amount > operatorItem.data.maxAmount)
-                    {
                         return CheckFailed($"Kwota powinna znajdować się w zakresie {operatorItem.data.minAmount}-{operatorItem.data.maxAmount}");
-                    }
                     break;
                 case INGJsonResponseRange.Enumerator:
                     if (!operatorItem.data.amounts.Contains(amount))
-                    {
                         return CheckFailed($"Kwota powinna być jedną z {String.Join(", ", operatorItem.data.amounts)}");
-                    }
                     break;
                 default:
                     throw new NotImplementedException();
             }
 
-            (INGJsonResponsePaymentConfirmable jsonResponseGsmPreload, bool requestProcessed) gsmPreloadRequest = PerformRequest<INGJsonResponsePaymentConfirmable>(
+            //TODO niepoprawny numer telefonu
+            (INGJsonResponsePaymentConfirmable response, bool requestProcessed) gsmPreloadResponse = PerformRequest<INGJsonResponsePaymentConfirmable>(
                 "rengsmppreload", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestGsmPreload.Create(Token, (int)amount, operatorItem.data.id, "+48" + phoneNumber, GetAccountData().accountNumber.SimplifyAccountNumber())),
                 null, true, null, null);
-            if (!gsmPreloadRequest.requestProcessed)
+            if (!gsmPreloadResponse.requestProcessed)
                 return false;
 
-            return Confirm(gsmPreloadRequest.jsonResponseGsmPreload.data);
+            return Confirm(gsmPreloadResponse.response.data, amount);
         }
 
         protected override INGHistoryFilter CreateFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact)
@@ -288,7 +408,7 @@ namespace BankService.Bank_ING
                 INGJsonResponseSign? sign = null;
                 if (filter.Direction != null)
                     sign = filter.Direction == OperationDirection.Execute ? INGJsonResponseSign.Debit : INGJsonResponseSign.Credit;
-                (INGJsonResponseHistory jsonResponseHistory, bool requestProcessed) historyRequest = PerformRequest<INGJsonResponseHistory>(
+                (INGJsonResponseHistory response, bool requestProcessed) historyResponse = PerformRequest<INGJsonResponseHistory>(
                     "rengetfury", HttpMethod.Post,
                     JsonConvert.SerializeObject(INGJsonRequestHistory.Create(Token,
                         filter.DateFrom,
@@ -313,32 +433,32 @@ namespace BankService.Bank_ING
                         filter.ShowBlocksAndBlockReleases
                     )),
                     null, true, null, null);
-                if (!historyRequest.requestProcessed)
+                if (!historyResponse.requestProcessed)
                     return null;
 
-                pageCounter = (int)(Math.Ceiling(historyRequest.jsonResponseHistory.data.numtrns / (double)maxTransactionsPerPageCount));
+                pageCounter = (int)(Math.Ceiling(historyResponse.response.data.numtrns / (double)maxTransactionsPerPageCount));
 
                 //TODO szczegóły transakcji rengetfurydet
-                result.AddRange(historyRequest.jsonResponseHistory.data.trns.Select(t => new INGHistoryItem(t.m)));
+                result.AddRange(historyResponse.response.data.trns.Select(t => new INGHistoryItem(t.m)));
             }
             return result;
         }
 
         public override void GetDetailsFile(HistoryItem item, FileStream file)
         {
-            (INGJsonResponseTransactionPDF jsonResponseTransactionPDF, bool requestProcessed) transactionPDFRequest = PerformRequest<INGJsonResponseTransactionPDF>(
+            (INGJsonResponseTransactionPDF response, bool requestProcessed) transactionPDFResponse = PerformRequest<INGJsonResponseTransactionPDF>(
                 "renprepaccttranspdf", HttpMethod.Post,
                 JsonConvert.SerializeObject(INGJsonRequestTransactionPDF.Create(Token, item.Id)),
                 null, true, null, null);
-            if (!transactionPDFRequest.requestProcessed)
+            if (!transactionPDFResponse.requestProcessed)
                 return;
 
             UriBuilder uriBuilder = new UriBuilder(new Uri(new Uri(BaseAddress), "rengetbin"));
             NameValueCollection query = HttpUtility.ParseQueryString(uriBuilder.Query);
-            query["ref"] = transactionPDFRequest.jsonResponseTransactionPDF.data.refValue;
+            query["ref"] = transactionPDFResponse.response.data.refValue;
             query["att"] = "true";
             uriBuilder.Query = query.ToString();
-            (INGJsonResponseBase jsonResponse, bool requestProcessed) binRequest = PerformRequest<INGJsonResponseBase>(
+            (INGJsonResponseBase response, bool requestProcessed) binResponse = PerformRequest<INGJsonResponseBase>(
                 uriBuilder.ToString(), HttpMethod.Get, null,
                 null,
                 false, null,
@@ -348,21 +468,54 @@ namespace BankService.Bank_ING
                 });
         }
 
-        private bool Confirm(INGJsonResponsePaymentConfirmableData orderData)
+        private bool Confirm(INGJsonResponsePaymentConfirmableData orderData, double? amount)
         {
-            switch (orderData.ModeValue)
+            (INGJsonResponseAuthGetData response, bool requestProcessed) authGetDataResponse = PerformRequest<INGJsonResponseAuthGetData>(
+                "renauthgetdata", HttpMethod.Post,
+                JsonConvert.SerializeObject(INGJsonRequestAuthGetData.Create(Token, orderData.refValue)),
+                null, true, null, null);
+            if (!authGetDataResponse.requestProcessed)
+                return false;
+            if (authGetDataResponse.response.data.messageId != 0)
             {
-                case INGJsonResponseOrderMode.Web:
+                Message(authGetDataResponse.response.data.message);
+                return false;
+            }
+
+            switch (authGetDataResponse.response.data.FactorValue)
+            {
+                case INGJsonResponseAuthFactor.None:
                     {
-                        (INGJsonResponseConfirm jsonResponseConfirm, bool requestProcessed) confirmRequest = PerformRequest<INGJsonResponseConfirm>(
-                            "renconfirm", HttpMethod.Post,
-                            JsonConvert.SerializeObject(INGJsonRequestConfirm.Create(Token, orderData.docId)),
+                        if (!PromptOKCancel($"Potwierdź wykonanie operacji na kwotę {amount}"))
+                            return false;
+
+                        (INGJsonResponseAuthConfirm response, bool requestProcessed) confirmResponse = PerformRequest<INGJsonResponseAuthConfirm>(
+                            "renauthconfirm", HttpMethod.Post,
+                            JsonConvert.SerializeObject(INGJsonRequestAuthConfirm.Create(Token, orderData.refValue)),
                             null, true, null, null);
 
-                        return confirmRequest.requestProcessed;
+                        if (!confirmResponse.requestProcessed)
+                            return false;
+
+                        return ConfirmAuthorizationFinish(orderData.refValue, confirmResponse.response.data.token, authGetDataResponse.response.data.confirmURN);
                     }
-                case INGJsonResponseOrderMode.Code:
+                case INGJsonResponseAuthFactor.AutoConfirm:
                     {
+                        (INGJsonResponseAuthAutoConfirmConfirm response, bool requestProcessed) confirmResponse = PerformRequest<INGJsonResponseAuthAutoConfirmConfirm>(
+                            "renauthconfirm", HttpMethod.Post,
+                            JsonConvert.SerializeObject(INGJsonRequestAuthAutoConfirmConfirm.Create(Token, orderData.refValue)),
+                            null, true, null, null);
+
+                        Cookie browserCookie = Cookies.GetCookie("login.ingbank.pl", "TBN4VFFiLdynGrcM3aq");
+                        if (browserCookie != null)
+                            SaveCookie(("TBN4VFFiLdynGrcM3aq", browserCookie.Value, "/mojeing", "login.ingbank.pl"));
+
+                        return ConfirmAuthorizationFinish(orderData.refValue, authGetDataResponse.response.data.token, authGetDataResponse.response.data.confirmURN);
+                    }
+                case INGJsonResponseAuthFactor.SMS:
+                    {
+                        (INGJsonResponseAuthSMSConfirm response, bool requestProcessed) confirmResponse = (null, false);
+
                         bool codeProceeded = false;
                         while (!codeProceeded)
                         {
@@ -370,49 +523,90 @@ namespace BankService.Bank_ING
                             if (SMSCode == null)
                                 return false;
 
-                            (INGJsonResponseConfirm jsonResponseConfirm, bool requestProcessed) confirmRequest = PerformRequest<INGJsonResponseConfirm>(
-                                "renconfirm", HttpMethod.Post,
-                                JsonConvert.SerializeObject(INGJsonRequestConfirmCode.Create(Token, SMSCode, orderData.docId)),
-                                null,
-                                true,
-                                (INGJsonResponseConfirm jsonResponseConfirm) => { return jsonResponseConfirm.StatusValue != INGJsonResponseStatus.OK && jsonResponseConfirm.code != "2204"; },
-                                null);
-                            if (!confirmRequest.requestProcessed)
+                            confirmResponse = PerformRequest<INGJsonResponseAuthSMSConfirm>(
+                                "renauthconfirm", HttpMethod.Post,
+                                JsonConvert.SerializeObject(INGJsonRequestAuthSMSConfirm.Create(Token, orderData.refValue, SMSCode)),
+                                null, true, null, null);
+
+                            if (!confirmResponse.requestProcessed)
                                 return false;
 
-                            if (confirmRequest.jsonResponseConfirm.StatusValue != INGJsonResponseStatus.OK)
-                                Message(confirmRequest.jsonResponseConfirm.msg);
+                            if (confirmResponse.response.data.messageId != 0)
+                                Message(confirmResponse.response.data.message);
                             else
                                 codeProceeded = true;
                         }
-                        return true;
+
+                        return ConfirmAuthorizationFinish(orderData.refValue, confirmResponse.response.data.token, authGetDataResponse.response.data.confirmURN);
                     }
-                case INGJsonResponseOrderMode.Mobile:
+                case INGJsonResponseAuthFactor.Mobile:
                     {
                         if (!PromptOKCancel("Potwierdź operację na urządzeniu mobilnym"))
                             return false;
 
-                        (INGJsonResponseConfirmMobile jsonResponseConfirmMobile, bool requestProcessed) confirmRequest = PerformRequest<INGJsonResponseConfirmMobile>(
-                            "renconfirm", HttpMethod.Post,
-                            JsonConvert.SerializeObject(INGJsonRequestConfirm.Create(Token, orderData.docId)),
+                        return Confirm(orderData, amount);
+                    }
+                case INGJsonResponseAuthFactor.AddBrowser:
+                    {
+                        string browserName = null;
+                        if (PromptYesNo("Dodać przeglądarkę do zaufanych?"))
+                        {
+                            if (!authGetDataResponse.response.data.challenge.acceptNewBrowsers)
+                            {
+                                Message("Przekroczono limit zaufanych przeglądarek");
+                            }
+                            else
+                            {
+                                browserName = "C# client";
+                            }
+                        }
+
+                        bool saveBrowserCookie = browserName != null;
+
+                        (INGJsonResponseAuthAddBrowserConfirm response, bool requestProcessed) confirmResponse = PerformRequest<INGJsonResponseAuthAddBrowserConfirm>(
+                            "renauthconfirm", HttpMethod.Post,
+                            JsonConvert.SerializeObject(INGJsonRequestAuthAddBrowserConfirm.Create(Token, orderData.refValue, browserName)),
                             null, true, null, null);
-                        if (!confirmRequest.requestProcessed)
-                            return false;
-
-                        if (confirmRequest.jsonResponseConfirmMobile.data == null)
-                            return true;
-
-                        return Confirm(confirmRequest.jsonResponseConfirmMobile.data);
+                        return Confirm(orderData, null);
                     }
                 default:
                     throw new NotImplementedException();
             }
         }
 
+        private bool ConfirmFastTransfer(INGJsonResponseFastTransferConfirmableData data, double? amount)
+        {
+            if (!PromptOKCancel($"Potwierdź wykonanie operacji na kwotę {amount}"))
+                return false;
+
+            (INGJsonResponseFastTransferAuthConfirm response, bool requestProcessed) confirmResponse = PerformRequest<INGJsonResponseFastTransferAuthConfirm>(
+                "renconfirm", HttpMethod.Post,
+                JsonConvert.SerializeObject(INGJsonRequestFastTransferAuthConfirm.Create(Token, data.docId)),
+                null, true, null, null);
+
+            if (!confirmResponse.requestProcessed)
+                return false;
+
+            return confirmResponse.response.StatusValue == INGJsonResponseStatus.OK;
+        }
+
+        private bool ConfirmAuthorizationFinish(string refValue, string dataToken, string confirmUrl)
+        {
+            (INGJsonResponseAuthFinished response, bool requestProcessed) finishedResponse = PerformRequest<INGJsonResponseAuthFinished>(
+                confirmUrl, HttpMethod.Post,
+                JsonConvert.SerializeObject(INGJsonRequestAuthFinished.Create(Token, refValue, dataToken)),
+                null, true, null, null);
+
+            if (Token == null && finishedResponse.requestProcessed)
+                Token = finishedResponse.response.data.token;
+
+            return finishedResponse.requestProcessed;
+        }
+
         private static HttpRequestMessage CreateHttpRequestMessage(string requestUri, HttpMethod method, string jsonContent = null)
         {
             HttpRequestMessage message = new HttpRequestMessage(method, requestUri);
-            message.Headers.Add("X-Wolf-Protection", String.Empty);
+            message.Headers.Add("X-Wolf-Protection", "0");
 
             if (jsonContent != null)
                 message.Content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
@@ -453,9 +647,22 @@ namespace BankService.Bank_ING
             }
         }
 
-        private  string GetSMSCode()
+        private string GetSMSCode()
         {
             return PromptString("Kod SMS", @"^\d{8}$");
+        }
+
+        //TODO to samo co w Velo
+        private static (FastTransferType? type, string paData, string pblData) GetDataFromFastTransfer(string transferId)
+        {
+            bool pbl = transferId?.Length == 32;
+            bool pa = transferId?.Length == 36;
+            FastTransferType? type = null;
+            if (pbl)
+                type = FastTransferType.PayByLink;
+            if (pa)
+                type = FastTransferType.PA;
+            return (type, transferId, transferId);
         }
 
         private string Hmac(string key, string text)

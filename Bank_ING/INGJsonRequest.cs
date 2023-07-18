@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Net;
 using System.Runtime.Serialization;
 using Tools;
 
@@ -36,14 +37,12 @@ namespace BankService.Bank_ING
         [DataContract]
         public class INGJsonRequestLoginPassword
         {
-            //[DataMember]
-            //public string token { get; set; }
             [DataMember]
             public INGJsonRequestLoginPasswordData data { get; set; }
 
-            public static INGJsonRequestLoginPassword Create(string pwdhash, string login)
+            public static INGJsonRequestLoginPassword Create(string pwdhash, string login, string transferId)
             {
-                return new INGJsonRequestLoginPassword() { data = new INGJsonRequestLoginPasswordData() { pwdhash = pwdhash, login = login } };
+                return new INGJsonRequestLoginPassword() { data = new INGJsonRequestLoginPasswordData() { pwdhash = pwdhash, login = login, polApiLoginSessionId = transferId } };
             }
         }
 
@@ -54,6 +53,8 @@ namespace BankService.Bank_ING
             public string pwdhash { get; set; }
             [DataMember]
             public string login { get; set; }
+            [DataMember]
+            public string polApiLoginSessionId { get; set; }
             //[DataMember]
             //public string di { get; set; }
         }
@@ -61,8 +62,6 @@ namespace BankService.Bank_ING
         [DataContract]
         public class INGJsonRequestLogout
         {
-            //[DataMember]
-            //public string token { get; set; }
             [DataMember]
             public INGJsonRequestLogoutData data { get; set; }
 
@@ -116,6 +115,141 @@ namespace BankService.Bank_ING
         {
             [DataMember]
             public string docId { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthGetData : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestAuthGetDataData data { get; set; }
+
+            public static INGJsonRequestAuthGetData Create(string token, string refValue)
+            {
+                return new INGJsonRequestAuthGetData() {token = token ?? String.Empty, data = new INGJsonRequestAuthGetDataData() { refValue = refValue } };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthGetDataData
+        {
+            [DataMember(Name = "ref")]
+            public string refValue { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestAuthConfirmData data { get; set; }
+
+            public static INGJsonRequestAuthConfirm Create(string token, string refValue)
+            {
+                return new INGJsonRequestAuthConfirm() { token = token, data = new INGJsonRequestAuthConfirmData() { factor = "NONE", refValue = refValue } };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthConfirmData
+        {
+            [DataMember]
+            public string factor { get; set; }
+            [DataMember(Name = "ref")]
+            public string refValue { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferAuthConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestFastTransferAuthConfirmData data { get; set; }
+
+            public static INGJsonRequestFastTransferAuthConfirm Create(string token, string docId)
+            {
+                return new INGJsonRequestFastTransferAuthConfirm() { token = token, data = new INGJsonRequestFastTransferAuthConfirmData() { docId = docId } };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferAuthConfirmData
+        {
+            [DataMember]
+            public string docId { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthAutoConfirmConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestAuthAutoConfirmConfirmData data { get; set; }
+
+            public static INGJsonRequestAuthAutoConfirmConfirm Create(string token, string refValue)
+            {
+                return new INGJsonRequestAuthAutoConfirmConfirm() { token = token??String.Empty, data = new INGJsonRequestAuthAutoConfirmConfirmData() { factor = "AUTOCONFIRM", refValue = refValue} };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthAutoConfirmConfirmData : INGJsonRequestAuthConfirmData
+        {
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthSMSConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestAuthSMSConfirmData data { get; set; }
+
+            public static INGJsonRequestAuthSMSConfirm Create(string token, string refValue, string credentials)
+            {
+                return new INGJsonRequestAuthSMSConfirm() { token = token, data = new INGJsonRequestAuthSMSConfirmData() { factor = "SMS", refValue = refValue, credentials = credentials } };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthSMSConfirmData: INGJsonRequestAuthConfirmData
+        {
+            [DataMember]
+            public string credentials { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthAddBrowserConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestAuthAddBrowserConfirmData data { get; set; }
+
+            public static INGJsonRequestAuthAddBrowserConfirm Create(string token, string refValue, string credentials)
+            {
+                return new INGJsonRequestAuthAddBrowserConfirm() { token = token??String.Empty, data = new INGJsonRequestAuthAddBrowserConfirmData() { factor = "ADDBROWSER", refValue = refValue, credentials= credentials??String.Empty } };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthAddBrowserConfirmData: INGJsonRequestAuthConfirmData
+        {
+            [DataMember]
+            public string credentials { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthFinished : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestAuthFinishedData data { get; set; }
+
+            public static INGJsonRequestAuthFinished Create(string token, string refValue, string dataToken)
+            {
+                return new INGJsonRequestAuthFinished() { token = token, data = new INGJsonRequestAuthFinishedData() { refValue = refValue, token = dataToken } };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestAuthFinishedData
+        {
+            [DataMember(Name = "ref")]
+            public string refValue { get; set; }
+            [DataMember]
+            public string token { get; set; }
         }
 
         [DataContract]
@@ -187,6 +321,66 @@ namespace BankService.Bank_ING
             {
                 return new INGJsonRequestFastTransfer() { token = token };
             }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferPBL : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestFastTransferPBLData data { get; set; }
+
+            public static INGJsonRequestFastTransferPBL Create(string token, string ctxId)
+            {
+                return new INGJsonRequestFastTransferPBL() { token = token, data = new INGJsonRequestFastTransferPBLData() { ctxId = ctxId }  };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferPBLDataConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestFastTransferPBLDataConfirmData data { get; set; }
+
+            public static INGJsonRequestFastTransferPBLDataConfirm Create(string token, string ctxId, string debacc)
+            {
+                return new INGJsonRequestFastTransferPBLDataConfirm() { token = token, data = new INGJsonRequestFastTransferPBLDataConfirmData() { ctxId = ctxId, debacc= debacc }  };
+            }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferPBLDataConfirmData
+        {
+            [DataMember]
+            public string ctxId { get; set; }
+            [DataMember]
+            public string debacc { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferPBLData
+        {
+            [DataMember]
+            public string ctxId { get; set; }
+        }
+
+        [DataContract]
+        public class INGJsonRequestFastTransferConfirm : INGJsonRequestBase
+        {
+            [DataMember]
+            public INGJsonRequestFastTransferPolapiauthdataConfirmData data { get; set; }
+
+            public static INGJsonRequestFastTransferConfirm Create(string token, string debacc)
+            {
+                return new INGJsonRequestFastTransferConfirm() { token = token, data = new INGJsonRequestFastTransferPolapiauthdataConfirmData() { authType = "TRANSFER", account = debacc } };
+            }
+        }
+        [DataContract]
+        public class INGJsonRequestFastTransferPolapiauthdataConfirmData
+        {
+            [DataMember]
+            public string account { get; set; }
+            [DataMember]
+            public string authType { get; set; }
         }
 
         [DataContract]

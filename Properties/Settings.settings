@@ -2,10 +2,16 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="BankService.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="AcountNumbers" Type="Tools.SerializableStringDictionary" Scope="User">
+    <Setting Name="VeloBankAcountNumbers" Type="Tools.SerializableStringDictionary" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="AcountNumbersDownloadDate" Type="System.DateTime" Scope="User">
+    <Setting Name="VeloBankAcountNumbersDownloadDate" Type="System.DateTime" Scope="User">
+      <Value Profile="(Default)">0001-01-02</Value>
+    </Setting>
+    <Setting Name="GetinBankAcountNumbers" Type="Tools.SerializableStringDictionary" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="GetinBankAcountNumbersDownloadDate" Type="System.DateTime" Scope="User">
       <Value Profile="(Default)">0001-01-02</Value>
     </Setting>
   </Settings>

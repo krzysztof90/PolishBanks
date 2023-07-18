@@ -2,7 +2,8 @@
 {
     public enum BankType
     {
-        GetinBank,
+        VeloBank,
+        //GetinBank,
         ING
     }
 }

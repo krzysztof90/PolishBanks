@@ -14,18 +14,18 @@ namespace BankService.Bank_GetinBank
             {
                 new GetinBankHistoryFilter()
                 {
-                    DateFrom = Properties.Settings.Default.AcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.AcountNumbersDownloadDate,
+                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
                     //operacje kartą
                     ChannelType = GetinBankFilterChannel.Bank
                 },
                 new GetinBankHistoryFilter()
                 {
-                    DateFrom = Properties.Settings.Default.AcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.AcountNumbersDownloadDate,
+                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
                     OperationType = GetinBankFilterOperation.Elixir
                 },
                 new GetinBankHistoryFilter()
                 {
-                    DateFrom = Properties.Settings.Default.AcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.AcountNumbersDownloadDate,
+                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
                     OperationType = GetinBankFilterOperation.Blik
                 }
             };
@@ -47,15 +47,15 @@ namespace BankService.Bank_GetinBank
                 emptyOperations = operations.Where(o => (o.ReferenceNumber == null || o.ReferenceNumber == "-") && o.Type != OperationType.Card && !o.IsCommisionForTransfer()).OrderBy(o => o.OrderDate).ToList();
 
                 if (emptyOperations.Count != 0)
-                    Properties.Settings.Default.AcountNumbersDownloadDate = emptyOperations.FirstOrDefault().OrderDate;
+                    Properties.Settings.Default.GetinBankAcountNumbersDownloadDate = emptyOperations.FirstOrDefault().OrderDate;
                 else
-                    Properties.Settings.Default.AcountNumbersDownloadDate = DateTime.Today;
+                    Properties.Settings.Default.GetinBankAcountNumbersDownloadDate = DateTime.Today;
 
-                if (Properties.Settings.Default.AcountNumbers == null)
-                    Properties.Settings.Default.AcountNumbers = new SerializableStringDictionary();
+                if (Properties.Settings.Default.GetinBankAcountNumbers == null)
+                    Properties.Settings.Default.GetinBankAcountNumbers = new SerializableStringDictionary();
                 foreach (GetinBankHistoryItem operation in operations.Where(o => !(o.ReferenceNumber == null || o.ReferenceNumber == "-")))
-                    if (!Properties.Settings.Default.AcountNumbers.ContainsKey(operation.ReferenceNumber))
-                        Properties.Settings.Default.AcountNumbers.Add(operation.ReferenceNumber, operation.Direction == OperationDirection.Execute ? operation.ToAccountNumber : operation.FromAccountNumber);
+                    if (!Properties.Settings.Default.GetinBankAcountNumbers.ContainsKey(operation.ReferenceNumber))
+                        Properties.Settings.Default.GetinBankAcountNumbers.Add(operation.ReferenceNumber, operation.Direction == OperationDirection.Execute ? operation.ToAccountNumber : operation.FromAccountNumber);
                 Properties.Settings.Default.Save();
             }
 

@@ -12,7 +12,7 @@ namespace BankService.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.10.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.6.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,24 +25,47 @@ namespace BankService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::Tools.SerializableStringDictionary AcountNumbers {
+        public global::Tools.SerializableStringDictionary VeloBankAcountNumbers {
             get {
-                return ((global::Tools.SerializableStringDictionary)(this["AcountNumbers"]));
+                return ((global::Tools.SerializableStringDictionary)(this["VeloBankAcountNumbers"]));
             }
             set {
-                this["AcountNumbers"] = value;
+                this["VeloBankAcountNumbers"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("0001-01-02")]
-        public global::System.DateTime AcountNumbersDownloadDate {
+        public global::System.DateTime VeloBankAcountNumbersDownloadDate {
             get {
-                return ((global::System.DateTime)(this["AcountNumbersDownloadDate"]));
+                return ((global::System.DateTime)(this["VeloBankAcountNumbersDownloadDate"]));
             }
             set {
-                this["AcountNumbersDownloadDate"] = value;
+                this["VeloBankAcountNumbersDownloadDate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::Tools.SerializableStringDictionary GetinBankAcountNumbers {
+            get {
+                return ((global::Tools.SerializableStringDictionary)(this["GetinBankAcountNumbers"]));
+            }
+            set {
+                this["GetinBankAcountNumbers"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0001-01-02")]
+        public global::System.DateTime GetinBankAcountNumbersDownloadDate {
+            get {
+                return ((global::System.DateTime)(this["GetinBankAcountNumbersDownloadDate"]));
+            }
+            set {
+                this["GetinBankAcountNumbersDownloadDate"] = value;
             }
         }
     }

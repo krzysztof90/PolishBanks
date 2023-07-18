@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BankService</RootNamespace>
     <AssemblyName>BankService</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,7 +36,7 @@
       <HintPath>..\Bank\packages\HtmlAgilityPack.1.11.38\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\Bank\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\Bank\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,16 +55,24 @@
     <Compile Include="BankType.cs" />
     <Compile Include="BankTypeAttribute.cs" />
     <Compile Include="Bank_GetinBank\GetinBankAcountNumbersHistory.cs" />
-    <Compile Include="Bank_GetinBank\GetinBankBrowserJsonRequest.cs" />
+    <Compile Include="Bank_GetinBank\GetinBankJsonRequest.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankAcountNumbersHistory.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonConfirmationStatusType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonModuleType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonRequest.cs" />
     <Compile Include="Bank_GetinBank\GetinBank.cs" />
     <Compile Include="Bank_GetinBank\GetinBankHistoryFilter.cs" />
     <Compile Include="Bank_GetinBank\GetinBankHistoryItem.cs" />
     <Compile Include="Bank_GetinBank\GetinBankJsonResponse.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonResponse.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonCategoryType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonConfirmType.cs" />
     <Compile Include="Bank_ING\ING.cs" />
     <Compile Include="Bank_ING\INGHistoryFilter.cs" />
     <Compile Include="Bank_ING\INGHistoryItem.cs" />
     <Compile Include="Bank_ING\INGJsonRequest.cs" />
     <Compile Include="Bank_ING\INGJsonResponse.cs" />
+    <Compile Include="Bank_ING\INGJsonResponseAuthFactor.cs" />
     <Compile Include="Bank_ING\INGJsonResponseCategory.cs" />
     <Compile Include="Bank_ING\INGJsonResponseCreditDebit.cs" />
     <Compile Include="Bank_ING\INGJsonResponseNoYes.cs" />
@@ -72,6 +81,14 @@
     <Compile Include="Bank_ING\INGJsonResponseSign.cs" />
     <Compile Include="Bank_ING\INGJsonResponseStatus.cs" />
     <Compile Include="Bank_ING\INGJsonResponseType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankHistoryFilter.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankHistoryItem.cs" />
+    <Compile Include="Bank_VeloBank\VeloBank.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonOperationType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonSideType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonOperationStatusType.cs" />
+    <Compile Include="Bank_VeloBank\VeloBankJsonTransferType.cs" />
+    <Compile Include="FastTransferType.cs" />
     <Compile Include="FilterEnumParameterAttribute.cs" />
     <Compile Include="HistoryFilter.cs" />
     <Compile Include="HistoryItem.cs" />
@@ -86,6 +103,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ToolsNugetExtension\ToolsNugetExtension.csproj">
       <Project>{e474261c-413a-44b1-be1a-9741250047de}</Project>
       <Name>ToolsNugetExtension</Name>
@@ -94,14 +119,6 @@
       <Project>{0dadfc9d-9eec-4fd3-8e20-660030a98716}</Project>
       <Name>Tools</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

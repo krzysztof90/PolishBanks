@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using BankService.LocalTools;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
@@ -12,13 +13,12 @@ using System.Net.Http.Headers;
 using System.Text;
 using Tools;
 using ToolsNugetExtension;
+using static BankService.Bank_GetinBank.GetinBankJsonRequest;
 using static BankService.Bank_GetinBank.GetinBankJsonResponse;
-using static BankService.Bank_GetinBank.GetinBankBrowserJsonRequest;
-using BankService.LocalTools;
 
 namespace BankService.Bank_GetinBank
 {
-    [BankTypeAttribute(BankType.GetinBank)]
+    //[BankTypeAttribute(BankType.GetinBank)]
     public class GetinBank : BankBase<GetinBankHistoryItem, GetinBankHistoryFilter>
     {
         const string userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:72.0) Gecko/20100101 Firefox/72.0";
@@ -35,6 +35,7 @@ namespace BankService.Bank_GetinBank
                     CallAvailableFundsClear();
             }
         }
+        private string AccCode => HomePage.SubstringFromToEx("href=\"#transfers/index/", "/");
 
         private IEnumerable<KeyValuePair<string, string>> heartbeatParameters;
 
@@ -91,7 +92,7 @@ namespace BankService.Bank_GetinBank
 
             IEnumerable<KeyValuePair<string, string>> setBrowserParamsParameters = new KeyValuePair<string, string>[] {
                 new KeyValuePair<string, string>("fingerprint", fingerprint),
-                new KeyValuePair<string, string>("fingerprintParams", JsonConvert.SerializeObject(new GetinBankBrowserJsonRequestFingerprint(){userAgent = userAgent})),
+                new KeyValuePair<string, string>("fingerprintParams", JsonConvert.SerializeObject(new GetinBankJsonRequestBrowserFingerprint(){userAgent = userAgent})),
             };
 
             PerformRequest("index/setBrowserParams", HttpMethod.Post, setBrowserParamsParameters, null, true, null);
@@ -347,6 +348,7 @@ namespace BankService.Bank_GetinBank
             string newTransferId = transferId
                 .Replace("https://secure.getinbank.pl/pbl/payment/new/", String.Empty)
                 .Replace("https://secure.getinbank.pl/pbl/#index/index/", String.Empty);
+            //.Replace("https://secure.getinbank.pl/pa/#index/index/", String.Empty);
 
             if (newTransferId.Length != 64)
             {
@@ -356,7 +358,7 @@ namespace BankService.Bank_GetinBank
             return newTransferId;
         }
 
-        protected override bool LoginRequestForFastTransfer(string login, string password, string transferId, /*Browser browser,*/ string cookie)
+        protected override bool LoginRequestForFastTransfer(string login, string password, string transferId, string cookie)
         {
             IEnumerable<KeyValuePair<string, string>> loginLoginParameters = new KeyValuePair<string, string>[] {
                 new KeyValuePair<string, string>("step", "1"),
@@ -407,7 +409,7 @@ namespace BankService.Bank_GetinBank
             return true;
         }
 
-        protected override string MakeFastTransfer(string transferId, /*Browser browser,*/ string cookie)
+        protected override string MakeFastTransfer(string transferId, string cookie)
         {
             //TODO przed wykonaniem informacja o danych przelewu
 
@@ -669,9 +671,6 @@ namespace BankService.Bank_GetinBank
                 return CheckFailed("numer konta nie jest poprawny");
             }
 
-            string accCode;
-            accCode = HomePage.SubstringFromToEx("href=\"#accounts/details/", "/");
-
             string amountToConfirm;
             string titleToConfirm;
             string transferPayment;
@@ -682,7 +681,7 @@ namespace BankService.Bank_GetinBank
 
             IEnumerable<KeyValuePair<string, string>> transferBeginParameters = new KeyValuePair<string, string>[] {
                 new KeyValuePair<string, string>("step", "2"),
-                new KeyValuePair<string, string>("accCode", accCode),
+                new KeyValuePair<string, string>("accCode", AccCode),
                 new KeyValuePair<string, string>("object_name", recipient),
                 new KeyValuePair<string, string>("address1", address),
                 new KeyValuePair<string, string>("nrb", formattedAccountNumber),
@@ -804,8 +803,6 @@ namespace BankService.Bank_GetinBank
 
         protected override bool MakePrepaidTransfer(string recipient, string phoneNumber, double amount)
         {
-            string accCode = HomePage.SubstringFromToEx("href=\"#accounts/details/", "/");
-
             IEnumerable<(string name, string code)> operators;
 
             (string responseStr, MediaTypeHeaderValue responseTypeHeader, bool requestProcessed) prepaidRequest = PerformRequest(
@@ -834,7 +831,7 @@ namespace BankService.Bank_GetinBank
 
             IEnumerable<KeyValuePair<string, string>> transferBeginParameters = new KeyValuePair<string, string>[] {
                     new KeyValuePair<string, string>("step", "2"),
-                    new KeyValuePair<string, string>("accCode", accCode),
+                    new KeyValuePair<string, string>("accCode", AccCode),
                     new KeyValuePair<string, string>("object_name", recipient),
                     new KeyValuePair<string, string>("phone_number", phoneNumber.SimplifyPhoneNumber()),
                     new KeyValuePair<string, string>("operator", operatorCode),
@@ -983,100 +980,100 @@ namespace BankService.Bank_GetinBank
             if (!getHistoryRequest.requestProcessed)
                 return null;
 
-            if (filter != null && filter.FindAccountNumber)
+            if (filter != null)
             {
-                List<GetinBankHistoryItem> emptyOperations = GetinBankAcountNumbersHistory.Download(this);
-
-                Dictionary<(DateTime dateFrom, DateTime dateTo), List<string>> ranges = new Dictionary<(DateTime dateFrom, DateTime dateTo), List<string>>();
-                foreach (DictionaryEntry entry in Properties.Settings.Default.AcountNumbers)
+                if (filter.FindAccountNumber)
                 {
-                    if (AccountNumberTools.CompareAccountNumbers((string)entry.Value, filter.AccountNumber))
-                    {
-                        DateTime transferDate = GetDateFromReferenceNumber((string)entry.Key);
-                        if ((filter.DateFrom == null || filter.DateFrom <= transferDate) && (filter.DateTo == null || transferDate <= filter.DateTo))
-                        {
-                            List<string> refNumbers;
-                            DateTime rangeDateFrom;
-                            DateTime rangeDateTo;
-                            KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> range = ranges.SingleOrDefault(r => r.Key.dateFrom <= transferDate && transferDate <= r.Key.dateTo);
-                            if (!range.Equals(default(KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>>)))
-                            {
-                                refNumbers = range.Value;
-                                rangeDateFrom = range.Key.dateFrom;
-                                rangeDateTo = range.Key.dateTo;
-                            }
-                            else
-                            {
-                                refNumbers = new List<string>();
-                                rangeDateFrom = transferDate;
-                                rangeDateTo = transferDate;
-                            }
-                            refNumbers.Add((string)entry.Key);
-                            ranges[(rangeDateFrom, rangeDateTo)] = refNumbers;
+                    List<GetinBankHistoryItem> emptyOperations = GetinBankAcountNumbersHistory.Download(this);
 
-                            KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> bottomRange = ranges.SingleOrDefault(r => r.Key.dateTo == transferDate.AddDays(-1));
-                            if (!bottomRange.Equals(default(KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>>)))
+                    Dictionary<(DateTime dateFrom, DateTime dateTo), List<string>> ranges = new Dictionary<(DateTime dateFrom, DateTime dateTo), List<string>>();
+                    foreach (DictionaryEntry entry in Properties.Settings.Default.GetinBankAcountNumbers)
+                    {
+                        if (AccountNumberTools.CompareAccountNumbers((string)entry.Value, filter.AccountNumber))
+                        {
+                            DateTime transferDate = GetDateFromReferenceNumber((string)entry.Key);
+                            if ((filter.DateFrom == null || filter.DateFrom <= transferDate) && (filter.DateTo == null || transferDate <= filter.DateTo))
                             {
-                                List<string> refNumbersMerge = bottomRange.Value;
-                                refNumbers.AddRange(refNumbersMerge);
-                                ranges.Remove((rangeDateFrom, rangeDateTo));
-                                ranges.Remove(bottomRange.Key);
-                                rangeDateFrom = bottomRange.Key.dateFrom;
+                                List<string> refNumbers;
+                                DateTime rangeDateFrom;
+                                DateTime rangeDateTo;
+                                KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> range = ranges.SingleOrDefault(r => r.Key.dateFrom <= transferDate && transferDate <= r.Key.dateTo);
+                                if (!range.Equals(default(KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>>)))
+                                {
+                                    refNumbers = range.Value;
+                                    rangeDateFrom = range.Key.dateFrom;
+                                    rangeDateTo = range.Key.dateTo;
+                                }
+                                else
+                                {
+                                    refNumbers = new List<string>();
+                                    rangeDateFrom = transferDate;
+                                    rangeDateTo = transferDate;
+                                }
+                                refNumbers.Add((string)entry.Key);
                                 ranges[(rangeDateFrom, rangeDateTo)] = refNumbers;
-                            }
-                            KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> topRange = ranges.SingleOrDefault(r => r.Key.dateFrom == transferDate.AddDays(1));
-                            if (!topRange.Equals(default(KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>>)))
-                            {
-                                List<string> refNumbersMerge = topRange.Value;
-                                refNumbers.AddRange(refNumbersMerge);
-                                ranges.Remove((rangeDateFrom, rangeDateTo));
-                                ranges.Remove(topRange.Key);
-                                rangeDateTo = topRange.Key.dateTo;
-                                ranges[(rangeDateFrom, rangeDateTo)] = refNumbers;
+
+                                KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> bottomRange = ranges.SingleOrDefault(r => r.Key.dateTo == transferDate.AddDays(-1));
+                                if (!bottomRange.Equals(default(KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>>)))
+                                {
+                                    List<string> refNumbersMerge = bottomRange.Value;
+                                    refNumbers.AddRange(refNumbersMerge);
+                                    ranges.Remove((rangeDateFrom, rangeDateTo));
+                                    ranges.Remove(bottomRange.Key);
+                                    rangeDateFrom = bottomRange.Key.dateFrom;
+                                    ranges[(rangeDateFrom, rangeDateTo)] = refNumbers;
+                                }
+                                KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> topRange = ranges.SingleOrDefault(r => r.Key.dateFrom == transferDate.AddDays(1));
+                                if (!topRange.Equals(default(KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>>)))
+                                {
+                                    List<string> refNumbersMerge = topRange.Value;
+                                    refNumbers.AddRange(refNumbersMerge);
+                                    ranges.Remove((rangeDateFrom, rangeDateTo));
+                                    ranges.Remove(topRange.Key);
+                                    rangeDateTo = topRange.Key.dateTo;
+                                    ranges[(rangeDateFrom, rangeDateTo)] = refNumbers;
+                                }
                             }
                         }
                     }
-                }
 
-                //usunięte, bo dublowało operacje z dzisiaj
-                //List<HistoryItem> notSavedItems = GetHistory(new GetinFilter()
-                //{
-                //    DateFrom = Properties.Settings.Default.AcountNumbersDownloadDate,
-                //    ChannelType = FilterChannel.Bank,
-                //    AmountExact = filter.AmountExact,
-                //    AmountFrom = filter.AmountFrom,
-                //    AmountTo = filter.AmountTo,
-                //    OperationType = filter.OperationType,
-                //    //StatusType=
-                //    Title = filter.Title
-                //});
-                //if (notSavedItems != null)
-                //    result.AddRange(notSavedItems.Where(i => AccountNumberTools.CompareAccountNumbers(i.direction == OperationDirection.Execute ? i.toAccountNumber : i.fromAccountNumber, filter.AccountNumber)));
-                if (emptyOperations != null)
-                    result.AddRange(emptyOperations.Where(i => AccountNumberTools.CompareAccountNumbers(i.Direction == OperationDirection.Execute ? i.ToAccountNumber : i.FromAccountNumber, filter.AccountNumber)));
+                    //usunięte, bo dublowało operacje z dzisiaj
+                    //List<HistoryItem> notSavedItems = GetHistory(new GetinFilter()
+                    //{
+                    //    DateFrom = Properties.Settings.Default.AcountNumbersDownloadDate,
+                    //    ChannelType = FilterChannel.Bank,
+                    //    AmountExact = filter.AmountExact,
+                    //    AmountFrom = filter.AmountFrom,
+                    //    AmountTo = filter.AmountTo,
+                    //    OperationType = filter.OperationType,
+                    //    //StatusType=
+                    //    Title = filter.Title
+                    //});
+                    //if (notSavedItems != null)
+                    //    result.AddRange(notSavedItems.Where(i => AccountNumberTools.CompareAccountNumbers(i.direction == OperationDirection.Execute ? i.toAccountNumber : i.fromAccountNumber, filter.AccountNumber)));
+                    if (emptyOperations != null)
+                        result.AddRange(emptyOperations.Where(i => AccountNumberTools.CompareAccountNumbers(i.Direction == OperationDirection.Execute ? i.ToAccountNumber : i.FromAccountNumber, filter.AccountNumber)));
 
-                foreach (KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> range in ranges.OrderByDescending(r => r.Key.dateFrom))
-                {
-                    //result.AddRange(new List<HistoryItem>().Where(i => range.Value.Contains(i.referenceNumber)));
-                    List<GetinBankHistoryItem> items = GetHistoryItems(new GetinBankHistoryFilter()
+                    foreach (KeyValuePair<(DateTime dateFrom, DateTime dateTo), List<string>> range in ranges.OrderByDescending(r => r.Key.dateFrom))
                     {
-                        DateFrom = range.Key.dateFrom,
-                        DateTo = range.Key.dateTo,
-                        ChannelType = GetinBankFilterChannel.Bank,
-                        AmountExact = filter.AmountExact,
-                        AmountFrom = filter.AmountFrom,
-                        AmountTo = filter.AmountTo,
-                        OperationType = filter.OperationType,
-                        //StatusType=
-                        Title = filter.Title
-                    });
-                    if (items != null)
-                        result.AddRange(items.Where(i => range.Value.Contains(i.ReferenceNumber)));
+                        //result.AddRange(new List<HistoryItem>().Where(i => range.Value.Contains(i.referenceNumber)));
+                        List<GetinBankHistoryItem> items = GetHistoryItems(new GetinBankHistoryFilter()
+                        {
+                            DateFrom = range.Key.dateFrom,
+                            DateTo = range.Key.dateTo,
+                            ChannelType = GetinBankFilterChannel.Bank,
+                            AmountExact = filter.AmountExact,
+                            AmountFrom = filter.AmountFrom,
+                            AmountTo = filter.AmountTo,
+                            OperationType = filter.OperationType,
+                            //StatusType=
+                            Title = filter.Title
+                        });
+                        if (items != null)
+                            result.AddRange(items.Where(i => range.Value.Contains(i.ReferenceNumber)));
+                    }
                 }
-            }
-            else
-            {
-                if (filter != null)
+                else
                 {
                     if (filter.SetTitle)
                     {
@@ -1098,39 +1095,40 @@ namespace BankService.Bank_GetinBank
                         if (!setFiltersRequest.requestProcessed)
                             return null;
                     }
-                }
 
-                //TODO liczbę stron pobrać z document
-                int? pageCounter = null;
-                for (int page = 1; (pageCounter == null || page <= pageCounter) && (filter.CounterLimit == 0 || result.Count < filter.CounterLimit); page++)
-                {
-                    bool success = false;
-
-                    while (!success)
+                    //TODO liczbę stron pobrać z document
+                    int? pageCounter = null;
+                    for (int page = 1; (pageCounter == null || page <= pageCounter) && (filter.CounterLimit == 0 || result.Count < filter.CounterLimit); page++)
                     {
-                        (string responseStr, MediaTypeHeaderValue responseTypeHeader, bool requestProcessed) loadHistoryRequest = PerformRequest(
-                            $"history/loadHistory/{page}", HttpMethod.Get, null, null, true, null);
+                        bool success = false;
 
-                        if (!loadHistoryRequest.requestProcessed)
-                            return null;
-                        AssertMediaType(loadHistoryRequest.responseTypeHeader, "text/html");
-
-                        HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument();
-                        document.LoadHtml(loadHistoryRequest.responseStr);
-
-                        if (document.DocumentNode.Descendants("section").SingleOrDefault(n => n.HasClass("empty-section")) != null)
+                        while (!success)
                         {
-                            pageCounter = 0;
-                            break;
+                            (string responseStr, MediaTypeHeaderValue responseTypeHeader, bool requestProcessed) loadHistoryRequest = PerformRequest(
+                                $"history/loadHistory/{page}", HttpMethod.Get, null, null, true, null);
+
+                            if (!loadHistoryRequest.requestProcessed)
+                                return null;
+                            AssertMediaType(loadHistoryRequest.responseTypeHeader, "text/html");
+
+                            HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument();
+                            document.LoadHtml(loadHistoryRequest.responseStr);
+
+                            if (document.DocumentNode.Descendants("section").SingleOrDefault(n => n.HasClass("empty-section")) != null)
+                            {
+                                pageCounter = 0;
+                                break;
+                            }
+
+                            pageCounter = Int32.Parse(document.DocumentNode.Descendants("input").Single(n => n.Id == "pages").GetAttributeValue("value", String.Empty));
+
+                            result.AddRange(document.DocumentNode.Descendants("li").Select(n => new GetinBankHistoryItem(n)));
+                            success = true;
                         }
-
-                        pageCounter = Int32.Parse(document.DocumentNode.Descendants("input").Single(n => n.Id == "pages").GetAttributeValue("value", String.Empty));
-
-                        result.AddRange(document.DocumentNode.Descendants("li").Select(n => new GetinBankHistoryItem(n)));
-                        success = true;
                     }
                 }
             }
+
             return result;
         }
 

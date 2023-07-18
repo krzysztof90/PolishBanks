@@ -27,6 +27,7 @@ namespace BankService
 
         public abstract bool IsTransfer { get; }
         public abstract string TransferTypeName { get; }
+        public abstract bool CompareTitle(string title);
     }
 
     public enum OperationDirection

@@ -27,7 +27,11 @@ namespace BankService.Bank_ING
             Title = $"{transaction.t1} {transaction.t2} {transaction.t3} {transaction.t4}";
         }
 
-        public override bool IsTransfer => throw new NotImplementedException();
+        public override bool IsTransfer => Type == INGJsonResponseType.TransferInternet2;
         public override string TransferTypeName => Type.GetEnumDescription();
+        public override bool CompareTitle(string title)
+        {
+            return Title.TrimEnd() == title.TrimEnd();
+        }
     }
 }
