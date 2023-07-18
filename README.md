@@ -1,3 +1,3 @@
 # PolishBanks
 Web APIs of banks in Poland
-: GetinBank, ING
+: GetinBank (deprecated), VeloBank, ING
