@@ -39,7 +39,7 @@ namespace BankService.Bank_ING
 
         public override bool FastTransferMandatoryTransferId => true;
         public override bool FastTransferMandatoryBrowserCookies => false;
-        public override bool FastTransferMandatoryCookie => true;
+        public override bool FastTransferMandatoryCookie => false;
         public override bool TransferMandatoryTitle => true;
         public override bool PrepaidTransferMandatoryRecipient => false;
 
@@ -273,6 +273,7 @@ namespace BankService.Bank_ING
         {
             string newTransferId = transferId
                 .Replace("https://login.ingbank.pl/mojeing/app/?#select/", String.Empty)
+                .Replace("https://login.ingbank.pl/mojeing/app/#select/", String.Empty)
 
                 .Replace("https://login.ingbank.pl/mojeing/paybylink/#login/ctxid=", String.Empty);
 
@@ -288,7 +289,6 @@ namespace BankService.Bank_ING
         {
             (FastTransferType? type, string paData, string pblData) fastTransferData = GetDataFromFastTransfer(transferId);
 
-            Cookies.Add(new Cookie("JSESSIONID", cookie, "/mojeing", "login.ingbank.pl"));
             return LoginRequest(login, password, transferId) && (fastTransferData.type == FastTransferType.PA ? PostLoginRequest() : PostPBLLoginRequest());
         }
 
