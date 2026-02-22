@@ -10,8 +10,8 @@ namespace BankService
         private string accountNumber;
         public string AccountNumber
         {
-            get { return accountNumber?.SimplifyAccountNumber(); }
-            set { accountNumber = value; }
+            get => accountNumber?.SimplifyAccountNumber();
+            set => accountNumber = value;
         }
 
         public int CounterLimit { get; set; }
@@ -21,32 +21,28 @@ namespace BankService
         private DateTime? dateFrom;
         public DateTime? DateFrom
         {
-            get { return dateFrom; }
+            get => dateFrom;
             set
             {
                 dateFrom = value;
                 if (value != null)
-                {
                     OnDateSet?.Invoke();
-                }
             }
         }
         private DateTime? dateTo;
         public DateTime? DateTo
         {
-            get { return dateTo; }
+            get => dateTo;
             set
             {
                 dateTo = value;
                 if (value != null)
-                {
                     OnDateSet?.Invoke();
-                }
             }
         }
         public DateTime? DateExact
         {
-            get { return dateFrom == dateTo ? dateFrom : null; }
+            get => dateFrom == dateTo ? dateFrom : null;
             set
             {
                 if (value != null)
@@ -62,32 +58,28 @@ namespace BankService
         private double? amountFrom;
         public double? AmountFrom
         {
-            get { return amountFrom; }
+            get => amountFrom;
             set
             {
                 amountFrom = value;
                 if (value != null)
-                {
                     Amount = true;
-                }
             }
         }
         private double? amountTo;
         public double? AmountTo
         {
-            get { return amountTo; }
+            get => amountTo;
             set
             {
                 amountTo = value;
                 if (value != null)
-                {
                     Amount = true;
-                }
             }
         }
         public double? AmountExact
         {
-            get { return amountFrom == amountTo ? amountFrom : null; }
+            get => amountFrom == amountTo ? amountFrom : null;
             set
             {
                 if (value != null)
@@ -106,20 +98,13 @@ namespace BankService
             Init();
         }
 
-        public HistoryFilter(string _accountNumber, string _title, DateTime? _dateFrom, DateTime? _dateTo, DateTime? _dateExact, double? _amountFrom, double? _amountTo, double? _amountExact) : this()
+        public HistoryFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact) : this()
         {
-            AccountNumber = _accountNumber;
-            Title = _title;
-            if (_dateFrom != null)
-                DateFrom = _dateFrom;
-            if (_dateTo != null)
-                DateTo = _dateTo;
-            DateExact = _dateExact;
-            if (_amountFrom != null)
-                AmountFrom = _amountFrom;
-            if (_amountTo != null)
-                AmountTo = _amountTo;
-            AmountExact = _amountExact;
+            Direction = direction;
+            Title = title;
+            DateFrom = dateFrom;
+            DateTo = dateTo;
+            AmountExact = amountExact;
         }
 
         protected virtual void Init()

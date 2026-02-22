@@ -32,15 +32,38 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.11.38.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\Bank\packages\HtmlAgilityPack.1.11.38\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.12.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.12.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\Bank\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net, Version=3.0.0.0, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>packages\protobuf-net.3.2.56\lib\net462\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net.Core, Version=3.0.0.0, Culture=neutral, PublicKeyToken=257b51d87d2e4d67, processorArchitecture=MSIL">
+      <HintPath>packages\protobuf-net.Core.3.2.56\lib\net462\protobuf-net.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Collections.Immutable, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Collections.Immutable.7.0.0\lib\net462\System.Collections.Immutable.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -51,50 +74,149 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountData.cs" />
+    <Compile Include="AreaCodeAttribute.cs" />
+    <Compile Include="BankAuthorizationAttribute.cs" />
     <Compile Include="BankBase.cs" />
+    <Compile Include="BankCountry\BankPoland.cs" />
+    <Compile Include="BankCountry\BankPortugal.cs" />
+    <Compile Include="BankImageAttribute.cs" />
     <Compile Include="BankType.cs" />
     <Compile Include="BankTypeAttribute.cs" />
-    <Compile Include="Bank_GetinBank\GetinBankAcountNumbersHistory.cs" />
-    <Compile Include="Bank_GetinBank\GetinBankJsonRequest.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankAcountNumbersHistory.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonConfirmationStatusType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonModuleType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonRequest.cs" />
-    <Compile Include="Bank_GetinBank\GetinBank.cs" />
-    <Compile Include="Bank_GetinBank\GetinBankHistoryFilter.cs" />
-    <Compile Include="Bank_GetinBank\GetinBankHistoryItem.cs" />
-    <Compile Include="Bank_GetinBank\GetinBankJsonResponse.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonResponse.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonCategoryType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonConfirmType.cs" />
-    <Compile Include="Bank_ING\ING.cs" />
-    <Compile Include="Bank_ING\INGHistoryFilter.cs" />
-    <Compile Include="Bank_ING\INGHistoryItem.cs" />
-    <Compile Include="Bank_ING\INGJsonRequest.cs" />
-    <Compile Include="Bank_ING\INGJsonResponse.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseAuthFactor.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseCategory.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseCreditDebit.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseNoYes.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseOrderMode.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseRange.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseSign.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseStatus.cs" />
-    <Compile Include="Bank_ING\INGJsonResponseType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankHistoryFilter.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankHistoryItem.cs" />
-    <Compile Include="Bank_VeloBank\VeloBank.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonOperationType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonSideType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonOperationStatusType.cs" />
-    <Compile Include="Bank_VeloBank\VeloBankJsonTransferType.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBankAccountData.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBankAcountNumbersHistory.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBankJsonRequest.cs" />
+    <Compile Include="Bank_PL_ING\Fido2AuthorizationData.cs" />
+    <Compile Include="Bank_PL_ING\Fido2Options.cs" />
+    <Compile Include="Bank_PL_ING\INGAccountData.cs" />
+    <Compile Include="Bank_PL_ING\INGAccountsDetails.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonTaxNoYes.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonTaxOth.cs" />
+    <Compile Include="Fingerprints\Fingerprint.cs" />
+    <Compile Include="Bank_PL_mBank\mBank.cs" />
+    <Compile Include="Bank_PL_mBank\mBankAccountData.cs" />
+    <Compile Include="Bank_PL_mBank\mBankHistoryFilter.cs" />
+    <Compile Include="Bank_PL_mBank\mBankHistoryItem.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationMode.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationStatus.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationTransferStatus.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationType.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonCategory.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonOperationCode.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonOperationKind.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonOperationType.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonRequest.cs" />
+    <Compile Include="Bank_PL_mBank\mBankJsonResponse.cs" />
+    <Compile Include="Bank_PL_Nest\Nest.cs" />
+    <Compile Include="Bank_PL_Nest\NestAccountData.cs" />
+    <Compile Include="Bank_PL_Nest\NestHistoryFilter.cs" />
+    <Compile Include="Bank_PL_Nest\NestHistoryItem.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonAuthorizationMethod.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonAuthorizationPushType.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonCreditDebit.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonLoginProcess.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonOperationType.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonOperatorValueType.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonRequest.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonResponse.cs" />
+    <Compile Include="Bank_PL_Nest\NestJsonAuthorizationStatus.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankAccountData.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonLoginQRStatus.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderAccountData.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderActionNumberAttribute.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderActionType.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderConfirmTextAuthorizeGetHistory.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderJsonSuccess.cs" />
+    <Compile Include="ConfirmText\ConfirmTextAddDevice.cs" />
+    <Compile Include="ConfirmText\ConfirmTextAmount.cs" />
+    <Compile Include="ConfirmText\ConfirmTextAuthorize.cs" />
+    <Compile Include="ConfirmText\ConfirmTextDevice.cs" />
+    <Compile Include="ConfirmText\ConfirmTextFastTransfer.cs" />
+    <Compile Include="ConfirmText\ConfirmTextPaymentOfServices.cs" />
+    <Compile Include="ConfirmText\ConfirmTextPrepaidTransfer.cs" />
+    <Compile Include="ConfirmText\ConfirmTextTaxTransfer.cs" />
+    <Compile Include="ConfirmText\ConfirmTextTransfer.cs" />
+    <Compile Include="ConfirmText\ConfirmTextBase.cs" />
+    <Compile Include="ConfirmText\ConfirmTextTransferRecipient.cs" />
+    <Compile Include="Country.cs" />
+    <Compile Include="CountryImageAttribute.cs" />
+    <Compile Include="Fingerprints\FingerprintBase.cs" />
+    <Compile Include="Fingerprints\FingerprintManager.cs" />
+    <Compile Include="HtmlLabel.cs" />
+    <Compile Include="Bank_PT_Santander\Santander.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderHistoryFilter.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderHistoryItem.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderJsonResponse.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderJsonResponseStatus.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderTransactionType.cs" />
+    <Compile Include="Bank_PT_Santander\SantanderTransferType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankAcountNumbersHistory.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonConfirmationStatusType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonModuleType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonRequest.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBank.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBankHistoryFilter.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBankHistoryItem.cs" />
+    <Compile Include="Bank_PL_GetinBank\GetinBankJsonResponse.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonResponse.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonCategoryType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonConfirmType.cs" />
+    <Compile Include="Bank_PL_ING\ING.cs" />
+    <Compile Include="Bank_PL_ING\INGHistoryFilter.cs" />
+    <Compile Include="Bank_PL_ING\INGHistoryItem.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonRequest.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonResponse.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonAuthFactor.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonTransferCategory.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonCreditDebit.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonNoYes.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonOrderMode.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonOperatorRange.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonTransferSign.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonTransferStatus.cs" />
+    <Compile Include="Bank_PL_ING\INGJsonTransferType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankHistoryFilter.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankHistoryItem.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBank.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonOperationType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonSideType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonOperationStatusType.cs" />
+    <Compile Include="Bank_PL_VeloBank\VeloBankJsonTransferType.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="FastTransferType.cs" />
     <Compile Include="FilterEnumParameterAttribute.cs" />
     <Compile Include="HistoryFilter.cs" />
     <Compile Include="HistoryItem.cs" />
     <Compile Include="LocalTools\AccountNumberTools.cs" />
+    <Compile Include="LocalTools\AddressTools.cs" />
     <Compile Include="LocalTools\PhoneNumberTools.cs" />
-    <Compile Include="PrepaidOperatorComboBoxItem.cs" />
+    <Compile Include="MandatoryTransferDatas\MandatoryTransferData.cs" />
+    <Compile Include="MandatoryTransferDatas\MandatoryTransferDataAmount.cs" />
+    <Compile Include="MandatoryTransferDatas\MandatoryTransferDataString.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="SMSCodes\SMSCodeValidator.cs" />
+    <Compile Include="SMSCodes\SMSCodeValidatorCypher.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifierIDCard.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifierNIP.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifierOther.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifierPassport.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifierPESEL.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifierREGON.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriod.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodDay.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodHalfYear.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodMonth.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodMonthDecade.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodQuarter.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodType.cs" />
+    <Compile Include="Tax\TaxPeriods\TaxPeriodYear.cs" />
+    <Compile Include="Tax\TaxCreditorIdentifiers\TaxCreditorIdentifier.cs" />
+    <None Include="packages.config" />
+    <Compile Include="SelectComboBoxItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -104,21 +226,72 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ToolsNugetExtension\ToolsNugetExtension.csproj">
-      <Project>{e474261c-413a-44b1-be1a-9741250047de}</Project>
-      <Name>ToolsNugetExtension</Name>
+    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\ToolsForms\ToolsForms.csproj">
+      <Project>{0fb4f3d3-901b-4c0d-afd2-e601ebd79943}</Project>
+      <Name>ToolsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Tools\Tools.csproj">
-      <Project>{0dadfc9d-9eec-4fd3-8e20-660030a98716}</Project>
+    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\ToolsNugetExtension\ToolsNugetExtensionHtmlAgilityPack\ToolsNugetExtensionHtmlAgilityPack.csproj">
+      <Project>{8e821c19-6ebb-461f-a68d-1d76f55705df}</Project>
+      <Name>ToolsNugetExtensionHtmlAgilityPack</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\Tools\Tools.csproj">
+      <Project>{0DADFC9D-9EEC-4FD3-8E20-660030A98716}</Project>
       <Name>Tools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Fido2\Fido2Authenticator.csproj">
+      <Project>{f155662d-687f-496a-b709-ab771b8837c0}</Project>
+      <Name>Fido2Authenticator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\ToolsWeb\ToolsWeb.csproj">
+      <Project>{2B40BF5D-3539-4F75-AE06-A8FF6CCD2138}</Project>
+      <Name>ToolsWeb</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\getin_bank.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ing.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\velo_bank.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\santander.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pocztowy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pl_pko.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pl_nest.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pl_mBank.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\volkswagen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pl.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pt.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
