@@ -1,12 +1,12 @@
-# \# PolishBanks
+\# PolishBanks
 
-# Web APIs of banks in Poland
+Web APIs of banks in Poland
 
-# \* GetinBank (deprecated), VeloBank, ING, mBank, Nest, PKO  
+\* GetinBank (deprecated), VeloBank, ING, mBank, Nest, PKO  
 
-# and Portugal
+and Portugal
 
-# \* Santander
+\* Santander
 
-# 
+
 
