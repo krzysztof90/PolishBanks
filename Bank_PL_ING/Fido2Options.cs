@@ -12,7 +12,7 @@ namespace BankService.Bank_PL_ING
         [DataMember] public string rpId { get; set; }
         [DataMember] public List<OptionsAllowCredentials> allowCredentials { get; set; }
         [DataMember] public OptionsExtensions extensions { get; set; }
-     
+
         public override bool EncodeChallenge => false;
         public override string Challenge => challenge;
         public override bool EncodeResult => true;

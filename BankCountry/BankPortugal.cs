@@ -8,6 +8,7 @@ namespace BankService.BankCountry
     public abstract class BankPortugal<A, H, F, AccDetResp> : BankBase<A, H, F, AccDetResp> where A : AccountData where H : HistoryItem where F : HistoryFilter where AccDetResp : class
     {
         public override Country Country => Country.Portugal;
+        public override string TimeZoneName => "GMT Standard Time";
 
         public override bool EnabledFastTransfer => false;
         public override bool EnabledPaymentOfServices => true;
@@ -28,7 +29,7 @@ namespace BankService.BankCountry
             throw new ArgumentException();
         }
 
-        public override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
+        protected override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
         {
             throw new ArgumentException();
         }

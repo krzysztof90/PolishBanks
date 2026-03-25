@@ -4,24 +4,24 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Tools;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    public class mBankJsonResponse
+    public class MBankJsonResponse
     {
         [DataContract]
-        public class mBankJsonResponseBase
+        public class MBankJsonResponseBase
         {
         }
 
         [DataContract]
-        public class mBankJsonResponseAmount
+        public class MBankJsonResponseAmount
         {
             [DataMember] public double value { get; set; }
             [DataMember] public string currency { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseLogin : mBankJsonResponseBase
+        public class MBankJsonResponseLogin : MBankJsonResponseBase
         {
             [DataMember] public string errorMessageBody { get; set; }
             [DataMember] public string errorMessageTitle { get; set; }
@@ -39,28 +39,28 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupData : mBankJsonResponseBase
+        public class MBankJsonResponseSetupData : MBankJsonResponseBase
         {
             [DataMember] public string entity { get; set; }
             [DataMember] public string antiForgeryToken { get; set; }
-            [DataMember] public mBankJsonResponseSetupDataCustomer customer { get; set; }
-            [DataMember] public mBankJsonResponseSetupDataProfile profile { get; set; }
-            [DataMember] public mBankJsonResponseSetupDataFlags flags { get; set; }
-            [DataMember] public mBankJsonResponseSetupDataLocalization localization { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataCustomer customer { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataProfile profile { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataFlags flags { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataLocalization localization { get; set; }
             [DataMember] public string veneziaCultureUrlPrefix { get; set; }
-            [DataMember] public mBankJsonResponseSetupDataTracker tracker { get; set; }
-            [DataMember] public mBankJsonResponseSetupDataConfiguration configuration { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataTracker tracker { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataConfiguration configuration { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataCustomer
+        public class MBankJsonResponseSetupDataCustomer
         {
-            [DataMember] public mBankJsonResponseSetupDataCustomerConsents consents { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataCustomerConsents consents { get; set; }
             [DataMember] public string name { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataCustomerConsents
+        public class MBankJsonResponseSetupDataCustomerConsents
         {
             [DataMember] public bool PR1 { get; set; }
             [DataMember] public bool PR2 { get; set; }
@@ -68,7 +68,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataProfile
+        public class MBankJsonResponseSetupDataProfile
         {
             [DataMember] public string name { get; set; }
             [DataMember] public bool isPb { get; set; }
@@ -76,14 +76,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataFlags
+        public class MBankJsonResponseSetupDataFlags
         {
             [DataMember] public bool AllowDemo { get; set; }
             [DataMember] public bool AllowTranslations { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataLocalization
+        public class MBankJsonResponseSetupDataLocalization
         {
             [DataMember] public List<string> languages { get; set; }
             [DataMember] public string selectedLanguage { get; set; }
@@ -92,34 +92,34 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataTracker
+        public class MBankJsonResponseSetupDataTracker
         {
             [DataMember] public string cdnAddress { get; set; }
             [DataMember] public string trackerKey { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataConfiguration
+        public class MBankJsonResponseSetupDataConfiguration
         {
-            [DataMember] public mBankJsonResponseSetupDataConfigurationSessionTimer sessionTimer { get; set; }
+            [DataMember] public MBankJsonResponseSetupDataConfigurationSessionTimer sessionTimer { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseSetupDataConfigurationSessionTimer
+        public class MBankJsonResponseSetupDataConfigurationSessionTimer
         {
             [DataMember] public int sessionTimeout { get; set; }
             [DataMember] public int timeLeftToShowAlert { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizationData : mBankJsonResponseBase
+        public class MBankJsonResponseAuthorizationData : MBankJsonResponseBase
         {
             [DataMember] public string ScaAuthorizationId { get; set; }
             [DataMember] public bool TrustedDeviceAddingAllowed { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizationLocale : mBankJsonResponseBase
+        public class MBankJsonResponseAuthorizationLocale : MBankJsonResponseBase
         {
             [DataMember(Name = "auth.CancelButtonLabel")] public string CancelButtonLabel { get; set; }
             [DataMember(Name = "auth.ErrorTitleLabel")] public string ErrorTitleLabel { get; set; }
@@ -131,15 +131,15 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorization : mBankJsonResponseBase
+        public class MBankJsonResponseAuthorization : MBankJsonResponseBase
         {
-            [DataMember] public mBankJsonResponseAuthorizationAuthorizationData authorizationData { get; set; }
+            [DataMember] public MBankJsonResponseAuthorizationAuthorizationData authorizationData { get; set; }
             [DataMember] public string data { get; set; }
             [DataMember] public int operationTimeout { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizationAuthorizationData
+        public class MBankJsonResponseAuthorizationAuthorizationData
         {
             [DataMember] public string authorizationType { get; set; }
             [DataMember] public string deviceName { get; set; }
@@ -160,73 +160,73 @@ namespace BankService.Bank_PL_mBank
             //TODO enum
             [DataMember] public string authorizationStatus { get; set; }
 
-            public mBankJsonAuthorizationType? AuthorizationTypeValue
+            public MBankJsonAuthorizationType? AuthorizationTypeValue
             {
-                get { return authorizationType.GetEnumByJsonValue<mBankJsonAuthorizationType>(); }
-                set { authorizationType = value.GetEnumJsonValue<mBankJsonAuthorizationType>(); }
+                get => authorizationType.GetEnumByJsonValue<MBankJsonAuthorizationType>();
+                set => authorizationType = value.GetEnumJsonValue<MBankJsonAuthorizationType>();
             }
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizationStatus : mBankJsonResponseBase
+        public class MBankJsonResponseAuthorizationStatus : MBankJsonResponseBase
         {
             [DataMember] public string authorizationStatus { get; set; }
             [DataMember] public string authorizationId { get; set; }
-            [DataMember] public mBankJsonResponseAuthorizePostResult postResult { get; set; }
+            [DataMember] public MBankJsonResponseAuthorizePostResult postResult { get; set; }
             //TODO enum
             [DataMember] public string notificationMethod { get; set; }
 
-            public mBankJsonAuthorizationStatus? AuthorizationStatusValue
+            public MBankJsonAuthorizationStatus? AuthorizationStatusValue
             {
-                get { return authorizationStatus.GetEnumByJsonValue<mBankJsonAuthorizationStatus>(); }
-                set { authorizationStatus = value.GetEnumJsonValue<mBankJsonAuthorizationStatus>(); }
+                get => authorizationStatus.GetEnumByJsonValue<MBankJsonAuthorizationStatus>();
+                set => authorizationStatus = value.GetEnumJsonValue<MBankJsonAuthorizationStatus>();
             }
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizationTransferStatus : mBankJsonResponseBase
+        public class MBankJsonResponseAuthorizationTransferStatus : MBankJsonResponseBase
         {
             [DataMember] public string Status { get; set; }
             [DataMember] public string Message { get; set; }
             [DataMember] public string ErrorCode { get; set; }
 
-            public mBankJsonAuthorizationTransferStatus? AuthorizationStatusValue
+            public MBankJsonAuthorizationTransferStatus? AuthorizationStatusValue
             {
-                get { return Status.GetEnumByJsonValue<mBankJsonAuthorizationTransferStatus>(); }
-                set { Status = value.GetEnumJsonValue<mBankJsonAuthorizationTransferStatus>(); }
+                get => Status.GetEnumByJsonValue<MBankJsonAuthorizationTransferStatus>();
+                set => Status = value.GetEnumJsonValue<MBankJsonAuthorizationTransferStatus>();
             }
         }
 
         [DataContract]
-        public class mBankJsonResponseFinalizeAuthorization : mBankJsonResponseBase
+        public class MBankJsonResponseFinalizeAuthorization : MBankJsonResponseBase
         {
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorize : mBankJsonResponseBase
+        public class MBankJsonResponseAuthorize : MBankJsonResponseBase
         {
             [DataMember] public string type { get; set; }
             [DataMember] public string title { get; set; }
             [DataMember] public int status { get; set; }
             [DataMember] public string detail { get; set; }
-            [DataMember] public mBankJsonResponseAuthorizeErrors errors { get; set; }
+            [DataMember] public MBankJsonResponseAuthorizeErrors errors { get; set; }
             [DataMember] public string traceId { get; set; }
-            [DataMember] public mBankJsonResponseAuthorizePostResult postResult { get; set; }
+            [DataMember] public MBankJsonResponseAuthorizePostResult postResult { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizeErrors
+        public class MBankJsonResponseAuthorizeErrors
         {
         }
 
         [DataContract]
-        public class mBankJsonResponseAuthorizePostResult
+        public class MBankJsonResponseAuthorizePostResult
         {
-            [DataMember] public mBankJsonResponseExecutePostResultData data { get; set; }
+            [DataMember] public MBankJsonResponseExecutePostResultData data { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseExecutePostResultData
+        public class MBankJsonResponseExecutePostResultData
         {
             [DataMember] public string scaAuthorizationId { get; set; }
             [DataMember] public string browserName { get; set; }
@@ -235,35 +235,35 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseExecute : mBankJsonResponseBase
+        public class MBankJsonResponseExecute : MBankJsonResponseBase
         {
-            [DataMember] public mBankJsonResponseExecutePostResult PostResult { get; set; }
+            [DataMember] public MBankJsonResponseExecutePostResult PostResult { get; set; }
             [DataMember] public string Message { get; set; }
             [DataMember] public string ErrorCode { get; set; }
             [DataMember] public string error { get; set; }
             [DataMember] public string source { get; set; }
             [DataMember] public string message { get; set; }
             [DataMember] public string type { get; set; }
-            [DataMember] public mBankJsonResponseExecuteApiFault apiFault { get; set; }
+            [DataMember] public MBankJsonResponseExecuteApiFault apiFault { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseExecuteApiFault
+        public class MBankJsonResponseExecuteApiFault
         {
             [DataMember] public string code { get; set; }
             [DataMember] public string message { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseExecutePostResult
+        public class MBankJsonResponseExecutePostResult
         {
             [DataMember] public bool blockResources { get; set; }
-            [DataMember] public mBankJsonResponseExecutePostResultOperationBasketStatus operationBasketStatus { get; set; }
+            [DataMember] public MBankJsonResponseExecutePostResultOperationBasketStatus operationBasketStatus { get; set; }
             //TODO enum
             [DataMember] public string transferTimeType { get; set; }
-            [DataMember] public mBankJsonResponseDomesticAccount receiverAccount { get; set; }
-            [DataMember] public mBankJsonResponseDomesticAccount senderAccount { get; set; }
-            [DataMember] public mBankJsonResponseAmount transferAmount { get; set; }
+            [DataMember] public MBankJsonResponseDomesticAccount receiverAccount { get; set; }
+            [DataMember] public MBankJsonResponseDomesticAccount senderAccount { get; set; }
+            [DataMember] public MBankJsonResponseAmount transferAmount { get; set; }
             [DataMember] public bool isTransactionWithheld { get; set; }
             [DataMember] public bool showRepeatFromBasketWarning { get; set; }
             [DataMember] public string operationWarningsAndErrors { get; set; }
@@ -271,7 +271,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseExecutePostResultOperationBasketStatus
+        public class MBankJsonResponseExecutePostResultOperationBasketStatus
         {
             [DataMember] public bool firstAuthLimitReached { get; set; }
             [DataMember] public bool secondAuthLimitReached { get; set; }
@@ -279,48 +279,48 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTrustedDevicesCheck : mBankJsonResponseBase
+        public class MBankJsonResponseTrustedDevicesCheck : MBankJsonResponseBase
         {
             [DataMember] public bool isValid { get; set; }
             [DataMember] public string deviceName { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTrustedDevicesAdd : mBankJsonResponseBase
+        public class MBankJsonResponseTrustedDevicesAdd : MBankJsonResponseBase
         {
             [DataMember] public bool isValid { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseUserSettings : mBankJsonResponseBase
+        public class MBankJsonResponseUserSettings : MBankJsonResponseBase
         {
-            [DataMember] public List<mBankJsonResponseUserSettingsProduct> products { get; set; }
+            [DataMember] public List<MBankJsonResponseUserSettingsProduct> products { get; set; }
             [DataMember] public bool isWospEnabled { get; set; }
             [DataMember] public bool isSupportUkraineEnabled { get; set; }
             [DataMember] public bool isWospFloodReliefEnabled { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseUserSettingsProduct
+        public class MBankJsonResponseUserSettingsProduct
         {
             [DataMember] public string id { get; set; }
             [DataMember] public string productType { get; set; }
             [DataMember] public int? order { get; set; }
         }
 
-        //TODO common part with mBankJsonResponseUserSettings
+        //TODO common part with MBankJsonResponseUserSettings
         [DataContract]
-        public class mBankJsonResponseProducts : mBankJsonResponseBase
+        public class MBankJsonResponseProducts : MBankJsonResponseBase
         {
-            [DataMember] public List<mBankJsonResponseProductsProduct> products { get; set; }
+            [DataMember] public List<MBankJsonResponseProductsProduct> products { get; set; }
             [DataMember] public bool isWospEnabled { get; set; }
             [DataMember] public bool isSupportUkraineEnabled { get; set; }
             [DataMember] public bool isWospFloodReliefEnabled { get; set; }
         }
 
-        //TODO covers with mBankJsonResponseUserSettingsProduct
+        //TODO covers with MBankJsonResponseUserSettingsProduct
         [DataContract]
-        public class mBankJsonResponseProductsProduct : mBankJsonResponseUserSettingsProduct
+        public class MBankJsonResponseProductsProduct : MBankJsonResponseUserSettingsProduct
         {
             [DataMember] public string currentMonthExpenditure { get; set; }
             [DataMember] public string upcomingPayments { get; set; }
@@ -329,7 +329,7 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public double AvailableBalance { get; set; }
             [DataMember] public string currency { get; set; }
             [DataMember] public string additionalName { get; set; }
-            [DataMember] public mBankJsonResponseAmount balance { get; set; }
+            [DataMember] public MBankJsonResponseAmount balance { get; set; }
             [DataMember] public string nameAddition { get; set; }
             [DataMember] public string accountNumberToRedirect { get; set; }
             [DataMember] public string name { get; set; }
@@ -337,20 +337,20 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseExtendSession : mBankJsonResponseBase
+        public class MBankJsonResponseExtendSession : MBankJsonResponseBase
         {
             [DataMember] public bool success { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseHistory : mBankJsonResponseBase
+        public class MBankJsonResponseHistory : MBankJsonResponseBase
         {
-            [DataMember] public List<mBankJsonResponseHistoryPfmProduct> pfmProducts { get; set; }
+            [DataMember] public List<MBankJsonResponseHistoryPfmProduct> pfmProducts { get; set; }
             //TODO datetime?
             [DataMember] public string dateFrom { get; set; }
             [DataMember] public string dateTo { get; set; }
-            [DataMember] public List<mBankJsonResponseHistoryPfmTransactionType> pfmTransactionTypes { get; set; }
-            [DataMember] public List<mBankJsonResponseHistoryCategory> categories { get; set; }
+            [DataMember] public List<MBankJsonResponseHistoryPfmTransactionType> pfmTransactionTypes { get; set; }
+            [DataMember] public List<MBankJsonResponseHistoryCategory> categories { get; set; }
             [DataMember] public string accountNumber { get; set; }
             [DataMember] public List<string> tags { get; set; }
             [DataMember] public string transactionId { get; set; }
@@ -373,7 +373,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseHistoryPfmProduct
+        public class MBankJsonResponseHistoryPfmProduct
         {
             [DataMember] public string id { get; set; }
             [DataMember] public string contractNumber { get; set; }
@@ -391,32 +391,32 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseHistoryPfmTransactionType
+        public class MBankJsonResponseHistoryPfmTransactionType
         {
             [DataMember] public string value { get; set; }
             [DataMember] public string label { get; set; }
             [DataMember] public bool isSelected { get; set; }
-            [DataMember] public List<mBankJsonResponseHistoryPfmTransactionType> subtypes { get; set; }
+            [DataMember] public List<MBankJsonResponseHistoryPfmTransactionType> subtypes { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseHistoryCategory
+        public class MBankJsonResponseHistoryCategory
         {
             [DataMember] public string id { get; set; }
             [DataMember] public string name { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTransactions : mBankJsonResponseBase
+        public class MBankJsonResponseTransactions : MBankJsonResponseBase
         {
-            [DataMember] public List<mBankJsonResponseTransactionsTransaction> transactions { get; set; }
+            [DataMember] public List<MBankJsonResponseTransactionsTransaction> transactions { get; set; }
             [DataMember] public string nextPageUrl { get; set; }
             [DataMember] public int totalOperationsCount { get; set; }
             [DataMember] public int pageCount { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTransactionsTransaction
+        public class MBankJsonResponseTransactionsTransaction
         {
             [DataMember] public long pfmId { get; set; }
             [DataMember] public int operationNumber { get; set; }
@@ -443,30 +443,30 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public List<string> tags { get; set; }
             [DataMember] public string standingOrder { get; set; }
 
-            public mBankJsonOperationCode? OperationCodeValue
+            public MBankJsonOperationCode? OperationCodeValue
             {
-                get { return operationCode.GetEnumByJsonValue<mBankJsonOperationCode>(); }
-                set { operationCode = value.GetEnumJsonValue<mBankJsonOperationCode>(); }
+                get => operationCode.GetEnumByJsonValue<MBankJsonOperationCode>();
+                set => operationCode = value.GetEnumJsonValue<MBankJsonOperationCode>();
             }
-            public mBankJsonOperationType? OperationTypeValue
+            public MBankJsonOperationType? OperationTypeValue
             {
                 //TODO GetEnumByJsonValueNoEmpty + other places
-                get { return operationType.GetEnumByJsonValue<mBankJsonOperationType>(); }
-                set { operationType = value.GetEnumJsonValue<mBankJsonOperationType>(); }
+                get => operationType.GetEnumByJsonValue<MBankJsonOperationType>();
+                set => operationType = value.GetEnumJsonValue<MBankJsonOperationType>();
             }
-            public mBankJsonCategory? CategoryValue
+            public MBankJsonCategory? CategoryValue
             {
-                get { return category.GetEnumByJsonValue<mBankJsonCategory>(); }
-                set { category = value.GetEnumJsonValue<mBankJsonCategory>(); }
+                get => category.GetEnumByJsonValue<MBankJsonCategory>();
+                set => category = value.GetEnumJsonValue<MBankJsonCategory>();
             }
         }
 
         [DataContract]
-        public class mBankJsonResponseTransaction : mBankJsonResponseBase
+        public class MBankJsonResponseTransaction : MBankJsonResponseBase
         {
             [DataMember] public int id { get; set; }
             [DataMember] public string type { get; set; }
-            [DataMember] public Dictionary<string, mBankJsonResponseTransactionDetails> details { get; set; }
+            [DataMember] public Dictionary<string, MBankJsonResponseTransactionDetails> details { get; set; }
             [DataMember] public bool canRetry { get; set; }
             [DataMember] public bool canReply { get; set; }
             [DataMember] public bool canPrint { get; set; }
@@ -475,15 +475,15 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public bool canConditionsPrint { get; set; }
             [DataMember] public string splitOverview { get; set; }
 
-            public mBankJsonOperationType? OperationTypeValue
+            public MBankJsonOperationType? OperationTypeValue
             {
-                get { return type.GetEnumByJsonValue<mBankJsonOperationType>(); }
-                set { type = value.GetEnumJsonValue<mBankJsonOperationType>(); }
+                get => type.GetEnumByJsonValue<MBankJsonOperationType>();
+                set => type = value.GetEnumJsonValue<MBankJsonOperationType>();
             }
         }
 
         [DataContract]
-        public class mBankJsonResponseTransactionDetails
+        public class MBankJsonResponseTransactionDetails
         {
             [DataMember] public string label { get; set; }
             [DataMember] public string key { get; set; }
@@ -492,21 +492,21 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponsePhoneCharge : mBankJsonResponseBase
+        public class MBankJsonResponsePhoneCharge : MBankJsonResponseBase
         {
-            [DataMember] public List<mBankJsonResponsePhoneChargeAccount> fromAccounts { get; set; }
-            [DataMember] public List<mBankJsonResponsePhoneChargeOperator> operators { get; set; }
+            [DataMember] public List<MBankJsonResponsePhoneChargeAccount> fromAccounts { get; set; }
+            [DataMember] public List<MBankJsonResponsePhoneChargeOperator> operators { get; set; }
             [DataMember] public double chargeAmount { get; set; }
             [DataMember] public DateTime operationDate { get; set; }
             [DataMember] public string regulationFileLink { get; set; }
             [DataMember] public string currency { get; set; }
             [DataMember] public bool isFirmAccount { get; set; }
-            [DataMember] public mBankJsonResponsePhoneChargeAddressBookNavigationData addressBookNavigationData { get; set; }
+            [DataMember] public MBankJsonResponsePhoneChargeAddressBookNavigationData addressBookNavigationData { get; set; }
             [DataMember] public string fromAccount { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponsePhoneChargeAccount
+        public class MBankJsonResponsePhoneChargeAccount
         {
             [DataMember] public double balance { get; set; }
             [DataMember] public string currency { get; set; }
@@ -515,13 +515,13 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponsePhoneChargeOperator
+        public class MBankJsonResponsePhoneChargeOperator
         {
             [DataMember] public string name { get; set; }
             [DataMember] public string operatorId { get; set; }
             [DataMember] public string minValue { get; set; }
             [DataMember] public string maxValue { get; set; }
-            [DataMember] public List<mBankJsonResponsePhoneChargeOperatorAmount> amounts { get; set; }
+            [DataMember] public List<MBankJsonResponsePhoneChargeOperatorAmount> amounts { get; set; }
             [DataMember] public string mTransferId { get; set; }
 
             public double MinValue => Double.Parse(minValue);
@@ -529,14 +529,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponsePhoneChargeOperatorAmount
+        public class MBankJsonResponsePhoneChargeOperatorAmount
         {
             [DataMember] public string display { get; set; }
             [DataMember] public double value { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponsePhoneChargeAddressBookNavigationData
+        public class MBankJsonResponsePhoneChargeAddressBookNavigationData
         {
             [DataMember] public string id { get; set; }
             [DataMember] public string number { get; set; }
@@ -548,7 +548,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseInitPrepare : mBankJsonResponseBase
+        public class MBankJsonResponseInitPrepare : MBankJsonResponseBase
         {
             [DataMember] public string AuthMode { get; set; }
             [DataMember] public string ListNumber { get; set; }
@@ -562,20 +562,20 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public string Status { get; set; }
             [DataMember] public bool Pending { get; set; }
             [DataMember] public int StatusCheckInterval { get; set; }
-            [DataMember] public mBankJsonResponseInitPrepareData Data { get; set; }
+            [DataMember] public MBankJsonResponseInitPrepareData Data { get; set; }
             [DataMember] public string AuthData { get; set; }
             [DataMember] public string Message { get; set; }
             [DataMember] public string ErrorCode { get; set; }
 
-            public mBankJsonAuthorizationMode? AuthorizationModeValue
+            public MBankJsonAuthorizationMode? AuthorizationModeValue
             {
-                get { return AuthMode.GetEnumByJsonValue<mBankJsonAuthorizationMode>(); }
-                set { AuthMode = value.GetEnumJsonValue<mBankJsonAuthorizationMode>(); }
+                get => AuthMode.GetEnumByJsonValue<MBankJsonAuthorizationMode>();
+                set => AuthMode = value.GetEnumJsonValue<MBankJsonAuthorizationMode>();
             }
         }
 
         [DataContract]
-        public class mBankJsonResponseInitPrepareData
+        public class MBankJsonResponseInitPrepareData
         {
             [DataMember] public double chargeAmount { get; set; }
             [DataMember] public string phoneNumber { get; set; }
@@ -592,18 +592,18 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseDomestic : mBankJsonResponseBase
+        public class MBankJsonResponseDomestic : MBankJsonResponseBase
         {
             [DataMember] public List<string> eeaCountries { get; set; }
             [DataMember] public List<string> availableCurrencies { get; set; }
-            [DataMember] public List<mBankJsonResponseDomesticAccount> availableAccounts { get; set; }
+            [DataMember] public List<MBankJsonResponseDomesticAccount> availableAccounts { get; set; }
             [DataMember] public List<string> availableCreditCards { get; set; }
             [DataMember] public List<DateTime> unavailableDates { get; set; }
-            [DataMember] public List<mBankJsonResponseDomesticTransferMode> transferModes { get; set; }
+            [DataMember] public List<MBankJsonResponseDomesticTransferMode> transferModes { get; set; }
             [DataMember] public string defaultAccount { get; set; }
             [DataMember] public string defaultEmail { get; set; }
             [DataMember] public string czSkData { get; set; }
-            [DataMember] public mBankJsonResponseDomesticTransferData transferData { get; set; }
+            [DataMember] public MBankJsonResponseDomesticTransferData transferData { get; set; }
             [DataMember] public bool isTransferDateFixed { get; set; }
             [DataMember] public bool hasTemplateAccountForOtherProfile { get; set; }
             [DataMember] public bool isBasketModified { get; set; }
@@ -611,15 +611,15 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseDomesticAccount
+        public class MBankJsonResponseDomesticAccount
         {
-            [DataMember] public mBankJsonResponseAmount amount { get; set; }
-            [DataMember] public mBankJsonResponseAmount ownFunds { get; set; }
+            [DataMember] public MBankJsonResponseAmount amount { get; set; }
+            [DataMember] public MBankJsonResponseAmount ownFunds { get; set; }
             [DataMember] public string name { get; set; }
             [DataMember] public string fullName { get; set; }
             [DataMember] public string userAccountName { get; set; }
             [DataMember] public string maskedNumber { get; set; }
-            [DataMember] public List<mBankJsonResponseDomesticAccountCoowner> coowners { get; set; }
+            [DataMember] public List<MBankJsonResponseDomesticAccountCoowner> coowners { get; set; }
             [DataMember] public string currency { get; set; }
             [DataMember] public bool hasTemplateAccountForOtherProfile { get; set; }
             [DataMember] public bool isCurrencyAccount { get; set; }
@@ -631,7 +631,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseDomesticAccountCoowner
+        public class MBankJsonResponseDomesticAccountCoowner
         {
             [DataMember] public string coownerId { get; set; }
             [DataMember] public string displayName { get; set; }
@@ -641,7 +641,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseDomesticTransferMode
+        public class MBankJsonResponseDomesticTransferMode
         {
             [DataMember] public string transferModeType { get; set; }
             [DataMember] public string transferType { get; set; }
@@ -656,14 +656,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseDomesticTransferData
+        public class MBankJsonResponseDomesticTransferData
         {
             [DataMember] public string fromAccount { get; set; }
             [DataMember] public string toAccount { get; set; }
             [DataMember] public string perfToken { get; set; }
-            [DataMember] public mBankJsonResponseAmount amount { get; set; }
+            [DataMember] public MBankJsonResponseAmount amount { get; set; }
             [DataMember] public string title { get; set; }
-            [DataMember] public mBankJsonResponseDomesticTransferDataCzSkTransferData czSkTransferData { get; set; }
+            [DataMember] public MBankJsonResponseDomesticTransferDataCzSkTransferData czSkTransferData { get; set; }
             [DataMember] public string bankDetails { get; set; }
             [DataMember] public string receiverName { get; set; }
             [DataMember] public string receiverAddress { get; set; }
@@ -689,7 +689,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseDomesticTransferDataCzSkTransferData
+        public class MBankJsonResponseDomesticTransferDataCzSkTransferData
         {
             [DataMember] public string reference { get; set; }
             [DataMember] public string constantSymbol { get; set; }
@@ -701,16 +701,16 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTransferCheck : mBankJsonResponseBase
+        public class MBankJsonResponseTransferCheck : MBankJsonResponseBase
         {
-            [DataMember] public List<mBankJsonResponseTransferCheckAccount> availableAccounts { get; set; }
+            [DataMember] public List<MBankJsonResponseTransferCheckAccount> availableAccounts { get; set; }
             [DataMember] public List<string> availableCreditCards { get; set; }
             [DataMember] public string perfToken { get; set; }
-            [DataMember] public mBankJsonResponseTransferCheckBankDetails bankDetails { get; set; }
+            [DataMember] public MBankJsonResponseTransferCheckBankDetails bankDetails { get; set; }
             [DataMember] public List<string> availableCurrencies { get; set; }
             [DataMember] public DateTime transferDate { get; set; }
             [DataMember] public bool isTransferDateFixed { get; set; }
-            [DataMember] public List<mBankJsonResponseDomesticTransferMode> transferModes { get; set; }
+            [DataMember] public List<MBankJsonResponseDomesticTransferMode> transferModes { get; set; }
             [DataMember] public string selectedTransferType { get; set; }
             //TODO enum
             [DataMember] public string redirectToForm { get; set; }
@@ -720,7 +720,7 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public bool isPeriodicTransferAvailable { get; set; }
             [DataMember] public bool isStandingOrderAvailable { get; set; }
             [DataMember] public bool isSeriesAvailable { get; set; }
-            [DataMember] public mBankJsonResponseTransferCheckAdditionalOptions additionalOptions { get; set; }
+            [DataMember] public MBankJsonResponseTransferCheckAdditionalOptions additionalOptions { get; set; }
             [DataMember] public bool isInstantPaymentAvailableFromAccount { get; set; }
             [DataMember] public bool isReceiverAccountCzBreGroupIban { get; set; }
             [DataMember] public bool isInstantPaymentAmountExceeded { get; set; }
@@ -732,7 +732,7 @@ namespace BankService.Bank_PL_mBank
 
         //TODO common part with account
         [DataContract]
-        public class mBankJsonResponseTransferCheckAccount
+        public class MBankJsonResponseTransferCheckAccount
         {
             [DataMember] public string number { get; set; }
             [DataMember] public string cardNumber { get; set; }
@@ -740,7 +740,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTransferCheckBankDetails
+        public class MBankJsonResponseTransferCheckBankDetails
         {
             [DataMember] public string bic { get; set; }
             [DataMember] public string bankCode { get; set; }
@@ -754,7 +754,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTransferCheckAdditionalOptions
+        public class MBankJsonResponseTransferCheckAdditionalOptions
         {
             [DataMember] public bool showBlockFunds { get; set; }
             [DataMember] public bool showSendConfirmations { get; set; }
@@ -764,7 +764,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxFormType
+        public class MBankJsonResponseTaxFormType
         {
             [DataMember] public string formName { get; set; }
             [DataMember] public string beDate { get; set; }
@@ -775,14 +775,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepare : mBankJsonResponseBase
+        public class MBankJsonResponseTaxTransferPrepare : MBankJsonResponseBase
         {
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormData formData { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareSidebarData sidebarData { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormData formData { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareSidebarData sidebarData { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormData
+        public class MBankJsonResponseTaxTransferPrepareFormData
         {
             [DataMember] public string tasksCenterData { get; set; }
             [DataMember] public string templateId { get; set; }
@@ -792,13 +792,13 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public string sender { get; set; }
             [DataMember] public string commitmentId { get; set; }
             [DataMember] public string amount { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataIdType idType { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataNameAndAddress nameAndAddress { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataPeriod period { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataIdType idType { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataNameAndAddress nameAndAddress { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataPeriod period { get; set; }
             [DataMember] public string taxAuthority { get; set; }
             [DataMember] public List<string> symbolsList { get; set; }
             [DataMember] public DateTime date { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataAdditionalOptions additionalOptions { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataAdditionalOptions additionalOptions { get; set; }
             [DataMember] public string formType { get; set; }
             [DataMember] public string paymentName { get; set; }
             [DataMember] public string repeatFor { get; set; }
@@ -807,15 +807,15 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public string tryAgain { get; set; }
             [DataMember] public string currency { get; set; }
             [DataMember] public string frequency { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataIdTypesDict idTypesDict { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataIdTypesDict idTypesDict { get; set; }
             [DataMember] public bool requiresPP { get; set; }
             [DataMember] public bool showTaxAuthorityEditControls { get; set; }
             [DataMember] public string emails { get; set; }
             [DataMember] public bool saveAmountInTemplate { get; set; }
             [DataMember] public string templateName { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataDefaultData defaultData { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataDefaultData defaultData { get; set; }
             [DataMember] public bool useCache { get; set; }
-            [DataMember] public mBankJsonResponseTaxTransferPrepareFormDataLastCheckedValues lastCheckedValues { get; set; }
+            [DataMember] public MBankJsonResponseTaxTransferPrepareFormDataLastCheckedValues lastCheckedValues { get; set; }
             [DataMember] public bool canAddToBasket { get; set; }
             [DataMember] public bool addToBasket { get; set; }
             [DataMember] public bool isTrusted { get; set; }
@@ -829,14 +829,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataIdType
+        public class MBankJsonResponseTaxTransferPrepareFormDataIdType
         {
             [DataMember] public string series { get; set; }
             [DataMember] public string type { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataNameAndAddress
+        public class MBankJsonResponseTaxTransferPrepareFormDataNameAndAddress
         {
             [DataMember] public string city { get; set; }
             [DataMember] public string name { get; set; }
@@ -845,17 +845,17 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataPeriod
+        public class MBankJsonResponseTaxTransferPrepareFormDataPeriod
         {
             [DataMember] public string currentPeriod { get; set; }
             [DataMember] public int currentValue { get; set; }
             [DataMember] public int currentMonth { get; set; }
             [DataMember] public int currentYear { get; set; }
-            [DataMember] public List<mBankJsonResponseTaxTransferPrepareFormDataPeriodValidator> validator { get; set; }
+            [DataMember] public List<MBankJsonResponseTaxTransferPrepareFormDataPeriodValidator> validator { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataPeriodValidator
+        public class MBankJsonResponseTaxTransferPrepareFormDataPeriodValidator
         {
             [DataMember] public string period { get; set; }
             [DataMember] public double valueMax { get; set; }
@@ -865,7 +865,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataAdditionalOptions
+        public class MBankJsonResponseTaxTransferPrepareFormDataAdditionalOptions
         {
             [DataMember] public string addReceiver { get; set; }
             [DataMember] public bool blockResources { get; set; }
@@ -875,14 +875,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataIdTypesDict
+        public class MBankJsonResponseTaxTransferPrepareFormDataIdTypesDict
         {
             [DataMember] public string activeType { get; set; }
-            [DataMember] public List<mBankJsonResponseTaxTransferPrepareFormDataIdTypesDictType> types { get; set; }
+            [DataMember] public List<MBankJsonResponseTaxTransferPrepareFormDataIdTypesDictType> types { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataIdTypesDictType
+        public class MBankJsonResponseTaxTransferPrepareFormDataIdTypesDictType
         {
             [DataMember] public bool decisionNo { get; set; }
             [DataMember] public bool declarationNo { get; set; }
@@ -893,21 +893,21 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataDefaultData
+        public class MBankJsonResponseTaxTransferPrepareFormDataDefaultData
         {
             [DataMember] public bool isMyContact { get; set; }
             [DataMember] public string recipientId { get; set; }
             [DataMember] public string fromAccount { get; set; }
             [DataMember] public string sender { get; set; }
             [DataMember] public List<string> availableCurrency { get; set; }
-            [DataMember] public List<mBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccount> availableFromAccounts { get; set; }
+            [DataMember] public List<MBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccount> availableFromAccounts { get; set; }
             [DataMember] public string currency { get; set; }
             [DataMember] public bool isDefined { get; set; }
             [DataMember] public bool isAddToAddressDisabled { get; set; }
             [DataMember] public string recipientName { get; set; }
             [DataMember] public DateTime dateNow { get; set; }
             [DataMember] public DateTime date { get; set; }
-            [DataMember] public mBankJsonResponseCalendar calendar { get; set; }
+            [DataMember] public MBankJsonResponseCalendar calendar { get; set; }
             [DataMember] public bool blockResources { get; set; }
             [DataMember] public List<string> deliveryTime { get; set; }
             [DataMember] public List<string> zusAccounts { get; set; }
@@ -922,7 +922,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccount
+        public class MBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccount
         {
             [DataMember] public string accountParams { get; set; }
             [DataMember] public string activeCoownerId { get; set; }
@@ -931,7 +931,7 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public bool showBalance { get; set; }
             [DataMember] public double ownFunds { get; set; }
             [DataMember] public bool showOwnFunds { get; set; }
-            [DataMember] public List<mBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccountCoowner> coowners { get; set; }
+            [DataMember] public List<MBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccountCoowner> coowners { get; set; }
             [DataMember] public string currency { get; set; }
             [DataMember] public string displayName { get; set; }
             [DataMember] public bool isCreditCard { get; set; }
@@ -940,9 +940,9 @@ namespace BankService.Bank_PL_mBank
             [DataMember] public string relatedAccount { get; set; }
         }
 
-        //TODO common part with mBankJsonResponseDomesticAccountCoowner
+        //TODO common part with MBankJsonResponseDomesticAccountCoowner
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccountCoowner
+        public class MBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccountCoowner
         {
             [DataMember] public string coownerId { get; set; }
             [DataMember] public string displayName { get; set; }
@@ -960,7 +960,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseCalendar
+        public class MBankJsonResponseCalendar
         {
             [DataMember] public double utcOffsetInMinutes { get; set; }
             [DataMember] public DateTime maxDate { get; set; }
@@ -969,22 +969,22 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareFormDataLastCheckedValues
+        public class MBankJsonResponseTaxTransferPrepareFormDataLastCheckedValues
         {
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareSidebarData
+        public class MBankJsonResponseTaxTransferPrepareSidebarData
         {
             [DataMember] public string activeTemplateId { get; set; }
             [DataMember] public bool isContactShared { get; set; }
-            [DataMember] public List<mBankJsonResponseTaxTransferPrepareSidebarDataTemplateType> templateTypes { get; set; }
+            [DataMember] public List<MBankJsonResponseTaxTransferPrepareSidebarDataTemplateType> templateTypes { get; set; }
             [DataMember] public string sourceCategory { get; set; }
             [DataMember] public string receiverName { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxTransferPrepareSidebarDataTemplateType
+        public class MBankJsonResponseTaxTransferPrepareSidebarDataTemplateType
         {
             [DataMember] public string contactId { get; set; }
             [DataMember] public string blankLabel { get; set; }
@@ -995,14 +995,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxCity
+        public class MBankJsonResponseTaxCity
         {
             [DataMember] public string taxAuthorityName { get; set; }
             [DataMember] public string taxAccount { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonResponseTaxAccount
+        public class MBankJsonResponseTaxAccount
         {
             [DataMember] public string taxAuthorityName { get; set; }
             [DataMember] public string taxAccount { get; set; }

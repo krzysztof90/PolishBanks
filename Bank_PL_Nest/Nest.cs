@@ -104,7 +104,8 @@ namespace BankService.Bank_PL_Nest
 
             (NestJsonResponseTrustedDeviceCheck response, bool requestProcessed) checkTrustedDeviceResponse = PerformRequest<NestJsonResponseTrustedDeviceCheck>(
                 $"context/{contextId}/trustedDevices/check", HttpMethod.Get,
-                null, null, false);
+                null,
+                null, false);
             if (!checkTrustedDeviceResponse.requestProcessed)
                 return false;
 
@@ -119,7 +120,7 @@ namespace BankService.Bank_PL_Nest
         {
             string signType = "dashboardSca";
 
-            string prepareSignUrl = WebOperations.BuildUrlWithQuery(BaseAddress, $"context/{contextId}/{signType}/prepareSign",
+            string prepareSignUrl = WebOperations.BuildUrlWithQuery($"context/{contextId}/{signType}/prepareSign",
                 new List<(string key, string value)> { ("signedOperation", "confirmation") });
             (NestJsonResponsePrepareSignDashboardSca response, bool requestProcessed) prepareSignResponse = PerformRequest<NestJsonResponsePrepareSignDashboardSca>(
                 prepareSignUrl, HttpMethod.Post,
@@ -175,17 +176,16 @@ namespace BankService.Bank_PL_Nest
             //TODO if messageCode = "tokenSessionMismatch" then change for "Disconnected"
             (string response, bool requestProcessed) extendSessionResponse = PerformPlainRequest(
                 $"context/{contextId}/auth/session/extend", HttpMethod.Get);
-            if (!extendSessionResponse.requestProcessed)
-                return false;
 
-            return true;
+            return extendSessionResponse.requestProcessed;
         }
 
         protected override NestJsonResponseDashboardConfig GetAccountsDetails()
         {
             (NestJsonResponseDashboardConfig response, bool requestProcessed) dashboardResponse = PerformRequest<NestJsonResponseDashboardConfig>(
                 $"context/{contextId}/dashboard/www/config", HttpMethod.Get,
-                null, null, false);
+                null,
+                null, false);
 
             return dashboardResponse.response;
         }
@@ -195,34 +195,37 @@ namespace BankService.Bank_PL_Nest
             return accountsDetails.accounts.Select(a => new NestAccountData(a.name, a.nrb, a.currency, a.balance) { Id = a.id }).ToList();
         }
 
-        public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
+        protected override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
             //( response, bool requestProcessed) banksResponse = PerformRequest<>(
             //    "dictionary/banks", HttpMethod.Post,
             //    JsonConvert.SerializeObject(),
-            //    null);
+            //    null, false);
             //if (!banksResponse.requestProcessed)
             //    return false;
 
             (NestJsonResponseTransferDate response, bool requestProcessed) transferDateResponse = PerformRequest<NestJsonResponseTransferDate>(
                 $"context/{contextId}/order/getDefaultRealizationDate", HttpMethod.Get,
-                null, null, false);
+                null,
+                null, false);
             if (!transferDateResponse.requestProcessed)
                 return false;
 
-            NestJsonRequestPrepareSignTransfer requestPrepareSignTransfer = new NestJsonRequestPrepareSignTransfer();
-            requestPrepareSignTransfer.objectType = "domesticOrder";
-            requestPrepareSignTransfer.accountId = SelectedAccountData.Id;
-            requestPrepareSignTransfer.amount = amount;
-            requestPrepareSignTransfer.cntrAccountNo = accountNumber.SimplifyAccountNumber();
-            requestPrepareSignTransfer.cntrFullName = recipient;
-            requestPrepareSignTransfer.cntrAddress = address;
-            requestPrepareSignTransfer.realizationDate = transferDateResponse.response.date.Display("dd.MM.yyyy");
-            requestPrepareSignTransfer.currency = SelectedAccountData.Currency;
-            requestPrepareSignTransfer.standingType = "ONCE";
-            requestPrepareSignTransfer.title = title;
-            requestPrepareSignTransfer.orderType = "ELIXIR";
-            requestPrepareSignTransfer.dataChangesLog = "W10=";
+            NestJsonRequestPrepareSignTransfer requestPrepareSignTransfer = new NestJsonRequestPrepareSignTransfer
+            {
+                objectType = "domesticOrder",
+                accountId = SelectedAccountData.Id,
+                amount = amount,
+                cntrAccountNo = accountNumber.SimplifyAccountNumber(),
+                cntrFullName = recipient,
+                cntrAddress = address,
+                realizationDate = transferDateResponse.response.date.Display("dd.MM.yyyy"),
+                currency = SelectedAccountData.Currency,
+                standingType = "ONCE",
+                title = title,
+                orderType = "ELIXIR",
+                dataChangesLog = "W10="
+            };
 
             return PrepareSignAndConfirm("order", "creation", requestPrepareSignTransfer,
                 (NestJsonResponsePrepareSignOrder prepareSignResponse) =>
@@ -230,7 +233,7 @@ namespace BankService.Bank_PL_Nest
             );
         }
 
-        public override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
+        protected override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
         {
             (string response, bool requestProcessed) taxFormTypesResponse = PerformPlainRequest("dictionary/taxFormCode", HttpMethod.Get);
             if (!taxFormTypesResponse.requestProcessed)
@@ -243,20 +246,23 @@ namespace BankService.Bank_PL_Nest
 
             (NestJsonResponseTransferDate response, bool requestProcessed) transferDateResponse = PerformRequest<NestJsonResponseTransferDate>(
                 $"context/{contextId}/order/getDefaultRealizationDate", HttpMethod.Get,
-                null, null, false);
+                null,
+                null, false);
             if (!transferDateResponse.requestProcessed)
                 return false;
 
-            NestJsonRequestPrepareSignTaxTransfer requestPrepareSignTaxTransfer = new NestJsonRequestPrepareSignTaxTransfer();
-            requestPrepareSignTaxTransfer.objectType = "usOrder";
-            requestPrepareSignTaxTransfer.accountId = SelectedAccountData.Id;
-            requestPrepareSignTaxTransfer.amount = amount;
-            requestPrepareSignTaxTransfer.realizationDate = transferDateResponse.response.date.Display("dd.MM.yyyy");
-            requestPrepareSignTaxTransfer.currency = SelectedAccountData.Currency;
-            requestPrepareSignTaxTransfer.standingType = "ONCE";
-            requestPrepareSignTaxTransfer.dataChangesLog = "W10=";
-            requestPrepareSignTaxTransfer.taxFormCode = taxType;
-            requestPrepareSignTaxTransfer.taxPaymentId = obligationId;
+            NestJsonRequestPrepareSignTaxTransfer requestPrepareSignTaxTransfer = new NestJsonRequestPrepareSignTaxTransfer
+            {
+                objectType = "usOrder",
+                accountId = SelectedAccountData.Id,
+                amount = amount,
+                realizationDate = transferDateResponse.response.date.Display("dd.MM.yyyy"),
+                currency = SelectedAccountData.Currency,
+                standingType = "ONCE",
+                dataChangesLog = "W10=",
+                taxFormCode = taxType,
+                taxPaymentId = obligationId
+            };
 
             if (selectedTax.irp)
             {
@@ -267,7 +273,7 @@ namespace BankService.Bank_PL_Nest
             }
             else
             {
-                string taxOfficeUrl = WebOperations.BuildUrlWithQuery(BaseAddress, "dictionary/taxOffice",
+                string taxOfficeUrl = WebOperations.BuildUrlWithQuery("dictionary/taxOffice",
                     new List<(string key, string value)> { ("taxFormCode", taxType) });
                 (string response, bool requestProcessed) taxOfficeResponse = PerformPlainRequest(taxOfficeUrl, HttpMethod.Get);
                 List<NestJsonResponseTaxOffice> responseTaxOffices = JsonConvert.DeserializeObject<List<NestJsonResponseTaxOffice>>(taxOfficeResponse.response);
@@ -370,24 +376,27 @@ namespace BankService.Bank_PL_Nest
         {
             (NestJsonResponseEpayments response, bool requestProcessed) epaymentsResponse = PerformRequest<NestJsonResponseEpayments>(
                 $"context/{contextId}/epayments/{transferId}", HttpMethod.Get,
-                null, null, false);
+                null,
+                null, false);
             if (!epaymentsResponse.requestProcessed)
                 return null;
 
-            NestJsonRequestPrepareSignPbl requestPrepareSignPbl = new NestJsonRequestPrepareSignPbl();
-            requestPrepareSignPbl.objectType = "pblOrder";
-            requestPrepareSignPbl.accountId = SelectedAccountData.Id;
-            requestPrepareSignPbl.amount = epaymentsResponse.response.amount;
-            requestPrepareSignPbl.cntrAccountNo = epaymentsResponse.response.receiverAccountNumber;
-            requestPrepareSignPbl.cntrFullName = epaymentsResponse.response.receiverName;
-            //TODO without it
-            requestPrepareSignPbl.confirmationInfo = epaymentsResponse.response.email;
-            requestPrepareSignPbl.currency = SelectedAccountData.Currency;
-            requestPrepareSignPbl.orderType = "pbl";
-            requestPrepareSignPbl.realizationDate = DateTime.Today.Display("dd.MM.yyyy");
-            requestPrepareSignPbl.standingType = "ONCE";
-            requestPrepareSignPbl.title = epaymentsResponse.response.title;
-            requestPrepareSignPbl.transferUID = transferId.SubstringFromEx("/");
+            NestJsonRequestPrepareSignPbl requestPrepareSignPbl = new NestJsonRequestPrepareSignPbl
+            {
+                objectType = "pblOrder",
+                accountId = SelectedAccountData.Id,
+                amount = epaymentsResponse.response.amount,
+                cntrAccountNo = epaymentsResponse.response.receiverAccountNumber,
+                cntrFullName = epaymentsResponse.response.receiverName,
+                //TODO without it
+                confirmationInfo = epaymentsResponse.response.email,
+                currency = SelectedAccountData.Currency,
+                orderType = "pbl",
+                realizationDate = Today.Display("dd.MM.yyyy"),
+                standingType = "ONCE",
+                title = epaymentsResponse.response.title,
+                transferUID = transferId.SubstringFromEx("/")
+            };
 
             if (!PrepareSignAndConfirm("order", "creation", requestPrepareSignPbl,
                 (NestJsonResponsePrepareSignOrder prepareSignResponse) =>
@@ -401,7 +410,8 @@ namespace BankService.Bank_PL_Nest
         {
             (NestJsonResponseOperator response, bool requestProcessed) operatorResponse = PerformRequest<NestJsonResponseOperator>(
                 $"context/{contextId}/topup", HttpMethod.Get,
-                null, null, false);
+                null,
+                null, false);
             if (!operatorResponse.requestProcessed)
                 return false;
 
@@ -423,17 +433,19 @@ namespace BankService.Bank_PL_Nest
                     throw new NotImplementedException();
             }
 
-            NestJsonRequestPrepareSignPrepaid requestPrepareSignPrepaid = new NestJsonRequestPrepareSignPrepaid();
-            requestPrepareSignPrepaid.objectType = "mobileChargeOrder";
-            requestPrepareSignPrepaid.accountId = SelectedAccountData.Id;
-            requestPrepareSignPrepaid.amount = amount;
-            requestPrepareSignPrepaid.clauseAccepted = true;
-            requestPrepareSignPrepaid.cntrFullName = recipient;
-            requestPrepareSignPrepaid.currency = SelectedAccountData.Currency;
-            requestPrepareSignPrepaid.mobilePhone = phoneNumber;
-            requestPrepareSignPrepaid.mobileOperator = operatorItem.name;
-            requestPrepareSignPrepaid.shouldBlockFunds = true;
-            requestPrepareSignPrepaid.standingType = "ONCE";
+            NestJsonRequestPrepareSignPrepaid requestPrepareSignPrepaid = new NestJsonRequestPrepareSignPrepaid
+            {
+                objectType = "mobileChargeOrder",
+                accountId = SelectedAccountData.Id,
+                amount = amount,
+                clauseAccepted = true,
+                cntrFullName = recipient,
+                currency = SelectedAccountData.Currency,
+                mobilePhone = phoneNumber,
+                mobileOperator = operatorItem.name,
+                shouldBlockFunds = true,
+                standingType = "ONCE"
+            };
 
             return PrepareSignAndConfirm("order", "creation", requestPrepareSignPrepaid,
                 (NestJsonResponsePrepareSignOrder prepareSignResponse) =>
@@ -442,24 +454,26 @@ namespace BankService.Bank_PL_Nest
 
         protected override NestHistoryFilter CreateFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact)
         {
-            return new NestHistoryFilter(direction, title, dateFrom, dateTo, amountExact) { OperationType = direction == OperationDirection.Execute ? NestFilterOperationType.Outgoing : NestFilterOperationType.Incoming, CounterLimit = 15 };
+            return new NestHistoryFilter(direction, title, dateFrom, dateTo, amountExact) { OperationType = direction == OperationDirection.Execute ? NestFilterOperationType.Outgoing : NestFilterOperationType.Incoming };
         }
 
         protected override List<NestHistoryItem> GetHistoryItems(NestHistoryFilter filter = null)
         {
             List<NestHistoryItem> result = new List<NestHistoryItem>();
 
-            NestJsonRequestHistory jsonRequestHistory = new NestJsonRequestHistory();
-            //TODO use from filter.CounterLimit + in other banks. Next pages if limit exceeded. Put default in CreateFilter
-            jsonRequestHistory.pagination = new NestJsonRequestPagination() { pageNumber = 1, pageSize = filter.CounterLimit };
+            NestJsonRequestHistory jsonRequestHistory = new NestJsonRequestHistory
+            {
+                //TODO use from filter.CounterLimit + in other banks. Next pages if limit exceeded. Put default in CreateFilter
+                pagination = new NestJsonRequestPagination() { pageNumber = 1, pageSize = filter.CounterLimit },
+                textSearch = filter.Title,
+                DateFromValue = filter.DateFrom,
+                DateToValue = filter.DateTo,
+                AmountFromValue = filter.AmountFrom,
+                AmountToValue = filter.AmountTo
+            };
             //TODO do operationTypeValue + in other banks
             if (filter.OperationType != null)
                 jsonRequestHistory.operationType = AttributeOperations.GetEnumAttribute((NestFilterOperationType)filter.OperationType, (FilterEnumParameterAttribute parameter) => parameter.Parameter, null);
-            jsonRequestHistory.textSearch = filter.Title;
-            jsonRequestHistory.DateFromValue = filter.DateFrom;
-            jsonRequestHistory.DateToValue = filter.DateTo;
-            jsonRequestHistory.AmountFromValue = filter.AmountFrom;
-            jsonRequestHistory.AmountToValue = filter.AmountTo;
 
             (NestJsonResponseHistory response, bool requestProcessed) historyResponse = PerformRequest<NestJsonResponseHistory>(
                 $"https://api2.nestbank.pl/account-query/api/public/v1/account/{SelectedAccountData.Id}/history", HttpMethod.Post,
@@ -467,23 +481,22 @@ namespace BankService.Bank_PL_Nest
                 null, true);
 
             if (historyResponse.requestProcessed)
-            {
                 foreach (NestJsonResponseHistoryItem transaction in historyResponse.response.list)
                 {
                     (NestJsonResponseHistoryDetails response, bool requestProcessed) transactionResponse = PerformRequest<NestJsonResponseHistoryDetails>(
                         $"https://api2.nestbank.pl/account-query/api/public/v1/account/{SelectedAccountData.Id}/operation/{transaction.operationNumber}", HttpMethod.Get,
-                        null, null, true);
+                        null,
+                        null, true);
 
                     result.Add(new NestHistoryItem(transaction, transactionResponse.response));
                 }
-            }
 
             return result;
         }
 
-        protected override bool GetDetailsFileMain(NestHistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        protected override bool GetDetailsFileMain(NestHistoryItem item, Func<string, FileStream> file)
         {
-            string exportUrl = WebOperations.BuildUrlWithQuery(BaseAddress, $"context/{contextId}/account/{SelectedAccountData.Id}/history/{item.Id}/export",
+            string exportUrl = WebOperations.BuildUrlWithQuery($"context/{contextId}/account/{SelectedAccountData.Id}/history/{item.Id}/export",
                 new List<(string key, string value)> { ("fileName", "Potwierdzenie zlecenia platniczego"), ("idType", "OPERATION_NUMBER") });
             PerformFileRequest(
                 exportUrl, HttpMethod.Get,
@@ -494,7 +507,7 @@ namespace BankService.Bank_PL_Nest
 
         private bool PrepareSignAndConfirm(string signType, string signOperation, NestJsonRequestPrepareSignTransferBase requestPrepareSignTransferBase, Func<NestJsonResponsePrepareSignOrder, ConfirmTextBase> confirmTextMethod)
         {
-            string prepareSignUrl = WebOperations.BuildUrlWithQuery(BaseAddress, $"context/{contextId}/{signType}/prepareSign",
+            string prepareSignUrl = WebOperations.BuildUrlWithQuery($"context/{contextId}/{signType}/prepareSign",
                 new List<(string key, string value)> { ("signedOperation", signOperation) });
             (NestJsonResponsePrepareSignOrder response, bool requestProcessed) prepareSignResponse = PerformRequest<NestJsonResponsePrepareSignOrder>(
                 prepareSignUrl, HttpMethod.Post,
@@ -515,7 +528,8 @@ namespace BankService.Bank_PL_Nest
                     {
                         (NestJsonResponseAuthorization response, bool requestProcessed) authorizationResponse = PerformRequest<NestJsonResponseAuthorization>(
                             $"context/{contextId}/authorization/getCrossChannelAuthorizationStatus", HttpMethod.Get,
-                            null, null, false);
+                            null,
+                            null, false);
                         if (!authorizationResponse.requestProcessed)
                             return false;
 
@@ -559,13 +573,13 @@ namespace BankService.Bank_PL_Nest
                         return SMSConfirm<bool, (NestJsonResponseSign response, bool requestProcessed)>(
                             (string SMSCode) =>
                             {
-                                string signUrl = WebOperations.BuildUrlWithQuery(BaseAddress, $"context/{contextId}/{signType}/sign",
+                                string signUrl = WebOperations.BuildUrlWithQuery($"context/{contextId}/{signType}/sign",
                                     new List<(string key, string value)> { ("signedOperation", signOperation) });
                                 return PerformRequest<NestJsonResponseSign>(
                                     signUrl, HttpMethod.Post,
                                     JsonConvert.SerializeObject(NestJsonRequestSign<T>.Create("", SMSCode, prepareSignResponse.objects, prepareSignResponse.objects[0], oneObject)),
                                     //All because if additional other error then wrong
-                                    (NestJsonResponseSign jsonResponseSign) => { return !(jsonResponseSign.level == "ERROR" && jsonResponseSign.problems.All(p => p.messageCode == "modules.authorization.sms.wrong.only")) && !CheckRequest(jsonResponseSign); },
+                                    (NestJsonResponseSign jsonResponseSign) => jsonResponseSign.level == "ERROR" && jsonResponseSign.problems.All(p => p.messageCode == "modules.authorization.sms.wrong.only"),
                                     false);
                             },
                             ((NestJsonResponseSign response, bool requestProcessed) signResponse) =>
@@ -574,8 +588,7 @@ namespace BankService.Bank_PL_Nest
                                     return false;
                                 if (signResponse.response.level == "ERROR" && signResponse.response.problems.All(p => p.messageCode == "modules.authorization.sms.wrong.only"))
                                     return null;
-                                else
-                                    return true;
+                                return true;
                             },
                             ((NestJsonResponseSign response, bool requestProcessed) signResponse) => true,
                             null,
@@ -628,7 +641,7 @@ namespace BankService.Bank_PL_Nest
         //TODO check everywhere requestProcessed + in other banks
         private (T, bool) PerformRequest<T>(string requestUri, HttpMethod method,
             string jsonContent,
-            Func<T, bool> invalidResponse,
+            Func<T, bool> errorExclude,
             bool addContextId) where T : NestJsonResponseBase
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, jsonContent, addContextId))
@@ -637,7 +650,7 @@ namespace BankService.Bank_PL_Nest
 
                 if (result.requestProcessed)
                 {
-                    if (invalidResponse == null ? !CheckRequest(result.response) : invalidResponse.Invoke(result.response))
+                    if ((errorExclude == null || !errorExclude.Invoke(result.response)) && !CheckRequest(result.response))
                         return (null, false);
                 }
 
@@ -652,7 +665,7 @@ namespace BankService.Bank_PL_Nest
         }
 
         private void PerformFileRequest(string requestUri, HttpMethod method,
-            Func<ContentDispositionHeaderValue, FileStream> fileStream)
+            Func<string, FileStream> fileStream)
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, null, false))
                 ProcessFileStream(request, fileStream);

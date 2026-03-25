@@ -137,8 +137,8 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonAuthFactor? FactorValue
             {
-                get { return factor.GetEnumByJsonValue<INGJsonAuthFactor>(); }
-                set { factor = value.GetEnumJsonValue<INGJsonAuthFactor>(); }
+                get => factor.GetEnumByJsonValue<INGJsonAuthFactor>();
+                set => factor = value.GetEnumJsonValue<INGJsonAuthFactor>();
             }
         }
 
@@ -411,112 +411,112 @@ namespace BankService.Bank_PL_ING
 
             public DateTime? FromDateValue
             {
-                get { return DateTime.Parse(fromDate); }
-                set { fromDate = value?.Display("yyyy-MM-dd") ?? String.Empty; }
+                get => DateTime.Parse(fromDate);
+                set => fromDate = value?.Display("yyyy-MM-dd") ?? String.Empty;
             }
 
             public DateTime? ToDateValue
             {
-                get { return DateTime.Parse(toDate); }
-                set { toDate = value?.Display("yyyy-MM-dd") ?? String.Empty; }
+                get => DateTime.Parse(toDate);
+                set => toDate = value?.Display("yyyy-MM-dd") ?? String.Empty;
             }
 
             public INGJsonNoYes? ConxValue
             {
-                get { return conx.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { conx = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => conx.GetEnumByJsonValue<INGJsonNoYes>();
+                set => conx = value.GetEnumJsonValue<INGJsonNoYes>();
             }
 
             public INGJsonTransferSign? SignValue
             {
-                get { return sign.GetEnumByJsonValue<INGJsonTransferSign>(); }
-                set { sign = value.GetEnumJsonValue<INGJsonTransferSign>(); }
+                get => sign.GetEnumByJsonValue<INGJsonTransferSign>();
+                set => sign = value.GetEnumJsonValue<INGJsonTransferSign>();
             }
 
             public bool? ShowIncomingTransfers
             {
-                get { return GetMaskValue(0); }
-                set { SetMaskValue(0, value); }
+                get => GetMaskValue(0);
+                set => SetMaskValue(0, value);
             }
 
             public bool? ShowInternalTransfers
             {
-                get { return GetMaskValue(1); }
-                set { SetMaskValue(1, value); }
+                get => GetMaskValue(1);
+                set => SetMaskValue(1, value);
             }
 
             public bool? ShowExternalTransfers
             {
-                get { return GetMaskValue(2); }
-                set { SetMaskValue(2, value); }
+                get => GetMaskValue(2);
+                set => SetMaskValue(2, value);
             }
 
             public bool? ShowCardTransactionsBlocks
             {
-                get { return GetMaskValue(3); }
-                set { SetMaskValue(3, value); }
+                get => GetMaskValue(3);
+                set => SetMaskValue(3, value);
             }
 
             public bool? ShowCardTransactions
             {
-                get { return GetMaskValue(4); }
-                set { SetMaskValue(4, value); }
+                get => GetMaskValue(4);
+                set => SetMaskValue(4, value);
             }
 
             public bool? ShowATM
             {
-                get { return GetMaskValue(5); }
-                set { SetMaskValue(5, value); }
+                get => GetMaskValue(5);
+                set => SetMaskValue(5, value);
             }
 
             public bool? ShowFees
             {
-                get { return GetMaskValue(6); }
-                set { SetMaskValue(6, value); }
+                get => GetMaskValue(6);
+                set => SetMaskValue(6, value);
             }
 
             //public bool? ShowTest
             //{
-            //    get { return GetMaskValue(7); }
-            //    set { SetMaskValue(7, value); }
+            //    get => GetMaskValue(7);
+            //    set => SetMaskValue(7, value);
             //}
 
             public bool? ShowSmartSaver
             {
-                get { return GetMaskValue(8); }
-                set { SetMaskValue(8, value); }
+                get => GetMaskValue(8);
+                set => SetMaskValue(8, value);
             }
 
             public bool? ShowBlocksAndBlockReleases
             {
-                get { return GetMaskValue(9); }
-                set { SetMaskValue(9, value); }
+                get => GetMaskValue(9);
+                set => SetMaskValue(9, value);
             }
 
             //public bool? ShowTest
             //{
-            //    get { return GetMaskValue(10); }
-            //    set { SetMaskValue(10, value); }
+            //    get =>GetMaskValue(10); 
+            //    set => SetMaskValue(10, value); 
             //}
             //public bool? ShowTest
             //{
-            //    get { return GetMaskValue(11); }
-            //    set { SetMaskValue(11, value); }
+            //    get =>GetMaskValue(11); 
+            //    set => SetMaskValue(11, value); 
             //}
             //public bool? ShowTest
             //{
-            //    get { return GetMaskValue(12); }
-            //    set { SetMaskValue(12, value); }
+            //    get =>GetMaskValue(12); 
+            //    set => SetMaskValue(12, value); 
             //}
             //public bool? ShowTest
             //{
-            //    get { return GetMaskValue(13); }
-            //    set { SetMaskValue(13, value); }
+            //    get =>GetMaskValue(13); 
+            //    set => SetMaskValue(13, value); 
             //}
             //public bool? ShowTest
             //{
-            //    get { return GetMaskValue(14); }
-            //    set { SetMaskValue(14, value); }
+            //    get =>GetMaskValue(14); 
+            //    set => SetMaskValue(14, value); 
             //}
 
             private bool? GetMaskValue(int index)
@@ -688,8 +688,8 @@ namespace BankService.Bank_PL_ING
             //TODO onlydate
             public DateTime? DateValue
             {
-                get { return DateTime.Parse(date); }
-                set { date = value?.Display("yyyy-MM-dd") ?? String.Empty; }
+                get => DateTime.Parse(date);
+                set => date = value?.Display("yyyy-MM-dd") ?? String.Empty;
             }
         }
 

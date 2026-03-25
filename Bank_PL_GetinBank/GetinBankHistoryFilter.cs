@@ -83,7 +83,7 @@ namespace BankService.Bank_PL_GetinBank
             };
         }
 
-        public IEnumerable<KeyValuePair<string, string>> CreateDetailsParameters()
+        public IEnumerable<KeyValuePair<string, string>> CreateDetailsParameters(DateTime today)
         {
             List<KeyValuePair<string, string>> result = new List<KeyValuePair<string, string>>();
 
@@ -94,9 +94,9 @@ namespace BankService.Bank_PL_GetinBank
                 case GetinBankFilterRange.Date:
                     result.Add(new KeyValuePair<string, string>("date", "1"));
                     result.Add(new KeyValuePair<string, string>("dateFrom", (DateFrom ?? DateTime.MinValue).Display("dd.MM.yyyy")));
-                    result.Add(new KeyValuePair<string, string>("dateFrom_submit", DateTime.Now.Display("dd.MM.yyyy")));
-                    result.Add(new KeyValuePair<string, string>("dateTo", (DateTo ?? DateTime.Now).Display("dd.MM.yyyy")));
-                    result.Add(new KeyValuePair<string, string>("dateTo_submit", (DateTo ?? DateTime.Now).Display("dd.MM.yyyy")));
+                    result.Add(new KeyValuePair<string, string>("dateFrom_submit", today.Display("dd.MM.yyyy")));
+                    result.Add(new KeyValuePair<string, string>("dateTo", (DateTo ?? today).Display("dd.MM.yyyy")));
+                    result.Add(new KeyValuePair<string, string>("dateTo_submit", (DateTo ?? today).Display("dd.MM.yyyy")));
                     break;
                 case GetinBankFilterRange.LastOperations:
                     result.Add(new KeyValuePair<string, string>("date", "2"));

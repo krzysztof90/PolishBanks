@@ -23,7 +23,7 @@ namespace BankService
         //TODO labels, translator
 
         private event Action<string> onMessage;
-        List<Action<string>> onMessageDelegates = new List<Action<string>>();
+        private readonly List<Action<string>> onMessageDelegates = new List<Action<string>>();
         public event Action<string> OnMessage
         {
             add
@@ -83,6 +83,7 @@ namespace BankService
         private System.Threading.Timer heartbeatTimer;
 
         public abstract Country Country { get; }
+        public abstract string TimeZoneName { get; }
         protected abstract int HeartbeatInterval { get; }
         protected abstract SMSCodeValidator SMSCodeValidator { get; }
         public abstract bool EnabledFastTransfer { get; }
@@ -104,16 +105,19 @@ namespace BankService
         public abstract bool EmptyAccountsData { get; }
         //TODO currency transfers
         //TODO phone blik transfers
-        public abstract bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount);
-        public abstract bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount);
+        protected abstract bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount);
+        protected abstract bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount);
         protected abstract string CleanFastTransferUrl(string transferId);
         protected abstract bool LoginRequestForFastTransfer(string login, string password, List<object> additionalAuthorization, string transferId);
         protected abstract string MakeFastTransfer(string transferId);
-        public abstract bool MakePaymentOfServicesTransfer(string entity, string reference, double amount);
+        protected abstract bool MakePaymentOfServicesTransfer(string entity, string reference, double amount);
         protected abstract bool MakePrepaidTransfer(string recipient, string phoneNumber, double amount, string nif);
         public abstract HistoryFilter CreateHistoryFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact);
         public abstract List<HistoryItem> GetHistory(HistoryFilter filter = null);
-        public abstract bool GetDetailsFile(HistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file);
+        public abstract bool GetDetailsFile(HistoryItem item, Func<string, FileStream> file);
+
+        public DateTime Now => TimeZoneInfo.ConvertTimeFromUtc(DateTime.Now.ToUniversalTime(), TimeZoneInfo.FindSystemTimeZoneById(TimeZoneName));
+        public DateTime Today => Now.Date;
 
         public AccountData selectedAccountData;
         public AccountData SelectedAccountData
@@ -158,11 +162,10 @@ namespace BankService
                 //AllowAutoRedirect = true,
                 CookieContainer = Cookies
             };
-            HttpClient httpClient = new HttpClient(Handler);
-            httpClient.BaseAddress = new Uri(BaseAddress);
-            //httpClient.DefaultRequestVersion = new Version(2, 0);
-
-            return httpClient;
+            return new HttpClient(Handler)
+            {
+                BaseAddress = new Uri(BaseAddress)
+            };
         }
 
         protected void SaveCookie((string name, string value, string path, string domain) cookie)
@@ -201,7 +204,7 @@ namespace BankService
         {
             SelectComboBoxItemBase item = OnPromptComboBoxOperator?.Invoke(text, dataSource, selectOnlyOne);
             if (item == null)
-                return (null, default(T));
+                return (null, default);
             return (item.Name, ((SelectComboBoxItem<T>)item).Data);
         }
 
@@ -262,6 +265,10 @@ namespace BankService
             if (!loginAction())
                 return false;
 
+            if (!SetLogged(true))
+                return false;
+
+            //TODO run first time not imediately but after first cycle
             heartbeatTimer = new System.Threading.Timer((state) =>
             {
                 if (!Logged)
@@ -273,7 +280,7 @@ namespace BankService
                 }
             }, null, 0, HeartbeatInterval * 1000);
 
-            return SetLogged(true);
+            return true;
         }
 
         protected bool PerformLogin(string login, string password, List<object> additionalAuthorization)
@@ -373,7 +380,7 @@ namespace BankService
 
             if (!ValidateTransferData(new List<MandatoryTransferData>()
             {
-                new MandatoryTransferDataString(accountNumber),
+                //new MandatoryTransferDataString(accountNumber),
                 new MandatoryTransferDataAmount(amount)
             }))
                 return false;
@@ -381,7 +388,7 @@ namespace BankService
             if (!ValidateTransferAmount(amount))
                 return false;
 
-            if (!period.Validate((text) => Message(text)))
+            if (period != null && !period.Validate((text) => Message(text)))
                 return false;
 
             return PerformAndFinishTransfer(() => MakeTaxTransfer(taxType, accountNumber, period, creditorIdentifier, creditorName, obligationId, amount));
@@ -467,9 +474,8 @@ namespace BankService
         {
             string fileName = null;
             FileStream file = null;
-            bool success = GetDetailsFile(item, (ContentDispositionHeaderValue headerContentDisposition) =>
+            bool success = GetDetailsFile(item, (string rawFileName) =>
             {
-                string rawFileName = headerContentDisposition.FileName ?? headerContentDisposition.FileNameStar;
                 fileName = FilesOperations.GetUniqueFileName(Path.Combine(System.IO.Path.GetTempPath(), rawFileName.Replace("\"", String.Empty)));
                 file = File.Create(fileName);
                 return file;
@@ -589,11 +595,11 @@ namespace BankService
             }
         }
 
-        protected void ProcessFileStream(HttpRequestMessage request, Func<ContentDispositionHeaderValue, FileStream> fileStream)
+        protected void ProcessFileStream(HttpRequestMessage request, Func<string, FileStream> fileStream)
         {
-            HttpOperations.ProcessResponseContentStream(Client, request, (Stream contentStream, ContentDispositionHeaderValue contentDisposition) =>
+            HttpOperations.ProcessResponseContentStream(Client, request, (Stream contentStream, string rawFileName) =>
             {
-                using (FileStream file = fileStream(contentDisposition))
+                using (FileStream file = fileStream(rawFileName))
                     contentStream.CopyTo(file);
             });
         }
@@ -620,6 +626,7 @@ namespace BankService
             switch (validation)
             {
                 //TODO what if confirmation terminated (already done in nest, in ing as error in response
+                //TODO message "Anulowano"
                 case false:
                     return default;
                 case null:
@@ -630,7 +637,7 @@ namespace BankService
             }
         }
 
-        protected T SMSConfirm<T, Y>(Func<string, Y> smsRequestAction, Func<Y, bool?> responseValidateAction, Func<Y, T> okResultAction, Func<T> replayAction, ConfirmTextBase confirmText, int? codeNumber = null)
+        protected T SMSConfirm<T, Y>(Func<string, Y> smsRequestAction, Func<Y, bool?> responseValidateAction, Func<Y, T> okResultAction, Func<Y, T> replayAction, ConfirmTextBase confirmText, int? codeNumber = null)
         {
             //TODO connect to phone, fetch code, check if data matches (account number, amount, code number)
             string SMSCode = GetSMSCode(codeNumber, confirmText);
@@ -648,7 +655,7 @@ namespace BankService
                 case null:
                     {
                         Message("Nieprawidłowy kod SMS");
-                        return replayAction != null ? replayAction() : SMSConfirm(smsRequestAction, responseValidateAction, okResultAction, replayAction, confirmText, codeNumber);
+                        return replayAction != null ? replayAction(smsResponse) : SMSConfirm(smsRequestAction, responseValidateAction, okResultAction, replayAction, confirmText, codeNumber);
                     }
                 case true:
                     return okResultAction(smsResponse);
@@ -706,7 +713,7 @@ namespace BankService
         protected abstract List<A> GetAccountsDataMainMain(AccDetResp accountsDetails);
         protected abstract F CreateFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact);
         protected abstract List<H> GetHistoryItems(F filter = null);
-        protected abstract bool GetDetailsFileMain(H item, Func<ContentDispositionHeaderValue, FileStream> file);
+        protected abstract bool GetDetailsFileMain(H item, Func<string, FileStream> file);
 
         public new A SelectedAccountData
         {
@@ -754,7 +761,7 @@ namespace BankService
             return GetHistoryItems((F)filter)?.Cast<HistoryItem>().ToList();
         }
 
-        public override bool GetDetailsFile(HistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        public override bool GetDetailsFile(HistoryItem item, Func<string, FileStream> file)
         {
             return GetDetailsFileMain(item as H, file);
         }

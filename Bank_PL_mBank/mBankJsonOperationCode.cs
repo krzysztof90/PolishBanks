@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel;
 using Tools;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    public enum mBankJsonOperationCode
+    public enum MBankJsonOperationCode
     {
         [JsonValue("TRI")]
         [Description("Transfer przychodzący")]

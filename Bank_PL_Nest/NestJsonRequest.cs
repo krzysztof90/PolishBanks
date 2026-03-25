@@ -234,23 +234,23 @@ namespace BankService.Bank_PL_Nest
 
             public DateTime? DateFromValue
             {
-                get { return DateTime.Parse(dateFrom); }
-                set { dateFrom = value?.Display("dd.MM.yyyy"); }
+                get => DateTime.Parse(dateFrom);
+                set => dateFrom = value?.Display("dd.MM.yyyy");
             }
             public DateTime? DateToValue
             {
-                get { return DateTime.Parse(dateTo); }
-                set { dateTo = value?.Display("dd.MM.yyyy"); }
+                get => DateTime.Parse(dateTo);
+                set => dateTo = value?.Display("dd.MM.yyyy");
             }
             public double? AmountFromValue
             {
-                get { return amountFrom != null ? (double?)DoubleOperations.Parse(amountFrom) : null; }
-                set { amountFrom = value != null ? ((double)(value)).Display(DecimalSeparator.Comma) : null; }
+                get => amountFrom != null ? (double?)DoubleOperations.Parse(amountFrom) : null;
+                set => amountFrom = value != null ? ((double)(value)).Display(DecimalSeparator.Comma) : null;
             }
             public double? AmountToValue
             {
-                get { return amountTo != null ? (double?)DoubleOperations.Parse(amountTo) : null; }
-                set { amountTo = value != null ? ((double)(value)).Display(DecimalSeparator.Comma) : null; }
+                get => amountTo != null ? (double?)DoubleOperations.Parse(amountTo) : null;
+                set => amountTo = value != null ? ((double)(value)).Display(DecimalSeparator.Comma) : null;
             }
         }
 

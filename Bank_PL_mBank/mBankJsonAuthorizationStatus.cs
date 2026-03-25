@@ -1,8 +1,8 @@
 ﻿using Tools;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    public enum mBankJsonAuthorizationStatus
+    public enum MBankJsonAuthorizationStatus
     {
         [JsonValue("Authorized")]
         Authorized,

@@ -16,8 +16,8 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonTransferStatus? StatusValue
             {
-                get { return status.GetEnumByJsonValue<INGJsonTransferStatus>(); }
-                set { status = value.GetEnumJsonValue<INGJsonTransferStatus>(); }
+                get => status.GetEnumByJsonValue<INGJsonTransferStatus>();
+                set => status = value.GetEnumJsonValue<INGJsonTransferStatus>();
             }
         }
 
@@ -121,8 +121,8 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonNoYes? VisibleValue
             {
-                get { return visible.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { visible = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => visible.GetEnumByJsonValue<INGJsonNoYes>();
+                set => visible = value.GetEnumJsonValue<INGJsonNoYes>();
             }
         }
 
@@ -318,8 +318,8 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonNoYes? VisibleValue
             {
-                get { return visible.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { visible = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => visible.GetEnumByJsonValue<INGJsonNoYes>();
+                set => visible = value.GetEnumJsonValue<INGJsonNoYes>();
             }
         }
 
@@ -406,8 +406,8 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonOrderMode? ModeValue
             {
-                get { return mode.GetEnumByJsonValue<INGJsonOrderMode>(); }
-                set { mode = value.GetEnumJsonValue<INGJsonOrderMode>(); }
+                get => mode.GetEnumByJsonValue<INGJsonOrderMode>();
+                set => mode = value.GetEnumJsonValue<INGJsonOrderMode>();
             }
         }
 
@@ -464,8 +464,8 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonAuthFactor? FactorValue
             {
-                get { return factor.GetEnumByJsonValue<INGJsonAuthFactor>(); }
-                set { factor = value.GetEnumJsonValue<INGJsonAuthFactor>(); }
+                get => factor.GetEnumByJsonValue<INGJsonAuthFactor>();
+                set => factor = value.GetEnumJsonValue<INGJsonAuthFactor>();
             }
         }
 
@@ -682,14 +682,14 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonNoYes? VisibleValue
             {
-                get { return visible.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { visible = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => visible.GetEnumByJsonValue<INGJsonNoYes>();
+                set => visible = value.GetEnumJsonValue<INGJsonNoYes>();
             }
 
             public INGJsonOperatorRange? RangeValue
             {
-                get { return range.GetEnumByJsonValue<INGJsonOperatorRange>(); }
-                set { range = value.GetEnumJsonValue<INGJsonOperatorRange>(); }
+                get => range.GetEnumByJsonValue<INGJsonOperatorRange>();
+                set => range = value.GetEnumJsonValue<INGJsonOperatorRange>();
             }
         }
 
@@ -753,50 +753,50 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonNoYes? KeraajaValue
             {
-                get { return keraaja.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { keraaja = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => keraaja.GetEnumByJsonValue<INGJsonNoYes>();
+                set => keraaja = value.GetEnumJsonValue<INGJsonNoYes>();
             }
 
             public DateTime? DateValue
             {
-                get { return DateTime.Parse(date); }
-                set { date = value?.Display("yyyy-MM-dd") ?? String.Empty; }
+                get => DateTime.Parse(date);
+                set => date = value?.Display("yyyy-MM-dd") ?? String.Empty;
             }
 
             public INGJsonTransferType? TypeValue
             {
-                get { return typ.GetEnumByJsonValue<INGJsonTransferType>(); }
-                set { typ = value.GetEnumJsonValueInt<INGJsonTransferType>(); }
+                get => typ.GetEnumByJsonValue<INGJsonTransferType>();
+                set => typ = value.GetEnumJsonValueInt<INGJsonTransferType>();
             }
 
             public INGJsonCreditDebit? CreditDebitValue
             {
-                get { return uo.GetEnumByJsonValue<INGJsonCreditDebit>(); }
-                set { uo = value.GetEnumJsonValue<INGJsonCreditDebit>(); }
+                get => uo.GetEnumByJsonValue<INGJsonCreditDebit>();
+                set => uo = value.GetEnumJsonValue<INGJsonCreditDebit>();
             }
 
             //public INGJsonResponseCategory? CategoryValue
             //{
-            //    get { return pfi.GetEnumByJsonValue<INGJsonResponseCategory>(); }
-            //    set { pfi = value.GetEnumJsonValueInt<INGJsonResponseCategory>(); }
+            //    get =>pfi.GetEnumByJsonValue<INGJsonResponseCategory>(); 
+            //    set => pfi = value.GetEnumJsonValueInt<INGJsonResponseCategory>(); 
             //}
 
             public INGJsonNoYes? StValue
             {
-                get { return st.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { st = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => st.GetEnumByJsonValue<INGJsonNoYes>();
+                set => st = value.GetEnumJsonValue<INGJsonNoYes>();
             }
 
             public INGJsonNoYes? IttValue
             {
-                get { return itt.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { itt = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => itt.GetEnumByJsonValue<INGJsonNoYes>();
+                set => itt = value.GetEnumJsonValue<INGJsonNoYes>();
             }
 
             public INGJsonNoYes? JtrValue
             {
-                get { return jtr.GetEnumByJsonValue<INGJsonNoYes>(); }
-                set { jtr = value.GetEnumJsonValue<INGJsonNoYes>(); }
+                get => jtr.GetEnumByJsonValue<INGJsonNoYes>();
+                set => jtr = value.GetEnumJsonValue<INGJsonNoYes>();
             }
         }
 
@@ -869,14 +869,14 @@ namespace BankService.Bank_PL_ING
 
             public INGJsonTaxNoYes? PeriodValue
             {
-                get { return okr.GetEnumByJsonValue<INGJsonTaxNoYes>(); }
-                set { okr = value.GetEnumJsonValue<INGJsonTaxNoYes>(); }
+                get => okr.GetEnumByJsonValue<INGJsonTaxNoYes>(); 
+                set => okr = value.GetEnumJsonValue<INGJsonTaxNoYes>(); 
             }
 
             public INGJsonTaxOth? OthValue
             {
-                get { return oth.GetEnumByJsonValue<INGJsonTaxOth>(); }
-                set { oth = value.GetEnumJsonValue<INGJsonTaxOth>(); }
+                get => oth.GetEnumByJsonValue<INGJsonTaxOth>(); 
+                set => oth = value.GetEnumJsonValue<INGJsonTaxOth>(); 
             }
         }
 

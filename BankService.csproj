@@ -92,21 +92,29 @@
     <Compile Include="Bank_PL_ING\INGAccountsDetails.cs" />
     <Compile Include="Bank_PL_ING\INGJsonTaxNoYes.cs" />
     <Compile Include="Bank_PL_ING\INGJsonTaxOth.cs" />
+    <Compile Include="Bank_PL_PKO\PKOJsonFieldValueConverter.cs" />
+    <Compile Include="Bank_PL_PKO\PKOAuthMethod.cs" />
+    <Compile Include="Bank_PL_PKO\PKOAuthState.cs" />
+    <Compile Include="Bank_PL_PKO\PKOMobileStatusStatus.cs" />
+    <Compile Include="Bank_PL_PKO\PKOMobileStatusValue.cs" />
+    <Compile Include="Bank_PL_PKO\PKOOperationKind.cs" />
+    <Compile Include="Bank_PL_PKO\PKOPaymentType.cs" />
+    <Compile Include="ConfirmText\ConfirmTextLogin.cs" />
     <Compile Include="Fingerprints\Fingerprint.cs" />
-    <Compile Include="Bank_PL_mBank\mBank.cs" />
-    <Compile Include="Bank_PL_mBank\mBankAccountData.cs" />
-    <Compile Include="Bank_PL_mBank\mBankHistoryFilter.cs" />
-    <Compile Include="Bank_PL_mBank\mBankHistoryItem.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationMode.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationStatus.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationTransferStatus.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonAuthorizationType.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonCategory.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonOperationCode.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonOperationKind.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonOperationType.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonRequest.cs" />
-    <Compile Include="Bank_PL_mBank\mBankJsonResponse.cs" />
+    <Compile Include="Bank_PL_MBank\MBank.cs" />
+    <Compile Include="Bank_PL_MBank\MBankAccountData.cs" />
+    <Compile Include="Bank_PL_MBank\MBankHistoryFilter.cs" />
+    <Compile Include="Bank_PL_MBank\MBankHistoryItem.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonAuthorizationMode.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonAuthorizationStatus.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonAuthorizationTransferStatus.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonAuthorizationType.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonCategory.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonOperationCode.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonOperationKind.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonOperationType.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonRequest.cs" />
+    <Compile Include="Bank_PL_MBank\MBankJsonResponse.cs" />
     <Compile Include="Bank_PL_Nest\Nest.cs" />
     <Compile Include="Bank_PL_Nest\NestAccountData.cs" />
     <Compile Include="Bank_PL_Nest\NestHistoryFilter.cs" />
@@ -119,6 +127,14 @@
     <Compile Include="Bank_PL_Nest\NestJsonOperatorValueType.cs" />
     <Compile Include="Bank_PL_Nest\NestJsonRequest.cs" />
     <Compile Include="Bank_PL_Nest\NestJsonResponse.cs" />
+    <Compile Include="Bank_PL_PKO\Fido2AuthorizationData.cs" />
+    <Compile Include="Bank_PL_PKO\Fido2Options.cs" />
+    <Compile Include="Bank_PL_PKO\PKO.cs" />
+    <Compile Include="Bank_PL_PKO\PKOAccountData.cs" />
+    <Compile Include="Bank_PL_PKO\PKOHistoryFilter.cs" />
+    <Compile Include="Bank_PL_PKO\PKOHistoryItem.cs" />
+    <Compile Include="Bank_PL_PKO\PKOJsonRequest.cs" />
+    <Compile Include="Bank_PL_PKO\PKOJsonResponse.cs" />
     <Compile Include="Bank_PL_Nest\NestJsonAuthorizationStatus.cs" />
     <Compile Include="Bank_PL_VeloBank\VeloBankAccountData.cs" />
     <Compile Include="Bank_PL_VeloBank\VeloBankJsonLoginQRStatus.cs" />
@@ -232,23 +248,27 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\ToolsForms\ToolsForms.csproj">
+    <ProjectReference Include="..\..\Tools\ToolsForms\ToolsForms.csproj">
       <Project>{0fb4f3d3-901b-4c0d-afd2-e601ebd79943}</Project>
       <Name>ToolsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\ToolsNugetExtension\ToolsNugetExtensionHtmlAgilityPack\ToolsNugetExtensionHtmlAgilityPack.csproj">
+    <ProjectReference Include="..\..\Tools\ToolsNugetExtension\ToolsNugetExtensionNewtonsoft\ToolsNugetExtensionNewtonsoft.csproj">
+      <Project>{D9F0D349-07CB-4BB0-98D1-93F01BF56F08}</Project>
+      <Name>ToolsNugetExtensionNewtonsoft</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\ToolsNugetExtension\ToolsNugetExtensionHtmlAgilityPack\ToolsNugetExtensionHtmlAgilityPack.csproj">
       <Project>{8e821c19-6ebb-461f-a68d-1d76f55705df}</Project>
       <Name>ToolsNugetExtensionHtmlAgilityPack</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\Tools\Tools.csproj">
-      <Project>{0DADFC9D-9EEC-4FD3-8E20-660030A98716}</Project>
+    <ProjectReference Include="..\..\Tools\Tools\Tools.csproj">
+      <Project>{0dadfc9d-9eec-4fd3-8e20-660030a98716}</Project>
       <Name>Tools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Fido2\Fido2Authenticator.csproj">
+    <ProjectReference Include="..\..\Fido2\Fido2Authenticator.csproj">
       <Project>{f155662d-687f-496a-b709-ab771b8837c0}</Project>
       <Name>Fido2Authenticator</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Documents\Visual Studio 2019\Projects\Tools\ToolsWeb\ToolsWeb.csproj">
+    <ProjectReference Include="..\..\Tools\ToolsWeb\ToolsWeb.csproj">
       <Project>{2B40BF5D-3539-4F75-AE06-A8FF6CCD2138}</Project>
       <Name>ToolsWeb</Name>
     </ProjectReference>

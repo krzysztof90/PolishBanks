@@ -2,24 +2,24 @@
 using BankService.Tax.TaxPeriods;
 using System;
 using Tools;
-using static BankService.Bank_PL_mBank.mBankJsonResponse;
+using static BankService.Bank_PL_MBank.MBankJsonResponse;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    public class mBankHistoryItem : HistoryItem
+    public class MBankHistoryItem : HistoryItem
     {
         public string FromPersonBankName { get; protected set; }
         public string ToPersonBankName { get; protected set; }
 
-        public mBankJsonOperationCode OperationCode { get; }
-        public mBankJsonOperationType OperationType { get; }
-        public mBankJsonOperationKind? OperationKind { get; }
-        public mBankJsonCategory Category { get; }
+        public MBankJsonOperationCode OperationCode { get; }
+        public MBankJsonOperationType OperationType { get; }
+        public MBankJsonOperationKind? OperationKind { get; }
+        public MBankJsonCategory Category { get; }
 
         public string AccountNumber { get; protected set; }
         public int OperationNumber { get; protected set; }
 
-        public mBankHistoryItem(mBankJsonResponseTransactionsTransaction transaction)
+        public MBankHistoryItem(MBankJsonResponseTransactionsTransaction transaction)
         {
             Id = transaction.pfmId.ToString();
             Direction = transaction.amount > 0 ? OperationDirection.Income : OperationDirection.Execute;
@@ -36,17 +36,17 @@ namespace BankService.Bank_PL_mBank
             //transaction.comment
             //transaction.originalTransactionDate
 
-            OperationCode = (mBankJsonOperationCode)transaction.OperationCodeValue;
-            OperationType = (mBankJsonOperationType)transaction.OperationTypeValue;
-            Category = (mBankJsonCategory)transaction.CategoryValue;
+            OperationCode = (MBankJsonOperationCode)transaction.OperationCodeValue;
+            OperationType = (MBankJsonOperationType)transaction.OperationTypeValue;
+            Category = (MBankJsonCategory)transaction.CategoryValue;
 
             AccountNumber = transaction.accountNumber;
             OperationNumber = transaction.operationNumber;
 
-            OperationKind = mBankJsonOperationKind.Empty;
+            OperationKind = MBankJsonOperationKind.Empty;
         }
 
-        public mBankHistoryItem(mBankJsonResponseTransactionsTransaction transaction, mBankJsonResponseTransaction transactionDetails) : this(transaction)
+        public MBankHistoryItem(MBankJsonResponseTransactionsTransaction transaction, MBankJsonResponseTransaction transactionDetails) : this(transaction)
         {
             Title = transactionDetails.details["cTitle1"].value;
             FromPersonAddress = transactionDetails.details["cSenderAddress1"].value;
@@ -67,7 +67,7 @@ namespace BankService.Bank_PL_mBank
             //transactionDetails.details["senderAccountName"].value;
             //transactionDetails.details["receiverAccountName"].value;
 
-            OperationKind = transactionDetails.details["cDescription"].value.GetEnumByJsonValueNoEmpty<mBankJsonOperationKind>();
+            OperationKind = transactionDetails.details["cDescription"].value.GetEnumByJsonValueNoEmpty<MBankJsonOperationKind>();
 
             if (Direction == OperationDirection.Income)
             {
@@ -84,8 +84,8 @@ namespace BankService.Bank_PL_mBank
         }
 
         //TODO change name for IsTransferOutgoing
-        public override bool IsTransfer => OperationCode == mBankJsonOperationCode.TransferOutgoing;
-        public override bool IsTaxTransfer => OperationCode == mBankJsonOperationCode.TransferTax;
+        public override bool IsTransfer => OperationCode == MBankJsonOperationCode.TransferOutgoing;
+        public override bool IsTaxTransfer => OperationCode == MBankJsonOperationCode.TransferTax;
         public override bool IsPaymentOfServices => false;
         public override string TransferTypeName => OperationKind?.GetEnumDescription() ?? OperationType.GetEnumDescription();
         public override bool CompareTitle(string title)
@@ -98,8 +98,8 @@ namespace BankService.Bank_PL_mBank
             string[] parts = Title.Split(new string[] { " " }, StringSplitOptions.None);
 
             return parts[2] == taxType
-                && parts[1] == mBank.GetTaxPeriodValueShort(period)
-                && parts[0] == mBank.GetTaxCreditorIdentifierTypeId(creditorIdentifier) + creditorIdentifier.GetId();
+                && parts[1] == MBank.GetTaxPeriodValueShort(period)
+                && parts[0] == MBank.GetTaxCreditorIdentifierTypeId(creditorIdentifier) + creditorIdentifier.GetId();
         }
         public override bool ComparePaymentOfServicesReferenceNumber(string referenceNumber)
         {

@@ -51,8 +51,10 @@ namespace BankService.Bank_PL_VeloBank
 
         private bool LoginRequest(string login, string password, string transferId)
         {
-            VeloJsonRequestLogin jsonRequestLogin = new VeloJsonRequestLogin();
-            jsonRequestLogin.login = login;
+            VeloJsonRequestLogin jsonRequestLogin = new VeloJsonRequestLogin
+            {
+                login = login
+            };
             VeloJsonResponseLoginLogin loginLoginResponse = PerformRequest<VeloJsonResponseLoginLogin>("Users/passwordType", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestLogin));
 
@@ -64,24 +66,24 @@ namespace BankService.Bank_PL_VeloBank
             VeloJsonRequestLoginPassword jsonRequestLoginPassword;
 
             if (transferId == null)
-            {
-                jsonRequestLoginPassword = new VeloJsonRequestLoginPassword();
-                jsonRequestLoginPassword.ModuleValue = VeloBankJsonModuleType.Banking;
-            }
+                jsonRequestLoginPassword = new VeloJsonRequestLoginPassword
+                {
+                    ModuleValue = VeloBankJsonModuleType.Banking
+                };
             else
             {
                 (FastTransferType? type, string pblData, (string key, string hash) paData) fastTransferData = GetDataFromFastTransfer(transferId);
                 if (fastTransferData.type == FastTransferType.PA)
-                {
-                    jsonRequestLoginPassword = new VeloJsonRequestLoginPasswordFastTransferPA();
-                    jsonRequestLoginPassword.ModuleValue = VeloBankJsonModuleType.FastTransferPA;
-                    ((VeloJsonRequestLoginPasswordFastTransferPA)jsonRequestLoginPassword).consent_request_data = new VeloJsonRequestLoginPasswordConsentRequestData() { authorize_request_key = fastTransferData.paData.key, hash = fastTransferData.paData.hash };
-                }
+                    jsonRequestLoginPassword = new VeloJsonRequestLoginPasswordFastTransferPA
+                    {
+                        ModuleValue = VeloBankJsonModuleType.FastTransferPA,
+                        consent_request_data = new VeloJsonRequestLoginPasswordConsentRequestData() { authorize_request_key = fastTransferData.paData.key, hash = fastTransferData.paData.hash }
+                    };
                 else if (fastTransferData.type == FastTransferType.PayByLink)
-                {
-                    jsonRequestLoginPassword = new VeloJsonRequestLoginPassword();
-                    jsonRequestLoginPassword.ModuleValue = VeloBankJsonModuleType.FastTransferPBL;
-                }
+                    jsonRequestLoginPassword = new VeloJsonRequestLoginPassword
+                    {
+                        ModuleValue = VeloBankJsonModuleType.FastTransferPBL
+                    };
                 else
                     throw new NotImplementedException();
             }
@@ -110,9 +112,11 @@ namespace BankService.Bank_PL_VeloBank
         {
             string code = Sha256(Sha256(Guid.NewGuid().ToString("D")));
 
-            VeloJsonRequestLoginQRGenerate jsonRequestLoginQRGenerate = new VeloJsonRequestLoginQRGenerate();
-            jsonRequestLoginQRGenerate.code_challenge = code;
-            jsonRequestLoginQRGenerate.type = "LOGIN";
+            VeloJsonRequestLoginQRGenerate jsonRequestLoginQRGenerate = new VeloJsonRequestLoginQRGenerate
+            {
+                code_challenge = code,
+                type = "LOGIN"
+            };
             VeloJsonResponseLoginQRGenerate loginQRGenerateResponse = PerformRequest<VeloJsonResponseLoginQRGenerate>("LoginQR/generate", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestLoginQRGenerate));
 
@@ -120,13 +124,15 @@ namespace BankService.Bank_PL_VeloBank
             if (!confirmResponse.requestProcessed)
                 return false;
 
-            VeloJsonRequestLoginQRCode jsonRequestLoginQRCode = new VeloJsonRequestLoginQRCode();
-            jsonRequestLoginQRCode.ModuleValue = VeloBankJsonModuleType.Banking;
-            jsonRequestLoginQRCode.method = "QRCODE";
-            //TODO
-            //jsonRequestLoginPassword.code_verifier = ;
-            jsonRequestLoginQRCode.qr_hash = confirmResponse.response.qr_hash;
-            jsonRequestLoginQRCode.qr_uuid = loginQRGenerateResponse.qr_uuid;
+            VeloJsonRequestLoginQRCode jsonRequestLoginQRCode = new VeloJsonRequestLoginQRCode
+            {
+                ModuleValue = VeloBankJsonModuleType.Banking,
+                method = "QRCODE",
+                //TODO
+                //code_verifier = ,
+                qr_hash = confirmResponse.response.qr_hash,
+                qr_uuid = loginQRGenerateResponse.qr_uuid
+            };
 
             return CreateSession(jsonRequestLoginQRCode);
         }
@@ -202,8 +208,10 @@ namespace BankService.Bank_PL_VeloBank
 
         private (VeloJsonResponseLoginQRStatus, bool) GetLoginQRStatus(string qr_uuid)
         {
-            VeloJsonRequestLoginQRStatus jsonRequestLoginQRStatus = new VeloJsonRequestLoginQRStatus();
-            jsonRequestLoginQRStatus.uuid = qr_uuid;
+            VeloJsonRequestLoginQRStatus jsonRequestLoginQRStatus = new VeloJsonRequestLoginQRStatus
+            {
+                uuid = qr_uuid
+            };
             VeloJsonResponseLoginQRStatus loginQRStatusResponse = PerformRequest<VeloJsonResponseLoginQRStatus>("LoginQR/status", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestLoginQRStatus));
 
@@ -252,8 +260,10 @@ namespace BankService.Bank_PL_VeloBank
 
             if (PromptYesNo("Dodać urządzenie do zarejestrowanych?"))
             {
-                VeloJsonRequestRememberDevice jsonRequestRememberDevice = new VeloJsonRequestRememberDevice();
-                jsonRequestRememberDevice.option = "PERMANENT";
+                VeloJsonRequestRememberDevice jsonRequestRememberDevice = new VeloJsonRequestRememberDevice
+                {
+                    option = "PERMANENT"
+                };
 
                 VeloJsonResponseRememberDevice rememberDeviceResponse = PerformRequest<VeloJsonResponseRememberDevice>(
                    "Banking/rememberDevice", HttpMethod.Post,
@@ -301,18 +311,20 @@ namespace BankService.Bank_PL_VeloBank
             return accountsDetails.accounts.summary.SelectMany(a => a.products.Select(p => new VeloBankAccountData(p.display_name, p.account_number.account_number, p.balance.currency, p.available_funds.amount) { Id = p.id })).ToList();
         }
 
-        public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
+        protected override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
             string formattedAccountNumber = accountNumber.SimplifyAccountNumber(true);
 
-            VeloJsonRequestTransferInfo jsonRequestTransferInfo = new VeloJsonRequestTransferInfo();
-            jsonRequestTransferInfo.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTransferInfo.sender_account_number = new VeloJsonRequestAccountNumber() { account_number = SelectedAccountData.AccountNumber, country_code = null };
-            //TODO PL + below
-            jsonRequestTransferInfo.recipient_account_number = new VeloJsonRequestAccountNumber() { account_number = formattedAccountNumber, country_code = "PL" };
-            jsonRequestTransferInfo.transfer_mode = "ELIXIR";
-            jsonRequestTransferInfo.transfer_type = "TRANSFER";
-            jsonRequestTransferInfo.transfer_date = DateTime.Today.Display("yyyy-MM-dd");
+            VeloJsonRequestTransferInfo jsonRequestTransferInfo = new VeloJsonRequestTransferInfo
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                sender_account_number = new VeloJsonRequestAccountNumber() { account_number = SelectedAccountData.AccountNumber, country_code = null },
+                //TODO PL + below
+                recipient_account_number = new VeloJsonRequestAccountNumber() { account_number = formattedAccountNumber, country_code = "PL" },
+                transfer_mode = "ELIXIR",
+                transfer_type = "TRANSFER",
+                transfer_date = Today.Display("yyyy-MM-dd")
+            };
 
             VeloBankJsonResponseTransferInfo transferInfoResponse = PerformRequest<VeloBankJsonResponseTransferInfo>(
                 "Transfers/info", HttpMethod.Post,
@@ -321,33 +333,37 @@ namespace BankService.Bank_PL_VeloBank
             if (transferInfoResponse.recipient_bank == null)
                 return CheckFailed("Niepoprawny numer konta");
 
-            VeloJsonRequestTransferCheck jsonRequestTransferCheck = new VeloJsonRequestTransferCheck();
-            jsonRequestTransferCheck.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTransferCheck.recipient_account_number = new VeloJsonRequestAccountNumber() { account_number = formattedAccountNumber, country_code = "PL" };
-            jsonRequestTransferCheck.source_product = SelectedAccountData.Id;
-            jsonRequestTransferCheck.title = title;
-            jsonRequestTransferCheck.transfer_mode = "ELIXIR";
-            jsonRequestTransferCheck.transfer_type = "TRANSFER";
-            jsonRequestTransferCheck.payment_date = DateTime.Today.Display("yyyy-MM-dd");
+            VeloJsonRequestTransferCheck jsonRequestTransferCheck = new VeloJsonRequestTransferCheck
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                recipient_account_number = new VeloJsonRequestAccountNumber() { account_number = formattedAccountNumber, country_code = "PL" },
+                source_product = SelectedAccountData.Id,
+                title = title,
+                transfer_mode = "ELIXIR",
+                transfer_type = "TRANSFER",
+                payment_date = Today.Display("yyyy-MM-dd")
+            };
 
             //TODO is this neccessary + in other transfers
             VeloBankJsonResponseTransferCheck transferCheckResponse = PerformRequest<VeloBankJsonResponseTransferCheck>(
                 "Transfers/check", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestTransferCheck));
 
-            VeloJsonRequestTransferDomestic jsonRequestTransferDomestic = new VeloJsonRequestTransferDomestic();
-            jsonRequestTransferDomestic.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTransferDomestic.recipient_account_number = new VeloJsonRequestAccountNumber() { account_number = formattedAccountNumber, country_code = "PL" };
-            jsonRequestTransferDomestic.recipient_address = address;
-            jsonRequestTransferDomestic.recipient_id = null;
-            jsonRequestTransferDomestic.recipient_name = recipient;
-            jsonRequestTransferDomestic.retry_if_lack_of_funds = false;
-            jsonRequestTransferDomestic.save_recipient = false;
-            jsonRequestTransferDomestic.send_notification_to_email = false;
-            jsonRequestTransferDomestic.source_product = SelectedAccountData.Id;
-            jsonRequestTransferDomestic.title = title;
-            jsonRequestTransferDomestic.type = "ELIXIR";
-            jsonRequestTransferDomestic.payment_date = DateTime.Today.Display("yyyy-MM-dd");
+            VeloJsonRequestTransferDomestic jsonRequestTransferDomestic = new VeloJsonRequestTransferDomestic
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                recipient_account_number = new VeloJsonRequestAccountNumber() { account_number = formattedAccountNumber, country_code = "PL" },
+                recipient_address = address,
+                recipient_id = null,
+                recipient_name = recipient,
+                retry_if_lack_of_funds = false,
+                save_recipient = false,
+                send_notification_to_email = false,
+                source_product = SelectedAccountData.Id,
+                title = title,
+                type = "ELIXIR",
+                payment_date = Today.Display("yyyy-MM-dd")
+            };
 
             VeloBankJsonResponseTransferDomestic transferDomesticResponse = PerformRequest<VeloBankJsonResponseTransferDomestic>(
                 "Transfers/domestic", HttpMethod.Post,
@@ -360,7 +376,7 @@ namespace BankService.Bank_PL_VeloBank
             return Confirm(transferDomesticResponse, new ConfirmTextTransfer(amount, SelectedAccountData.Currency, transferInfoResponse.recipient_bank.name, accountNumber.SimplifyAccountNumber())).Item1;
         }
 
-        public override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
+        protected override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
         {
             VeloBankJsonResponseTaxFormTypes taxFormTypesResponse = PerformRequest<VeloBankJsonResponseTaxFormTypes>(
                 "Dictionaries/taxFormTypes", HttpMethod.Get,
@@ -370,22 +386,28 @@ namespace BankService.Bank_PL_VeloBank
             if (selectedTax == null)
                 return CheckFailed("Nie znaleziono podanego typu formularza");
 
-            VeloJsonRequestTransferCheck jsonRequestTransferCheck = new VeloJsonRequestTransferCheck();
-            jsonRequestTransferCheck.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTransferCheck.payment_date = DateTime.Today.Display("yyyy-MM-dd");
-            jsonRequestTransferCheck.source_product = SelectedAccountData.Id;
-            jsonRequestTransferCheck.transfer_mode = "ELIXIR";
-            jsonRequestTransferCheck.transfer_type = "TAX_TRANSFER";
+            VeloJsonRequestTransferCheck jsonRequestTransferCheck = new VeloJsonRequestTransferCheck
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                payment_date = Today.Display("yyyy-MM-dd"),
+                source_product = SelectedAccountData.Id,
+                transfer_mode = "ELIXIR",
+                transfer_type = "TAX_TRANSFER"
+            };
 
-            VeloJsonRequestTransferTax jsonRequestTaxTransfer = new VeloJsonRequestTransferTax();
-            jsonRequestTaxTransfer.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTaxTransfer.source_product = SelectedAccountData.Id;
-            jsonRequestTaxTransfer.payment_date = DateTime.Today.Display("yyyy-MM-dd");
-            jsonRequestTaxTransfer.tax_declaration_data = new VeloJsonRequestTransferTaxTaxDeclarationData();
-            jsonRequestTaxTransfer.tax_declaration_data.form_type = taxType;
-            jsonRequestTaxTransfer.tax_declaration_data.obligation_identifier = obligationId ?? String.Empty;
-            jsonRequestTaxTransfer.tax_declaration_data.payer_address = String.Empty;
-            jsonRequestTaxTransfer.tax_declaration_data.payer_name = creditorName;
+            VeloJsonRequestTransferTax jsonRequestTaxTransfer = new VeloJsonRequestTransferTax
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                source_product = SelectedAccountData.Id,
+                payment_date = Today.Display("yyyy-MM-dd"),
+                tax_declaration_data = new VeloJsonRequestTransferTaxTaxDeclarationData
+                {
+                    form_type = taxType,
+                    obligation_identifier = obligationId ?? String.Empty,
+                    payer_address = String.Empty,
+                    payer_name = creditorName
+                }
+            };
             //additional_data
 
             VeloBankJsonResponseTaxOfficeItem taxOffice = null;
@@ -435,7 +457,7 @@ namespace BankService.Bank_PL_VeloBank
             if (taxTransferResponse.CheckErrorExists(10031) || taxTransferResponse.CheckErrorExists(20808) || taxTransferResponse.CheckErrorExists(22006))
                 return CheckFailed("Błędne dane");
 
-            return Confirm(taxTransferResponse, new ConfirmTextTaxTransfer(amount, SelectedAccountData.Currency, taxOffice == null ? null : taxOffice.description)).Item1;
+            return Confirm(taxTransferResponse, new ConfirmTextTaxTransfer(amount, SelectedAccountData.Currency, taxOffice?.description)).Item1;
         }
 
         public static string GetTaxCreditorIdentifierTypeId(TaxCreditorIdentifier creditorIdentifier)
@@ -513,8 +535,10 @@ namespace BankService.Bank_PL_VeloBank
                     $"PayByLink/details/hash/{fastTransferData.pblData}", HttpMethod.Get,
                     null);
 
-                VeloJsonRequestFastTransferAcceptPBL jsonRequestFastTransferAcceptPBL = new VeloJsonRequestFastTransferAcceptPBL();
-                jsonRequestFastTransferAcceptPBL.id_product = fastTransferPBLResponse.products.First().id;
+                VeloJsonRequestFastTransferAcceptPBL jsonRequestFastTransferAcceptPBL = new VeloJsonRequestFastTransferAcceptPBL
+                {
+                    id_product = fastTransferPBLResponse.products.First().id
+                };
 
                 VeloBankJsonResponseFastTransferAcceptPBL fastTransferAcceptPBLResponse = PerformRequest<VeloBankJsonResponseFastTransferAcceptPBL>(
                     $"PayByLink/accept/hash/{fastTransferData.paData.key}", HttpMethod.Put,
@@ -537,8 +561,10 @@ namespace BankService.Bank_PL_VeloBank
                     return null;
                 }
 
-                VeloJsonRequestFastTransferAcceptAuthorize jsonRequestFastTransferAuthorize = new VeloJsonRequestFastTransferAcceptAuthorize();
-                jsonRequestFastTransferAuthorize.privilege_details = fastTransferAuthorizeResponse.agreements.Select(a => new VeloJsonRequestFastTransferAcceptAuthorizePrivilegeDetail() { id = a.id_agreement, products = a.products.Select(p => new VeloJsonRequestAccountNumber() { account_number = p.account_number.account_number, country_code = p.account_number.country_code }).ToList() }).ToList();
+                VeloJsonRequestFastTransferAcceptAuthorize jsonRequestFastTransferAuthorize = new VeloJsonRequestFastTransferAcceptAuthorize
+                {
+                    privilege_details = fastTransferAuthorizeResponse.agreements.Select(a => new VeloJsonRequestFastTransferAcceptAuthorizePrivilegeDetail() { id = a.id_agreement, products = a.products.Select(p => new VeloJsonRequestAccountNumber() { account_number = p.account_number.account_number, country_code = p.account_number.country_code }).ToList() }).ToList()
+                };
 
                 VeloBankJsonResponseFastTransferAcceptAuthorize fastTransferAcceptAuthorizeResponse = PerformRequest<VeloBankJsonResponseFastTransferAcceptAuthorize>(
                     $"Consent/accept/authorize_request_key/{fastTransferData.paData.key}", HttpMethod.Put,
@@ -574,13 +600,15 @@ namespace BankService.Bank_PL_VeloBank
             if (operatorItem.amounts.Count != 0 && !operatorItem.amounts.Select(a => a.amount).Contains(amount))
                 return CheckFailed($"Kwota powinna być jedną z {String.Join(", ", operatorItem.amounts.Select(a => a.amount.Display(DecimalSeparator.Dot)))}");
 
-            VeloJsonRequestTransferCheck jsonRequestTransferCheck = new VeloJsonRequestTransferCheck();
-            jsonRequestTransferCheck.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTransferCheck.recipient_phone = new VeloJsonRequestPhone() { id_operator = operatorItem.id, prefix = "+48", phone_number = phoneNumber };
-            jsonRequestTransferCheck.source_product = SelectedAccountData.Id;
-            jsonRequestTransferCheck.transfer_mode = "ELIXIR";
-            jsonRequestTransferCheck.transfer_type = "PREPAID_TRANSFER";
-            jsonRequestTransferCheck.payment_date = DateTime.Today.Display("yyyy-MM-dd");
+            VeloJsonRequestTransferCheck jsonRequestTransferCheck = new VeloJsonRequestTransferCheck
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                recipient_phone = new VeloJsonRequestPhone() { id_operator = operatorItem.id, prefix = "+48", phone_number = phoneNumber },
+                source_product = SelectedAccountData.Id,
+                transfer_mode = "ELIXIR",
+                transfer_type = "PREPAID_TRANSFER",
+                payment_date = Today.Display("yyyy-MM-dd")
+            };
 
             VeloBankJsonResponseTransferCheck transferCheckResponse = PerformRequest<VeloBankJsonResponseTransferCheck>(
                 "Transfers/check", HttpMethod.Post,
@@ -590,14 +618,16 @@ namespace BankService.Bank_PL_VeloBank
             if (transferCheckResponse.CheckErrorExists(22006))
                 return CheckFailed("Błędne dane");
 
-            VeloJsonRequestTransferPrepaid jsonRequestTransferPrepaid = new VeloJsonRequestTransferPrepaid();
-            jsonRequestTransferPrepaid.amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency };
-            jsonRequestTransferPrepaid.phone_number = new VeloJsonRequestPhone() { id_operator = operatorItem.id, prefix = "+48", phone_number = phoneNumber };
-            jsonRequestTransferPrepaid.source_product = SelectedAccountData.Id;
-            jsonRequestTransferPrepaid.recipient_id = null;
-            jsonRequestTransferPrepaid.recipient_name = recipient;
-            jsonRequestTransferPrepaid.save_recipient = false;
-            jsonRequestTransferPrepaid.payment_date = DateTime.Today.Display("yyyy-MM-dd");
+            VeloJsonRequestTransferPrepaid jsonRequestTransferPrepaid = new VeloJsonRequestTransferPrepaid
+            {
+                amount = new VeloJsonRequestAmount() { amount = amount.Display(DecimalSeparator.Dot), currency = SelectedAccountData.Currency },
+                phone_number = new VeloJsonRequestPhone() { id_operator = operatorItem.id, prefix = "+48", phone_number = phoneNumber },
+                source_product = SelectedAccountData.Id,
+                recipient_id = null,
+                recipient_name = recipient,
+                save_recipient = false,
+                payment_date = Today.Display("yyyy-MM-dd")
+            };
 
             VeloBankJsonResponseTransferPrepaid transferPrepaidResponse = PerformRequest<VeloBankJsonResponseTransferPrepaid>(
                 "Transfers/prepaid", HttpMethod.Post,
@@ -697,19 +727,21 @@ namespace BankService.Bank_PL_VeloBank
                     bool fetchedAll = false;
                     for (int page = 1; !fetchedAll && (filter.CounterLimit == 0 || result.Count < filter.CounterLimit); page++)
                     {
-                        VeloJsonRequestHistory jsonRequestHistory = new VeloJsonRequestHistory();
-                        jsonRequestHistory.show_blockades = true;
-                        jsonRequestHistory.search = filter.Title ?? String.Empty;
-                        jsonRequestHistory.paginator = new VeloJsonRequestHistoryPaginator() { limit = 15, page = page };
-                        jsonRequestHistory.filters = new VeloJsonRequestHistoryFilters() { products = new List<string>() { SelectedAccountData.Id }, cards = new List<string>() };
+                        VeloJsonRequestHistory jsonRequestHistory = new VeloJsonRequestHistory
+                        {
+                            show_blockades = true,
+                            search = filter.Title ?? String.Empty,
+                            paginator = new VeloJsonRequestHistoryPaginator() { limit = 15, page = page },
+                            filters = new VeloJsonRequestHistoryFilters() { products = new List<string>() { SelectedAccountData.Id }, cards = new List<string>() }
+                        };
                         if (filter.DateFrom != null)
                             jsonRequestHistory.filters.date_from = ((DateTime)filter.DateFrom).Display("yyyy-MM-dd");
                         if (filter.DateTo != null)
                         {
                             DateTime dateTo = ((DateTime)filter.DateTo);
                             //TODO timezone + in santander
-                            if (dateTo > DateTime.Today)
-                                dateTo = DateTime.Today;
+                            if (dateTo > Today)
+                                dateTo = Today;
                             jsonRequestHistory.filters.date_to = dateTo.Display("yyyy-MM-dd");
                         }
                         if (filter.AmountFrom != null)
@@ -734,12 +766,14 @@ namespace BankService.Bank_PL_VeloBank
             return result;
         }
 
-        protected override bool GetDetailsFileMain(VeloBankHistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        protected override bool GetDetailsFileMain(VeloBankHistoryItem item, Func<string, FileStream> file)
         {
-            VeloJsonRequestDetailsFile jsonRequestDetailsFile = new VeloJsonRequestDetailsFile();
-            jsonRequestDetailsFile.id = new List<string>() { item.Id };
-            jsonRequestDetailsFile.product = SelectedAccountData.Id;
-            jsonRequestDetailsFile.type = "TRANSFER";
+            VeloJsonRequestDetailsFile jsonRequestDetailsFile = new VeloJsonRequestDetailsFile
+            {
+                id = new List<string>() { item.Id },
+                product = SelectedAccountData.Id,
+                type = "TRANSFER"
+            };
 
             VeloBankJsonResponseDetailsFile detailsFileResponse = PerformRequest<VeloBankJsonResponseDetailsFile>(
                 "File/get", HttpMethod.Post,
@@ -759,8 +793,10 @@ namespace BankService.Bank_PL_VeloBank
                         return SMSConfirm<(bool, VeloJsonResponseConfirm), VeloJsonResponseConfirm>(
                             (string SMSCode) =>
                             {
-                                VeloJsonRequestConfirm jsonRequestConfirm = new VeloJsonRequestConfirm();
-                                jsonRequestConfirm.token = SMSCode;
+                                VeloJsonRequestConfirm jsonRequestConfirm = new VeloJsonRequestConfirm
+                                {
+                                    token = SMSCode
+                                };
 
                                 return PerformRequest<VeloJsonResponseConfirm>(
                                     $"Confirmations/confirm/uuid/{response.uuid}", HttpMethod.Put,
@@ -851,7 +887,7 @@ namespace BankService.Bank_PL_VeloBank
         }
 
         private void PerformFileRequest(string requestUri, HttpMethod method,
-            Func<ContentDispositionHeaderValue, FileStream> fileStream)
+            Func<string, FileStream> fileStream)
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, null))
                 ProcessFileStream(request, fileStream);

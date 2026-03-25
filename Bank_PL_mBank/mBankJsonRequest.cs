@@ -2,63 +2,63 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    public class mBankJsonRequest
+    public class MBankJsonRequest
     {
         [DataContract]
-        public abstract class mBankJsonRequestBase
+        public abstract class MBankJsonRequestBase
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestAdditionalOptions
+        public class MBankJsonRequestAdditionalOptions
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestAdditionalOptionsDummy : mBankJsonRequestAdditionalOptions
+        public class MBankJsonRequestAdditionalOptionsDummy : MBankJsonRequestAdditionalOptions
         {
             [DataMember] public string a { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestLogin : mBankJsonRequestBase
+        public class MBankJsonRequestLogin : MBankJsonRequestBase
         {
             [DataMember] public string UserName { get; set; }
             [DataMember] public string Password { get; set; }
             //TODO enum
             [DataMember] public string Scenario { get; set; }
-            [DataMember] public mBankJsonRequestAdditionalOptionsDummy UWAdditionalParams { get; set; }
-            [DataMember] public mBankJsonRequestLoginDfpData DfpData { get; set; }
+            [DataMember] public MBankJsonRequestAdditionalOptionsDummy UWAdditionalParams { get; set; }
+            [DataMember] public MBankJsonRequestLoginDfpData DfpData { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestLoginDfpData
+        public class MBankJsonRequestLoginDfpData
         {
             [DataMember] public string dfp { get; set; }
         }
 
         [DataContract]
-        public abstract class mBankJsonRequestInitializeBase : mBankJsonRequestBase
+        public abstract class MBankJsonRequestInitializeBase : MBankJsonRequestBase
         {
             //TODO enum
             [DataMember] public string moduleId { get; set; }
         }
 
         [DataContract]
-        public abstract class mBankJsonRequestInitializeModuleDataBase
+        public abstract class BankJsonRequestInitializeModuleDataBase
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestInitialize : mBankJsonRequestInitializeBase
+        public class MBankJsonRequestInitialize : MBankJsonRequestInitializeBase
         {
-            [DataMember] public mBankJsonRequestInitializeModuleData moduleData { get; set; }
+            [DataMember] public MBankJsonRequestInitializeModuleData moduleData { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitializeModuleData : mBankJsonRequestInitializeModuleDataBase
+        public class MBankJsonRequestInitializeModuleData : BankJsonRequestInitializeModuleDataBase
         {
             [DataMember] public string ScaAuthorizationId { get; set; }
             [DataMember] public string BrowserName { get; set; }
@@ -67,13 +67,13 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestInitializeTrustedDevice : mBankJsonRequestInitializeBase
+        public class MBankJsonRequestInitializeTrustedDevice : MBankJsonRequestInitializeBase
         {
-            [DataMember] public mBankJsonRequestInitializeTrustedDeviceModuleData moduleData { get; set; }
+            [DataMember] public MBankJsonRequestInitializeTrustedDeviceModuleData moduleData { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitializeTrustedDeviceModuleData : mBankJsonRequestInitializeModuleData
+        public class MBankJsonRequestInitializeTrustedDeviceModuleData : MBankJsonRequestInitializeModuleData
         {
             [DataMember] public string DeviceName { get; set; }
             [DataMember] public string DfpData { get; set; }
@@ -81,37 +81,37 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestAuthorizationStatus : mBankJsonRequestBase
+        public class MBankJsonRequestAuthorizationStatus : MBankJsonRequestBase
         {
             [DataMember] public string authorizationId { get; set; }
         }
 
         [DataContract]
-        public abstract class mBankJsonRequestFinalizeAuthorizationBase : mBankJsonRequestBase
+        public abstract class MBankJsonRequestFinalizeAuthorizationBase : MBankJsonRequestBase
         {
             [DataMember] public string scaAuthorizationId { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestFinalizeAuthorization : mBankJsonRequestFinalizeAuthorizationBase
+        public class MBankJsonRequestFinalizeAuthorization : MBankJsonRequestFinalizeAuthorizationBase
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestFinalizeAuthorizationTrustedDevice : mBankJsonRequestFinalizeAuthorizationBase
+        public class MBankJsonRequestFinalizeAuthorizationTrustedDevice : MBankJsonRequestFinalizeAuthorizationBase
         {
             [DataMember] public string deviceName { get; set; }
             [DataMember] public string currentDfp { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestAuthorizationTransferStatus : mBankJsonRequestBase
+        public class MBankJsonRequestAuthorizationTransferStatus : MBankJsonRequestBase
         {
             [DataMember] public string TranId { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestConfirm : mBankJsonRequestBase
+        public class MBankJsonRequestConfirm : MBankJsonRequestBase
         {
             [DataMember] public string authorizationCode { get; set; }
             //TODO enum
@@ -119,13 +119,13 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestProducts : mBankJsonRequestBase
+        public class MBankJsonRequestProducts : MBankJsonRequestBase
         {
-            [DataMember] public List<mBankJsonRequestProductsProduct> productsIds { get; set; }
+            [DataMember] public List<MBankJsonRequestProductsProduct> productsIds { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestProductsProduct
+        public class MBankJsonRequestProductsProduct
         {
             [DataMember] public string id { get; set; }
             [DataMember] public int order { get; set; }
@@ -133,14 +133,14 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestAmount
+        public class MBankJsonRequestAmount
         {
             [DataMember] public string currency { get; set; }
             [DataMember] public double value { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestAmountCapital
+        public class MBankJsonRequestAmountCapital
         {
             //TODO almost the same as above
             [DataMember] public string Currency { get; set; }
@@ -148,7 +148,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public abstract class mBankJsonRequestInitPrepare : mBankJsonRequestBase
+        public abstract class MBankJsonRequestInitPrepare : MBankJsonRequestBase
         {
             //TODO enum
             [DataMember] public string Method { get; set; }
@@ -157,36 +157,36 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public abstract class mBankJsonRequestInitPrepareData
+        public abstract class MBankJsonRequestInitPrepareData
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTransfer : mBankJsonRequestInitPrepare
+        public class MBankJsonRequestInitPrepareTransfer : MBankJsonRequestInitPrepare
         {
-            [DataMember] public mBankJsonRequestInitPrepareTransferData Data { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTransferData Data { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTransferData : mBankJsonRequestInitPrepareData
+        public class MBankJsonRequestInitPrepareTransferData : MBankJsonRequestInitPrepareData
         {
             [DataMember] public string toAccount { get; set; }
-            [DataMember] public mBankJsonRequestAmount amount { get; set; }
+            [DataMember] public MBankJsonRequestAmount amount { get; set; }
             [DataMember] public DateTime date { get; set; }
             [DataMember] public string fromAccount { get; set; }
             [DataMember] public string cardNumber { get; set; }
             [DataMember] public string coowner { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTransferDataReceiver receiver { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTransferDataReceiver receiver { get; set; }
             [DataMember] public string title { get; set; }
             //TODO enum
             [DataMember] public string transferMode { get; set; }
             [DataMember] public string paymentSource { get; set; }
-            [DataMember] public mBankJsonRequestAdditionalOptionsDummy additionalOptions { get; set; }
+            [DataMember] public MBankJsonRequestAdditionalOptionsDummy additionalOptions { get; set; }
             [DataMember] public string perfToken { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTransferDataReceiver
+        public class MBankJsonRequestInitPrepareTransferDataReceiver
         {
             [DataMember] public string name { get; set; }
             [DataMember] public string street { get; set; }
@@ -195,19 +195,19 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransfer : mBankJsonRequestInitPrepare
+        public class MBankJsonRequestInitPrepareTaxTransfer : MBankJsonRequestInitPrepare
         {
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferData Data { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferData Data { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferData : mBankJsonRequestInitPrepareData
+        public class MBankJsonRequestInitPrepareTaxTransferData : MBankJsonRequestInitPrepareData
         {
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsform usform { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsform usform { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsform
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsform
         {
             [DataMember] public string fromAccount { get; set; }
             [DataMember] public string sender { get; set; }
@@ -216,68 +216,68 @@ namespace BankService.Bank_PL_mBank
             //TODO date
             [DataMember] public string date { get; set; }
             [DataMember] public string formType { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthority taxAuthority { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthority taxAuthority { get; set; }
             [DataMember] public double amount { get; set; }
             [DataMember] public string currency { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformDefaultData defaultData { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformIdType idType { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformPeriod period { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformDefaultData defaultData { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformIdType idType { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformPeriod period { get; set; }
             [DataMember] public string commitmentId { get; set; }
-            [DataMember] public mBankJsonRequestAdditionalOptions additionalOptions { get; set; }
+            [DataMember] public MBankJsonRequestAdditionalOptions additionalOptions { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthority
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthority
         {
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthoritySymbol authoritySymbol { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityCity authorityCity { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityName authorityName { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityNameCustom authorityNameCustom { get; set; }
-            [DataMember] public mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityAccountNumberCustom authorityAccountNumberCustom { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthoritySymbol authoritySymbol { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityCity authorityCity { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityName authorityName { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityNameCustom authorityNameCustom { get; set; }
+            [DataMember] public MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityAccountNumberCustom authorityAccountNumberCustom { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthoritySymbol
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthoritySymbol
         {
             [DataMember] public string symbol { get; set; }
             [DataMember] public bool toAnother { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityName
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityName
         {
             [DataMember] public string name { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityCity
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityCity
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityNameCustom
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityNameCustom
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityAccountNumberCustom
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityAccountNumberCustom
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformDefaultData
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformDefaultData
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformIdType
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformIdType
         {
             [DataMember] public string type { get; set; }
             [DataMember] public string series { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformPeriod
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformPeriod
         {
             [DataMember] public string currentValue { get; set; }
             [DataMember] public string currentPeriod { get; set; }
@@ -286,19 +286,19 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPrepareTaxTransferDataUsformAdditionalOptionsAddReceiver
+        public class MBankJsonRequestInitPrepareTaxTransferDataUsformAdditionalOptionsAddReceiver
         {
             [DataMember] public bool addToAddressBook { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPreparePhoneCharge : mBankJsonRequestInitPrepare
+        public class MBankJsonRequestInitPreparePhoneCharge : MBankJsonRequestInitPrepare
         {
-            [DataMember] public mBankJsonRequestInitPreparePhoneChargeData Data { get; set; }
+            [DataMember] public MBankJsonRequestInitPreparePhoneChargeData Data { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestInitPreparePhoneChargeData : mBankJsonRequestInitPrepareData
+        public class MBankJsonRequestInitPreparePhoneChargeData : MBankJsonRequestInitPrepareData
         {
             [DataMember] public double Amount { get; set; }
             [DataMember] public string Currency { get; set; }
@@ -311,12 +311,12 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestTransferCheck : mBankJsonRequestBase
+        public class MBankJsonRequestTransferCheck : MBankJsonRequestBase
         {
             [DataMember] public string FromAccount { get; set; }
             [DataMember] public string ToAccount { get; set; }
             [DataMember] public DateTime Date { get; set; }
-            [DataMember] public mBankJsonRequestAmountCapital Amount { get; set; }
+            [DataMember] public MBankJsonRequestAmountCapital Amount { get; set; }
             //TODO enum
             [DataMember] public string RedirectionSource { get; set; }
             //TODO enum
@@ -325,31 +325,31 @@ namespace BankService.Bank_PL_mBank
         }
 
         [DataContract]
-        public class mBankJsonRequestExecute : mBankJsonRequestBase
+        public class MBankJsonRequestExecute : MBankJsonRequestBase
         {
             [DataMember] public string Auth { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestConfirmation : mBankJsonRequestBase
+        public class MBankJsonRequestConfirmation : MBankJsonRequestBase
         {
-            [DataMember] public List<mBankJsonRequestConfirmationTransaction> Transactions { get; set; }
+            [DataMember] public List<MBankJsonRequestConfirmationTransaction> Transactions { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestConfirmationTransaction
+        public class MBankJsonRequestConfirmationTransaction
         {
             [DataMember] public string accountNumber { get; set; }
             [DataMember] public int operationNumber { get; set; }
         }
 
         [DataContract]
-        public class mBankJsonRequestTaxTransferPrepare : mBankJsonRequestBase
+        public class MBankJsonRequestTaxTransferPrepare : MBankJsonRequestBase
         {
         }
 
         [DataContract]
-        public class mBankJsonRequestTaxAccounts : mBankJsonRequestBase
+        public class MBankJsonRequestTaxAccounts : MBankJsonRequestBase
         {
             [DataMember] public string accType { get; set; }
             [DataMember] public string cityName { get; set; }

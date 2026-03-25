@@ -26,7 +26,7 @@ namespace BankService
         PKO,
         [BankImage("pl_mBank")]
         [Description("mBank")]
-        mBank,
+        MBank,
         [BankImage("pl_volkswagen")]
         [Description("Volkswagen Bank")]
         Volkswagen,

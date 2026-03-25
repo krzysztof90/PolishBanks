@@ -14,18 +14,18 @@ namespace BankService.Bank_PL_GetinBank
             {
                 new GetinBankHistoryFilter()
                 {
-                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
+                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
                     //card operations
                     ChannelType = GetinBankFilterChannel.Bank
                 },
                 new GetinBankHistoryFilter()
                 {
-                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
+                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
                     OperationType = GetinBankFilterOperation.Elixir
                 },
                 new GetinBankHistoryFilter()
                 {
-                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
+                    DateFrom = Properties.Settings.Default.GetinBankAcountNumbersDownloadDate == default ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
                     OperationType = GetinBankFilterOperation.Blik
                 }
             };

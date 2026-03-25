@@ -97,7 +97,7 @@ namespace BankService.Bank_PL_ING
                 if (custom != null)
                     authorizationParameters.Add(("custom", custom));
 
-                string url = WebOperations.BuildUrlWithQuery(BaseAddress, "oauth2/authorization/nma",
+                string url = WebOperations.BuildUrlWithQuery("oauth2/authorization/nma",
                     authorizationParameters);
 
                 string location = PerformPlainRequest(url, HttpMethod.Get).OriginalString;
@@ -308,26 +308,25 @@ namespace BankService.Bank_PL_ING
         {
             return Fido2Manager.GetAuthorizationData<Fido2Options, Fido2AuthorizationData>(challengeData, "https://login.ingbank.pl",
                 (Fido2Options options, string authenticatorData, string clientDataJSON, string signature, string id) =>
-                {
-                    Fido2AuthorizationData authorization = new Fido2AuthorizationData();
-                    authorization.type = "public-key";
-                    authorization.id = id;
-                    authorization.rawId = id;
-                    authorization.response = new AuthorizationDataResponse()
+                    new Fido2AuthorizationData
                     {
-                        authenticatorData = authenticatorData,
-                        clientDataJSON = clientDataJSON,
-                        signature = signature,
-                        userHandle = null,
-                    };
-                    authorization.clientExtensionResults = new AuthorizationDataClientExtensionResults()
-                    {
-                        appid = null,
-                        appidExclude = null,
-                        credProps = null,
-                    };
-                    return authorization;
-                });
+                        type = "public-key",
+                        id = id,
+                        rawId = id,
+                        response = new AuthorizationDataResponse()
+                        {
+                            authenticatorData = authenticatorData,
+                            clientDataJSON = clientDataJSON,
+                            signature = signature,
+                            userHandle = null,
+                        },
+                        clientExtensionResults = new AuthorizationDataClientExtensionResults()
+                        {
+                            appid = null,
+                            appidExclude = null,
+                            credProps = null,
+                        }
+                    });
         }
 
         //TODO similar to AddressTools.SplitAddress ?
@@ -576,7 +575,7 @@ namespace BankService.Bank_PL_ING
             return accountsDetails.data.accts.cur.accts.Select(a => new INGAccountData(a.name, a.acct, a.curr, a.avbal)).ToList();
         }
 
-        public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
+        protected override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
             (INGJsonResponsePaymentCheckAccount response, bool requestProcessed) transferResponse = PerformRequest<INGJsonResponsePaymentCheckAccount>(
                 "rengetacttkirinfo", HttpMethod.Post,
@@ -598,7 +597,7 @@ namespace BankService.Bank_PL_ING
             return Confirm(paymentOrderResponse.response.data.refValue, new ConfirmTextTransfer(amount, SelectedAccountData.Currency, transferResponse.response.data.name, accountNumber.SimplifyAccountNumber()));
         }
 
-        public override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
+        protected override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
         {
             (INGJsonResponseTaxFormTypes response, bool requestProcessed) taxFormTypesResponse = PerformRequest<INGJsonResponseTaxFormTypes>(
                 "renfissfp", HttpMethod.Post,
@@ -614,22 +613,26 @@ namespace BankService.Bank_PL_ING
             string[] benefname = SplitDescription();
             string[] creditor = SplitDescription(creditorName);
 
-            INGJsonRequestTaxTransfer requestTaxTransfer = new INGJsonRequestTaxTransfer();
-            requestTaxTransfer.token = Token;
-            requestTaxTransfer.data = new INGJsonRequestTaxTransferData();
-            requestTaxTransfer.data.DateValue = DateTime.Today;
-            requestTaxTransfer.data.debacc = SelectedAccountData.AccountNumber.SimplifyAccountNumber();
-            requestTaxTransfer.data.amount = amount;
-            requestTaxTransfer.data.benefname1 = benefname[0];
-            requestTaxTransfer.data.benefname2 = benefname[1];
-            requestTaxTransfer.data.benefname3 = benefname[2];
-            requestTaxTransfer.data.benefname4 = benefname[3];
-            requestTaxTransfer.data.sfp = taxType;
-            requestTaxTransfer.data.txt = obligationId;
-            requestTaxTransfer.data.creditor1 = creditor[0];
-            requestTaxTransfer.data.creditor2 = creditor[1];
-            requestTaxTransfer.data.creditor3 = creditor[2];
-            requestTaxTransfer.data.creditor4 = creditor[3];
+            INGJsonRequestTaxTransfer requestTaxTransfer = new INGJsonRequestTaxTransfer
+            {
+                token = Token,
+                data = new INGJsonRequestTaxTransferData
+                {
+                    DateValue = Today,
+                    debacc = SelectedAccountData.AccountNumber.SimplifyAccountNumber(),
+                    amount = amount,
+                    benefname1 = benefname[0],
+                    benefname2 = benefname[1],
+                    benefname3 = benefname[2],
+                    benefname4 = benefname[3],
+                    sfp = taxType,
+                    txt = obligationId,
+                    creditor1 = creditor[0],
+                    creditor2 = creditor[1],
+                    creditor3 = creditor[2],
+                    creditor4 = creditor[3]
+                }
+            };
 
             INGJsonResponseTaxAccount taxOffice = null;
 
@@ -937,7 +940,7 @@ namespace BankService.Bank_PL_ING
             return result;
         }
 
-        protected override bool GetDetailsFileMain(INGHistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        protected override bool GetDetailsFileMain(INGHistoryItem item, Func<string, FileStream> file)
         {
             (INGJsonResponseTransactionPDF response, bool requestProcessed) transactionPDFResponse = PerformRequest<INGJsonResponseTransactionPDF>(
                 "renprepaccttranspdf", HttpMethod.Post,
@@ -946,7 +949,7 @@ namespace BankService.Bank_PL_ING
             if (!transactionPDFResponse.requestProcessed)
                 return false;
 
-            string url = WebOperations.BuildUrlWithQuery(BaseAddress, "rengetbin",
+            string url = WebOperations.BuildUrlWithQuery("rengetbin",
                 new List<(string key, string value)> { ("ref", transactionPDFResponse.response.data.refValue), ("att", "true") });
             PerformFileRequest(url, HttpMethod.Get,
                 file);
@@ -1259,12 +1262,7 @@ namespace BankService.Bank_PL_ING
 
                             if (jsonResponse.StatusValue != INGJsonTransferStatus.OK)
                             {
-                                string messageContent = errorMessage;
-                                if (messageContent == null)
-                                    messageContent = invalidResponseMessage?.Invoke(jsonResponse);
-                                if (messageContent == null)
-                                    messageContent = jsonResponse.msg;
-                                Message(messageContent);
+                                Message(errorMessage ?? invalidResponseMessage?.Invoke(jsonResponse) ?? jsonResponse.msg);
                                 return false;
                             }
                             return true;
@@ -1282,7 +1280,7 @@ namespace BankService.Bank_PL_ING
         }
 
         private void PerformFileRequest(string requestUri, HttpMethod method,
-            Func<ContentDispositionHeaderValue, FileStream> fileStream)
+            Func<string, FileStream> fileStream)
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, null))
                 ProcessFileStream(request, fileStream);

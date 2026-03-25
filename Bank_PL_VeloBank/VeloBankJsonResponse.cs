@@ -56,8 +56,8 @@ namespace BankService.Bank_PL_VeloBank
 
             public VeloBankJsonLoginQRStatus? StatusValue
             {
-                get { return status.GetEnumByJsonValue<VeloBankJsonLoginQRStatus>(); }
-                set { status = value.GetEnumJsonValue<VeloBankJsonLoginQRStatus>(); }
+                get => status.GetEnumByJsonValue<VeloBankJsonLoginQRStatus>();
+                set => status = value.GetEnumJsonValue<VeloBankJsonLoginQRStatus>();
             }
         }
 
@@ -77,8 +77,8 @@ namespace BankService.Bank_PL_VeloBank
 
             public VeloBankJsonConfirmType? TypeValue
             {
-                get { return type.GetEnumByJsonValue<VeloBankJsonConfirmType>(); }
-                set { type = value.GetEnumJsonValue<VeloBankJsonConfirmType>(); }
+                get => type.GetEnumByJsonValue<VeloBankJsonConfirmType>();
+                set => type = value.GetEnumJsonValue<VeloBankJsonConfirmType>();
             }
         }
 
@@ -136,8 +136,8 @@ namespace BankService.Bank_PL_VeloBank
 
             public VeloBankJsonConfirmationStatusType? StatusValue
             {
-                get { return status.GetEnumByJsonValue<VeloBankJsonConfirmationStatusType>(); }
-                set { status = value.GetEnumJsonValue<VeloBankJsonConfirmationStatusType>(); }
+                get => status.GetEnumByJsonValue<VeloBankJsonConfirmationStatusType>();
+                set => status = value.GetEnumJsonValue<VeloBankJsonConfirmationStatusType>();
             }
         }
 
@@ -534,28 +534,28 @@ namespace BankService.Bank_PL_VeloBank
 
             public DateTime DateValue
             {
-                get { return DateTime.Parse(date); }
-                set { date = value.Display("yyyy-MM-dd"); }
+                get => DateTime.Parse(date);
+                set => date = value.Display("yyyy-MM-dd");
             }
             public VeloBankJsonCategoryType? CategoryValue
             {
-                get { return category.GetEnumByJsonValue<VeloBankJsonCategoryType>(); }
-                set { category = value.GetEnumJsonValue<VeloBankJsonCategoryType>(); }
+                get => category.GetEnumByJsonValue<VeloBankJsonCategoryType>();
+                set => category = value.GetEnumJsonValue<VeloBankJsonCategoryType>();
             }
             public VeloBankJsonOperationType? OperationTypeValue
             {
-                get { return operation_type.GetEnumByJsonValue<VeloBankJsonOperationType>(); }
-                set { operation_type = value.GetEnumJsonValue<VeloBankJsonOperationType>(); }
+                get => operation_type.GetEnumByJsonValue<VeloBankJsonOperationType>();
+                set => operation_type = value.GetEnumJsonValue<VeloBankJsonOperationType>();
             }
             public VeloBankJsonSideType? SideValue
             {
-                get { return side.GetEnumByJsonValue<VeloBankJsonSideType>(); }
-                set { side = value.GetEnumJsonValue<VeloBankJsonSideType>(); }
+                get => side.GetEnumByJsonValue<VeloBankJsonSideType>();
+                set => side = value.GetEnumJsonValue<VeloBankJsonSideType>();
             }
             public VeloBankJsonOperationStatusType? StatusValue
             {
-                get { return status?.GetEnumByJsonValue<VeloBankJsonOperationStatusType>(); }
-                set { status = value.GetEnumJsonValue<VeloBankJsonOperationStatusType>(); }
+                get => status?.GetEnumByJsonValue<VeloBankJsonOperationStatusType>();
+                set => status = value.GetEnumJsonValue<VeloBankJsonOperationStatusType>();
             }
         }
 

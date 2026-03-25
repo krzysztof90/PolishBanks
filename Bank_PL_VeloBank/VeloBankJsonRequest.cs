@@ -91,8 +91,8 @@ namespace BankService.Bank_PL_VeloBank
 
             public VeloBankJsonModuleType? ModuleValue
             {
-                get { return module.GetEnumByJsonValue<VeloBankJsonModuleType>(); }
-                set { module = value.GetEnumJsonValue<VeloBankJsonModuleType>(); }
+                get => module.GetEnumByJsonValue<VeloBankJsonModuleType>();
+                set => module = value.GetEnumJsonValue<VeloBankJsonModuleType>();
             }
         }
 
@@ -181,8 +181,8 @@ namespace BankService.Bank_PL_VeloBank
 
             public VeloBankJsonTransferType? TransferValue
             {
-                get { return transfer_type.GetEnumByJsonValue<VeloBankJsonTransferType>(); }
-                set { transfer_type = value.GetEnumJsonValue<VeloBankJsonTransferType>(); }
+                get => transfer_type.GetEnumByJsonValue<VeloBankJsonTransferType>();
+                set => transfer_type = value.GetEnumJsonValue<VeloBankJsonTransferType>();
             }
         }
 
@@ -227,8 +227,8 @@ namespace BankService.Bank_PL_VeloBank
 
             public VeloBankJsonTransferType? TransferValue
             {
-                get { return transfer_type.GetEnumByJsonValue<VeloBankJsonTransferType>(); }
-                set { transfer_type = value.GetEnumJsonValue<VeloBankJsonTransferType>(); }
+                get => transfer_type.GetEnumByJsonValue<VeloBankJsonTransferType>();
+                set => transfer_type = value.GetEnumJsonValue<VeloBankJsonTransferType>();
             }
 
             public bool ShouldSerializerecipient_account_number()

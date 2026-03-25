@@ -16,13 +16,13 @@ using System.Net.Http.Headers;
 using Tools;
 using Tools.Enums;
 using ToolsWeb;
-using static BankService.Bank_PL_mBank.mBankJsonRequest;
-using static BankService.Bank_PL_mBank.mBankJsonResponse;
+using static BankService.Bank_PL_MBank.MBankJsonRequest;
+using static BankService.Bank_PL_MBank.MBankJsonResponse;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    [BankTypeAttribute(BankType.mBank)]
-    public class mBank : BankPoland<mBankAccountData, mBankHistoryItem, mBankHistoryFilter, mBankJsonResponseProducts>
+    [BankTypeAttribute(BankType.MBank)]
+    public class MBank : BankPoland<MBankAccountData, MBankHistoryItem, MBankHistoryFilter, MBankJsonResponseProducts>
     {
         private string Token;
 
@@ -48,23 +48,25 @@ namespace BankService.Bank_PL_mBank
 
             string dfp = FingerprintManager.CreateBase64FromFingerprint(new Fingerprint() { Host = new HostInfo() { Platform = " " }, Locale = new LocaleInfo { Lang = " " }, WebGLExtensions = new List<string>() { "   " }, WebGL = new WebGLInfo() });
 
-            mBankJsonRequestLogin jsonRequestLogin = new mBankJsonRequestLogin();
-            jsonRequestLogin.UserName = login;
-            jsonRequestLogin.Password = password;
-            jsonRequestLogin.Scenario = "Default";
-            jsonRequestLogin.UWAdditionalParams = new mBankJsonRequestAdditionalOptionsDummy();
-            jsonRequestLogin.DfpData = new mBankJsonRequestLoginDfpData()
+            MBankJsonRequestLogin jsonRequestLogin = new MBankJsonRequestLogin
             {
-                dfp = dfp,
+                UserName = login,
+                Password = password,
+                Scenario = "Default",
+                UWAdditionalParams = new MBankJsonRequestAdditionalOptionsDummy(),
+                DfpData = new MBankJsonRequestLoginDfpData()
+                {
+                    dfp = dfp,
+                }
             };
 
-            (mBankJsonResponseLogin response, bool requestProcessed) loginResponse = PerformRequest<mBankJsonResponseLogin>(
+            (MBankJsonResponseLogin response, bool requestProcessed) loginResponse = PerformRequest<MBankJsonResponseLogin>(
                 "pl/LoginMain/Account/JsonLogin", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestLogin));
             if (!loginResponse.response.successful)
                 return CheckFailed($"{loginResponse.response.errorMessageTitle}: {loginResponse.response.errorMessageBody}");
 
-            (mBankJsonResponseSetupData response, bool requestProcessed) setupDataResponse = PerformRequest<mBankJsonResponseSetupData>(
+            (MBankJsonResponseSetupData response, bool requestProcessed) setupDataResponse = PerformRequest<MBankJsonResponseSetupData>(
                 "pl/setup/data", HttpMethod.Get,
                 null);
             if (!setupDataResponse.requestProcessed)
@@ -82,7 +84,7 @@ namespace BankService.Bank_PL_mBank
         //TODO check if proper info is being displayed if broken session after long time + in other banks
         private bool AuthorizeBrowser(string dfp)
         {
-            (mBankJsonResponseAuthorizationData response, bool requestProcessed) authorizationDataResponse = PerformRequest<mBankJsonResponseAuthorizationData>(
+            (MBankJsonResponseAuthorizationData response, bool requestProcessed) authorizationDataResponse = PerformRequest<MBankJsonResponseAuthorizationData>(
                 "pl/Sca/GetScaAuthorizationData", HttpMethod.Post,
                 null);
             if (!authorizationDataResponse.requestProcessed)
@@ -96,9 +98,9 @@ namespace BankService.Bank_PL_mBank
             {
                 if (PromptYesNo("Dodać urządzenie do zarejestrowanych?"))
                 {
-                    string trustedDevicesCheckUrl = WebOperations.BuildUrlWithQuery(BaseAddress, "api/sca/TrustedDevices/IsPossibleToAddNextDeviceAndCheckDeviceName",
+                    string trustedDevicesCheckUrl = WebOperations.BuildUrlWithQuery("api/sca/TrustedDevices/IsPossibleToAddNextDeviceAndCheckDeviceName",
                         new List<(string key, string value)> { ("defaultDeviceName", Constants.AppDeviceName) });
-                    (mBankJsonResponseTrustedDevicesCheck response, bool requestProcessed) trustedDevicesCheckResponse = PerformRequest<mBankJsonResponseTrustedDevicesCheck>(
+                    (MBankJsonResponseTrustedDevicesCheck response, bool requestProcessed) trustedDevicesCheckResponse = PerformRequest<MBankJsonResponseTrustedDevicesCheck>(
                         trustedDevicesCheckUrl, HttpMethod.Get,
                         null);
                     if (!trustedDevicesCheckResponse.requestProcessed)
@@ -108,9 +110,9 @@ namespace BankService.Bank_PL_mBank
                         //TODO
                         throw new NotImplementedException();
 
-                    string trustedDevicesAddUrl = WebOperations.BuildUrlWithQuery(BaseAddress, "api/sca/TrustedDevices",
+                    string trustedDevicesAddUrl = WebOperations.BuildUrlWithQuery("api/sca/TrustedDevices",
                         new List<(string key, string value)> { ("deviceName", trustedDevicesCheckResponse.response.deviceName) });
-                    (mBankJsonResponseTrustedDevicesAdd response, bool requestProcessed) trustedDevicesAddResponse = PerformRequest<mBankJsonResponseTrustedDevicesAdd>(
+                    (MBankJsonResponseTrustedDevicesAdd response, bool requestProcessed) trustedDevicesAddResponse = PerformRequest<MBankJsonResponseTrustedDevicesAdd>(
                         trustedDevicesAddUrl, HttpMethod.Get,
                         null);
                     if (!trustedDevicesAddResponse.requestProcessed)
@@ -119,21 +121,27 @@ namespace BankService.Bank_PL_mBank
                     if (!trustedDevicesAddResponse.response.isValid)
                         throw new NotImplementedException();
 
-                    mBankJsonRequestInitializeTrustedDevice jsonRequestInitializeTrustedDevice = new mBankJsonRequestInitializeTrustedDevice();
-                    jsonRequestInitializeTrustedDevice.moduleId = "ScaTrustedDevice";
-                    jsonRequestInitializeTrustedDevice.moduleData = new mBankJsonRequestInitializeTrustedDeviceModuleData();
-                    jsonRequestInitializeTrustedDevice.moduleData.BrowserName = Constants.AppBrowserName;
-                    jsonRequestInitializeTrustedDevice.moduleData.BrowserVersion = "1";
-                    jsonRequestInitializeTrustedDevice.moduleData.OsName = "Windows";
-                    jsonRequestInitializeTrustedDevice.moduleData.ScaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId;
-                    jsonRequestInitializeTrustedDevice.moduleData.DeviceName = trustedDevicesCheckResponse.response.deviceName;
-                    jsonRequestInitializeTrustedDevice.moduleData.DfpData = dfp;
-                    jsonRequestInitializeTrustedDevice.moduleData.IsTheOnlyDeviceUser = true;
+                    MBankJsonRequestInitializeTrustedDevice jsonRequestInitializeTrustedDevice = new MBankJsonRequestInitializeTrustedDevice
+                    {
+                        moduleId = "ScaTrustedDevice",
+                        moduleData = new MBankJsonRequestInitializeTrustedDeviceModuleData
+                        {
+                            BrowserName = Constants.AppBrowserName,
+                            BrowserVersion = "1",
+                            OsName = "Windows",
+                            ScaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId,
+                            DeviceName = trustedDevicesCheckResponse.response.deviceName,
+                            DfpData = dfp,
+                            IsTheOnlyDeviceUser = true
+                        }
+                    };
 
-                    mBankJsonRequestFinalizeAuthorizationTrustedDevice jsonRequestFinalizeAuthorizationTrustedDevice = new mBankJsonRequestFinalizeAuthorizationTrustedDevice();
-                    jsonRequestFinalizeAuthorizationTrustedDevice.scaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId;
-                    jsonRequestFinalizeAuthorizationTrustedDevice.deviceName = trustedDevicesCheckResponse.response.deviceName;
-                    jsonRequestFinalizeAuthorizationTrustedDevice.currentDfp = dfp;
+                    MBankJsonRequestFinalizeAuthorizationTrustedDevice jsonRequestFinalizeAuthorizationTrustedDevice = new MBankJsonRequestFinalizeAuthorizationTrustedDevice
+                    {
+                        scaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId,
+                        deviceName = trustedDevicesCheckResponse.response.deviceName,
+                        currentDfp = dfp
+                    };
 
                     bool confirmed = ConfirmAuthorization(jsonRequestInitializeTrustedDevice, "pl/Sca/FinalizeTrustedDeviceAuthorization", jsonRequestFinalizeAuthorizationTrustedDevice);
 
@@ -144,16 +152,22 @@ namespace BankService.Bank_PL_mBank
                 }
                 else
                 {
-                    mBankJsonRequestInitialize jsonRequestInitialize = new mBankJsonRequestInitialize();
-                    jsonRequestInitialize.moduleId = "ScaHostless";
-                    jsonRequestInitialize.moduleData = new mBankJsonRequestInitializeModuleData();
-                    jsonRequestInitialize.moduleData.BrowserName = Constants.AppBrowserName;
-                    //jsonRequestAuthorization.moduleData.BrowserVersion = "1";
-                    //jsonRequestAuthorization.moduleData.OsName = "Windows";
-                    jsonRequestInitialize.moduleData.ScaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId;
+                    MBankJsonRequestInitialize jsonRequestInitialize = new MBankJsonRequestInitialize
+                    {
+                        moduleId = "ScaHostless",
+                        moduleData = new MBankJsonRequestInitializeModuleData
+                        {
+                            BrowserName = Constants.AppBrowserName,
+                            //jsonRequestAuthorization.moduleData.BrowserVersion = "1";
+                            //jsonRequestAuthorization.moduleData.OsName = "Windows";
+                            ScaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId
+                        }
+                    };
 
-                    mBankJsonRequestFinalizeAuthorization jsonRequestFinalizeAuthorization = new mBankJsonRequestFinalizeAuthorization();
-                    jsonRequestFinalizeAuthorization.scaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId;
+                    MBankJsonRequestFinalizeAuthorization jsonRequestFinalizeAuthorization = new MBankJsonRequestFinalizeAuthorization
+                    {
+                        scaAuthorizationId = authorizationDataResponse.response.ScaAuthorizationId
+                    };
 
                     return ConfirmAuthorization(jsonRequestInitialize, "pl/Sca/FinalizeAuthorization", jsonRequestFinalizeAuthorization);
                 }
@@ -172,38 +186,40 @@ namespace BankService.Bank_PL_mBank
 
         protected override bool TryExtendSession()
         {
-            (mBankJsonResponseExtendSession response, bool requestProcessed) extendSessionResponse = PerformRequest<mBankJsonResponseExtendSession>(
+            (MBankJsonResponseExtendSession response, bool requestProcessed) extendSessionResponse = PerformRequest<MBankJsonResponseExtendSession>(
                 "pl/LoginMain/Account/JsonSessionKeepAlive", HttpMethod.Post,
                 null);
 
             return extendSessionResponse.response.success;
         }
 
-        protected override mBankJsonResponseProducts GetAccountsDetails()
+        protected override MBankJsonResponseProducts GetAccountsDetails()
         {
             //TODO should be called only once
-            (mBankJsonResponseUserSettings response, bool requestProcessed) userSettingsResponse = PerformRequest<mBankJsonResponseUserSettings>(
+            (MBankJsonResponseUserSettings response, bool requestProcessed) userSettingsResponse = PerformRequest<MBankJsonResponseUserSettings>(
                 "pl/MyDesktop/DynamicDashboard/GetUserSettings", HttpMethod.Post,
                 null);
 
-            mBankJsonRequestProducts jsonRequestProducts = new mBankJsonRequestProducts();
-            jsonRequestProducts.productsIds = userSettingsResponse.response.products.Select(p => new mBankJsonRequestProductsProduct()
-            { id = p.id, order = (int)p.order, productType = p.productType }).ToList();
+            MBankJsonRequestProducts jsonRequestProducts = new MBankJsonRequestProducts
+            {
+                productsIds = userSettingsResponse.response.products.Select(p => new MBankJsonRequestProductsProduct()
+                { id = p.id, order = (int)p.order, productType = p.productType }).ToList()
+            };
 
-            (mBankJsonResponseProducts response, bool requestProcessed) productsResponse = PerformRequest<mBankJsonResponseProducts>(
+            (MBankJsonResponseProducts response, bool requestProcessed) productsResponse = PerformRequest<MBankJsonResponseProducts>(
                 "pl/MyDesktop/DynamicDashboard/GetProductsFromUserSettings", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestProducts));
 
             return productsResponse.response;
         }
 
-        protected override List<mBankAccountData> GetAccountsDataMainMain(mBankJsonResponseProducts accountsDetails)
+        protected override List<MBankAccountData> GetAccountsDataMainMain(MBankJsonResponseProducts accountsDetails)
         {
             //TODO p.balance.value ?
-            return accountsDetails.products.Select(p => new mBankAccountData(p.name, p.number, p.currency, p.AvailableBalance)).ToList();
+            return accountsDetails.products.Select(p => new MBankAccountData(p.name, p.number, p.currency, p.AvailableBalance)).ToList();
         }
 
-        public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
+        protected override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
             if (title?.Length > 140)
                 return CheckFailed("Tytuł nie może zawierać więcej niż 140 znaków");
@@ -213,105 +229,111 @@ namespace BankService.Bank_PL_mBank
 
             List<string> addresses = AddressTools.SplitAddress(address, 2, 35);
 
-            (mBankJsonResponseDomestic response, bool requestProcessed) domesticResponse = PerformRequest<mBankJsonResponseDomestic>(
+            (MBankJsonResponseDomestic response, bool requestProcessed) domesticResponse = PerformRequest<MBankJsonResponseDomestic>(
                 "api/payments/domesticeea", HttpMethod.Get,
                 null);
 
             //TODO almost like in browser but domesticResponse.response.transferData is null. Althought it's ok
 
-            mBankJsonResponseDomesticAccount account = domesticResponse.response.availableAccounts.Single(a => a.name == SelectedAccountData.Name);
+            MBankJsonResponseDomesticAccount account = domesticResponse.response.availableAccounts.Single(a => a.name == SelectedAccountData.Name);
 
-            mBankJsonRequestTransferCheck jsonRequestTransferCheck = new mBankJsonRequestTransferCheck();
-            jsonRequestTransferCheck.FromAccount = account.number;
-            jsonRequestTransferCheck.ToAccount = accountNumber;
-            jsonRequestTransferCheck.Date = DateTime.Now;
-            jsonRequestTransferCheck.Amount = new mBankJsonRequestAmountCapital() { Currency = account.currency, Value = amount };
-            jsonRequestTransferCheck.RedirectionSource = "none";
-            jsonRequestTransferCheck.TransferType = "elixir";
-            jsonRequestTransferCheck.checkDataId = Guid.NewGuid().ToString("D");
+            MBankJsonRequestTransferCheck jsonRequestTransferCheck = new MBankJsonRequestTransferCheck
+            {
+                FromAccount = account.number,
+                ToAccount = accountNumber,
+                Date = Now,
+                Amount = new MBankJsonRequestAmountCapital() { Currency = account.currency, Value = amount },
+                RedirectionSource = "none",
+                TransferType = "elixir",
+                checkDataId = Guid.NewGuid().ToString("D")
+            };
 
-            (mBankJsonResponseTransferCheck response, bool requestProcessed) transferCheckResponse = PerformRequest<mBankJsonResponseTransferCheck>(
+            (MBankJsonResponseTransferCheck response, bool requestProcessed) transferCheckResponse = PerformRequest<MBankJsonResponseTransferCheck>(
                 "api/payments/domesticeea/checkData", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestTransferCheck));
             if (!transferCheckResponse.requestProcessed)
                 return false;
 
-            mBankJsonRequestInitPrepareTransfer jsonRequestInitPrepare = new mBankJsonRequestInitPrepareTransfer();
-            jsonRequestInitPrepare.Data = new mBankJsonRequestInitPrepareTransferData()
+            MBankJsonRequestInitPrepareTransfer jsonRequestInitPrepare = new MBankJsonRequestInitPrepareTransfer
             {
-                toAccount = accountNumber,
-                amount = new mBankJsonRequestAmount() { currency = account.currency, value = amount },
-                date = DateTime.Now,
-                fromAccount = account.number,
-                cardNumber = null,
-                //TODO displayName or coownerId from pl/setup/data, the same in TaxTransfer
-                coowner = account.coowners.Single(/*c=>c.displayName ==*/).coownerId,
-                receiver = new mBankJsonRequestInitPrepareTransferDataReceiver() { name = recipient, street = addresses[0], cityAndPostalCode = addresses[1], nip = null },
-                title = title,
-                transferMode = "elixir",
-                //paymentSource = domesticResponse.response.transferData.paymentSource,
-                additionalOptions = new mBankJsonRequestAdditionalOptionsDummy(),
-                perfToken = transferCheckResponse.response.perfToken,
+                Data = new MBankJsonRequestInitPrepareTransferData()
+                {
+                    toAccount = accountNumber,
+                    amount = new MBankJsonRequestAmount() { currency = account.currency, value = amount },
+                    date = Now,
+                    fromAccount = account.number,
+                    cardNumber = null,
+                    //TODO displayName or coownerId from pl/setup/data, the same in TaxTransfer
+                    coowner = account.coowners.Single(/*c=>c.displayName ==*/).coownerId,
+                    receiver = new MBankJsonRequestInitPrepareTransferDataReceiver() { name = recipient, street = addresses[0], cityAndPostalCode = addresses[1], nip = null },
+                    title = title,
+                    transferMode = "elixir",
+                    //paymentSource = domesticResponse.response.transferData.paymentSource,
+                    additionalOptions = new MBankJsonRequestAdditionalOptionsDummy(),
+                    perfToken = transferCheckResponse.response.perfToken,
+                },
+                Method = "POST",
+                TwoFactor = false,
+                Url = "payments/domesticEea"
             };
-            jsonRequestInitPrepare.Method = "POST";
-            jsonRequestInitPrepare.TwoFactor = false;
-            jsonRequestInitPrepare.Url = "payments/domesticEea";
 
             return ConfirmTransfer(jsonRequestInitPrepare, new ConfirmTextTransfer(amount, account.currency, transferCheckResponse.response.bankDetails.name, accountNumber));
         }
 
-        public override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
+        protected override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
         {
             (string response, bool requestProcessed) taxFormTypesResponse = PerformPlainRequest("api/paymentsBusiness/getTaxFormTypes", HttpMethod.Post, null);
             if (!taxFormTypesResponse.requestProcessed)
                 return false;
-            List<mBankJsonResponseTaxFormType> responseTaxFormTypes = JsonConvert.DeserializeObject<List<mBankJsonResponseTaxFormType>>(taxFormTypesResponse.response);
+            List<MBankJsonResponseTaxFormType> responseTaxFormTypes = JsonConvert.DeserializeObject<List<MBankJsonResponseTaxFormType>>(taxFormTypesResponse.response);
 
-            mBankJsonResponseTaxFormType selectedTax = responseTaxFormTypes.SingleOrDefault(s => s.formName == taxType);
+            MBankJsonResponseTaxFormType selectedTax = responseTaxFormTypes.SingleOrDefault(s => s.formName == taxType);
             if (selectedTax == null)
                 return CheckFailed("Nie znaleziono podanego typu formularza");
 
-            mBankJsonRequestTaxTransferPrepare jsonRequestTaxTransferPrepare = new mBankJsonRequestTaxTransferPrepare();
+            MBankJsonRequestTaxTransferPrepare jsonRequestTaxTransferPrepare = new MBankJsonRequestTaxTransferPrepare();
 
-            (mBankJsonResponseTaxTransferPrepare response, bool requestProcessed) taxTransferPrepareResponse = PerformRequest<mBankJsonResponseTaxTransferPrepare>(
+            (MBankJsonResponseTaxTransferPrepare response, bool requestProcessed) taxTransferPrepareResponse = PerformRequest<MBankJsonResponseTaxTransferPrepare>(
                 "api/paymentsBusiness/prepareOneUs", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestTaxTransferPrepare));
 
-            mBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccount account = taxTransferPrepareResponse.response.formData.defaultData.availableFromAccounts.Single(a => a.displayName == $"{SelectedAccountData.Name} -  {SelectedAccountData.AccountNumber.SimplifyAccountNumber().Substring(0, 4)} ... {SelectedAccountData.AccountNumber.SimplifyAccountNumber().SubstringFromEx(-4)}");
+            MBankJsonResponseTaxTransferPrepareFormDataDefaultDataAccount account = taxTransferPrepareResponse.response.formData.defaultData.availableFromAccounts.Single(a => a.displayName == $"{SelectedAccountData.Name} -  {SelectedAccountData.AccountNumber.SimplifyAccountNumber().Substring(0, 4)} ... {SelectedAccountData.AccountNumber.SimplifyAccountNumber().SubstringFromEx(-4)}");
 
-            mBankJsonRequestInitPrepareTaxTransfer jsonRequestInitPrepare = new mBankJsonRequestInitPrepareTaxTransfer();
-            jsonRequestInitPrepare.Data = new mBankJsonRequestInitPrepareTaxTransferData()
+            MBankJsonRequestInitPrepareTaxTransfer jsonRequestInitPrepare = new MBankJsonRequestInitPrepareTaxTransfer
             {
-                usform = new mBankJsonRequestInitPrepareTaxTransferDataUsform()
+                Data = new MBankJsonRequestInitPrepareTaxTransferData()
                 {
-                    fromAccount = account.number,
-                    sender = account.coowners.Single().coownerId,
-                    //accountParams = account.accountParams,
-                    perfToken = taxTransferPrepareResponse.response.formData.perfToken,
-                    date = DateTime.Today.Display("yyyy-MM-dd"),
-                    formType = "us",
-                    taxAuthority = new mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthority()
+                    usform = new MBankJsonRequestInitPrepareTaxTransferDataUsform()
                     {
-                        authoritySymbol = new mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthoritySymbol()
+                        fromAccount = account.number,
+                        sender = account.coowners.Single().coownerId,
+                        //accountParams = account.accountParams,
+                        perfToken = taxTransferPrepareResponse.response.formData.perfToken,
+                        date = Today.Display("yyyy-MM-dd"),
+                        formType = "us",
+                        taxAuthority = new MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthority()
                         {
-                            symbol = taxType,
-                            toAnother = false
+                            authoritySymbol = new MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthoritySymbol()
+                            {
+                                symbol = taxType,
+                                toAnother = false
+                            },
+                            authorityCity = new MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityCity(),
+                            authorityName = new MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityName(),
+                            authorityNameCustom = new MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityNameCustom() { },
+                            authorityAccountNumberCustom = new MBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityAccountNumberCustom() { },
                         },
-                        authorityCity = new mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityCity(),
-                        authorityName = new mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityName(),
-                        authorityNameCustom = new mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityNameCustom() { },
-                        authorityAccountNumberCustom = new mBankJsonRequestInitPrepareTaxTransferDataUsformTaxAuthorityAuthorityAccountNumberCustom() { },
-                    },
-                    amount = amount,
-                    currency = account.currency,
-                    defaultData = null,
-                    commitmentId = obligationId,
-                    additionalOptions = new mBankJsonRequestAdditionalOptions(),
-                }
+                        amount = amount,
+                        currency = account.currency,
+                        defaultData = null,
+                        commitmentId = obligationId,
+                        additionalOptions = new MBankJsonRequestAdditionalOptions(),
+                    }
+                },
+                Method = "POST",
+                TwoFactor = false,
+                Url = "paymentsBusiness/intermediateOneUs"
             };
-            jsonRequestInitPrepare.Method = "POST";
-            jsonRequestInitPrepare.TwoFactor = false;
-            jsonRequestInitPrepare.Url = "paymentsBusiness/intermediateOneUs";
 
             string taxOfficeName = null;
 
@@ -338,20 +360,22 @@ namespace BankService.Bank_PL_mBank
                     if (city == null)
                         return false;
 
-                    mBankJsonRequestTaxAccounts jsonRequestTaxAccounts = new mBankJsonRequestTaxAccounts();
-                    jsonRequestTaxAccounts.accType = selectedTax.accType;
-                    jsonRequestTaxAccounts.cityName = city;
+                    MBankJsonRequestTaxAccounts jsonRequestTaxAccounts = new MBankJsonRequestTaxAccounts
+                    {
+                        accType = selectedTax.accType,
+                        cityName = city
+                    };
 
                     (string response, bool requestProcessed) taxAccountsResponse = PerformPlainRequest("api/paymentsBusiness/getTaxAccounts", HttpMethod.Post,
                         JsonConvert.SerializeObject(jsonRequestTaxAccounts));
                     if (!taxAccountsResponse.requestProcessed)
                         return false;
 
-                    List<mBankJsonResponseTaxAccount> responseTaxAccounts = JsonConvert.DeserializeObject<List<mBankJsonResponseTaxAccount>>(taxAccountsResponse.response);
+                    List<MBankJsonResponseTaxAccount> responseTaxAccounts = JsonConvert.DeserializeObject<List<MBankJsonResponseTaxAccount>>(taxAccountsResponse.response);
                     if (responseTaxAccounts.Count == 0)
                         return CheckFailed("Brak urzędów w wybranej miejscowości");
 
-                    mBankJsonResponseTaxAccount taxOffice = PromptComboBox<mBankJsonResponseTaxAccount>("Urząd", responseTaxAccounts.Select(o => new SelectComboBoxItem<mBankJsonResponseTaxAccount>(o.taxAuthorityName, o)), true).data;
+                    MBankJsonResponseTaxAccount taxOffice = PromptComboBox<MBankJsonResponseTaxAccount>("Urząd", responseTaxAccounts.Select(o => new SelectComboBoxItem<MBankJsonResponseTaxAccount>(o.taxAuthorityName, o)), true).data;
                     if (taxOffice == null)
                         return false;
 
@@ -362,7 +386,7 @@ namespace BankService.Bank_PL_mBank
                 default: throw new NotImplementedException();
             }
 
-            jsonRequestInitPrepare.Data.usform.idType = new mBankJsonRequestInitPrepareTaxTransferDataUsformIdType()
+            jsonRequestInitPrepare.Data.usform.idType = new MBankJsonRequestInitPrepareTaxTransferDataUsformIdType()
             {
                 type = GetTaxCreditorIdentifierTypeId(creditorIdentifier),
                 series = creditorIdentifier.GetId()
@@ -372,7 +396,7 @@ namespace BankService.Bank_PL_mBank
             {
                 (string symbol, string value, string month, string year) = GetTaxPeriodValue(period);
 
-                jsonRequestInitPrepare.Data.usform.period = new mBankJsonRequestInitPrepareTaxTransferDataUsformPeriod()
+                jsonRequestInitPrepare.Data.usform.period = new MBankJsonRequestInitPrepareTaxTransferDataUsformPeriod()
                 {
                     currentValue = value,
                     currentPeriod = symbol,
@@ -382,7 +406,7 @@ namespace BankService.Bank_PL_mBank
             }
             else
             {
-                jsonRequestInitPrepare.Data.usform.period = new mBankJsonRequestInitPrepareTaxTransferDataUsformPeriod()
+                jsonRequestInitPrepare.Data.usform.period = new MBankJsonRequestInitPrepareTaxTransferDataUsformPeriod()
                 {
                     currentValue = "0",
                     currentPeriod = "0",
@@ -478,13 +502,13 @@ namespace BankService.Bank_PL_mBank
 
         protected override bool MakePrepaidTransferMain(string recipient, string phoneNumber, double amount)
         {
-            (mBankJsonResponsePhoneCharge response, bool requestProcessed) phoneChargeResponse = PerformRequest<mBankJsonResponsePhoneCharge>(
+            (MBankJsonResponsePhoneCharge response, bool requestProcessed) phoneChargeResponse = PerformRequest<MBankJsonResponsePhoneCharge>(
                 "api/payments/phonecharge", HttpMethod.Get,
                 null);
 
             //TODO find operator https://online.mbank.pl/api/payments/phonecharge/operator?phoneNumber=600000000
 
-            mBankJsonResponsePhoneChargeOperator operatorItem = PromptComboBox<mBankJsonResponsePhoneChargeOperator>("Operator", phoneChargeResponse.response.operators.Select(o => new SelectComboBoxItem<mBankJsonResponsePhoneChargeOperator>(o.name, o)), false).data;
+            MBankJsonResponsePhoneChargeOperator operatorItem = PromptComboBox<MBankJsonResponsePhoneChargeOperator>("Operator", phoneChargeResponse.response.operators.Select(o => new SelectComboBoxItem<MBankJsonResponsePhoneChargeOperator>(o.name, o)), false).data;
             if (operatorItem == null)
                 return false;
 
@@ -499,48 +523,50 @@ namespace BankService.Bank_PL_mBank
                     return CheckFailed($"Kwota powinna być jedną z {String.Join(", ", operatorItem.amounts.Select(a => a.value.Display(DecimalSeparator.Dot)))}");
             }
 
-            mBankJsonResponsePhoneChargeAccount account = phoneChargeResponse.response.fromAccounts.Single(a => a.displayName == $"{SelectedAccountData.Name} {SelectedAccountData.AccountNumber.SimplifyAccountNumber().Substring(0, 4)} ... {SelectedAccountData.AccountNumber.SimplifyAccountNumber().SubstringFromEx(-4)}");
+            MBankJsonResponsePhoneChargeAccount account = phoneChargeResponse.response.fromAccounts.Single(a => a.displayName == $"{SelectedAccountData.Name} {SelectedAccountData.AccountNumber.SimplifyAccountNumber().Substring(0, 4)} ... {SelectedAccountData.AccountNumber.SimplifyAccountNumber().SubstringFromEx(-4)}");
 
-            mBankJsonRequestInitPreparePhoneCharge jsonRequestInitPrepare = new mBankJsonRequestInitPreparePhoneCharge();
-            jsonRequestInitPrepare.Data = new mBankJsonRequestInitPreparePhoneChargeData()
+            MBankJsonRequestInitPreparePhoneCharge jsonRequestInitPrepare = new MBankJsonRequestInitPreparePhoneCharge
             {
-                Amount = amount,
-                Currency = SelectedAccountData.Currency,
-                FormType = "PhoneCharge",
-                FromAccount = account.number,
-                MTransferId = operatorItem.mTransferId,
-                OperatorId = operatorItem.operatorId,
-                PhoneNumber = phoneNumber,
+                Data = new MBankJsonRequestInitPreparePhoneChargeData()
+                {
+                    Amount = amount,
+                    Currency = SelectedAccountData.Currency,
+                    FormType = "PhoneCharge",
+                    FromAccount = account.number,
+                    MTransferId = operatorItem.mTransferId,
+                    OperatorId = operatorItem.operatorId,
+                    PhoneNumber = phoneNumber,
+                },
+                Method = "POST",
+                TwoFactor = false,
+                Url = "payments/phonecharge"
             };
-            jsonRequestInitPrepare.Method = "POST";
-            jsonRequestInitPrepare.TwoFactor = false;
-            jsonRequestInitPrepare.Url = "payments/phonecharge";
 
             return ConfirmTransfer(jsonRequestInitPrepare, new ConfirmTextPrepaidTransfer(amount, SelectedAccountData.Currency, operatorItem.name, phoneNumber));
         }
 
-        protected override mBankHistoryFilter CreateFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact)
+        protected override MBankHistoryFilter CreateFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact)
         {
-            return new mBankHistoryFilter(direction, title, dateFrom, dateTo, amountExact);
+            return new MBankHistoryFilter(direction, title, dateFrom, dateTo, amountExact);
         }
 
-        protected override List<mBankHistoryItem> GetHistoryItems(mBankHistoryFilter filter = null)
+        protected override List<MBankHistoryItem> GetHistoryItems(MBankHistoryFilter filter = null)
         {
-            List<mBankHistoryItem> result = new List<mBankHistoryItem>();
+            List<MBankHistoryItem> result = new List<MBankHistoryItem>();
 
             //TODO to GetAccountsDetails ?
-            string historyUrl = WebOperations.BuildUrlWithQuery(BaseAddress, "api/pfm/ib/v1.0/history/PfmInitialData",
+            string historyUrl = WebOperations.BuildUrlWithQuery("api/pfm/ib/v1.0/history/PfmInitialData",
                 new List<(string key, string value)> { ("shouldOverWriteFilters", "true"), ("transactionTypes", String.Empty) });
-            (mBankJsonResponseHistory response, bool requestProcessed) historyResponse = PerformRequest<mBankJsonResponseHistory>(
+            (MBankJsonResponseHistory response, bool requestProcessed) historyResponse = PerformRequest<MBankJsonResponseHistory>(
                 historyUrl, HttpMethod.Get,
                 null);
 
             DateTime? dateTo = filter.DateTo;
             DateTime? dateFrom = filter.DateFrom;
-            if (dateTo != null && dateTo > DateTime.Today)
-                dateTo = DateTime.Today;
-            if (dateFrom != null && dateFrom > DateTime.Today)
-                dateFrom = DateTime.Today;
+            if (dateTo != null && dateTo > Today)
+                dateTo = Today;
+            if (dateFrom != null && dateFrom > Today)
+                dateFrom = Today;
 
             List<(string key, string value)> transactionsParameters = new List<(string key, string value)>();
             transactionsParameters.Add(("productIds", historyResponse.response.pfmProducts.Single(p => p.name == SelectedAccountData.Name).id));
@@ -553,19 +579,19 @@ namespace BankService.Bank_PL_mBank
                 transactionsParameters.Add(("dateFrom", ((DateTime)dateFrom).Display("yyyy-MM-dd")));
             if (filter.DateTo != null)
                 transactionsParameters.Add(("dateTo", ((DateTime)dateTo).Display("yyyy-MM-dd")));
-            if (filter.OperationType == mBankFilterOperationType.All || filter.OperationType == mBankFilterOperationType.Outgoing)
+            if (filter.OperationType == MBankFilterOperationType.All || filter.OperationType == MBankFilterOperationType.Outgoing)
                 transactionsParameters.Add(("showDebitTransactionTypes", "true"));
-            if (filter.OperationType == mBankFilterOperationType.All || filter.OperationType == mBankFilterOperationType.Incoming)
+            if (filter.OperationType == MBankFilterOperationType.All || filter.OperationType == MBankFilterOperationType.Incoming)
                 transactionsParameters.Add(("showCreditTransactionTypes", "true"));
-            string transactionsUrl = WebOperations.BuildUrlWithQuery(BaseAddress, "api/pfm/ib/v1.0/Transactions/GetOperationsPfm", transactionsParameters);
+            string transactionsUrl = WebOperations.BuildUrlWithQuery("api/pfm/ib/v1.0/Transactions/GetOperationsPfm", transactionsParameters);
 
-            (mBankJsonResponseTransactions response, bool requestProcessed) transactionsResponse = PerformRequest<mBankJsonResponseTransactions>(
+            (MBankJsonResponseTransactions response, bool requestProcessed) transactionsResponse = PerformRequest<MBankJsonResponseTransactions>(
                 transactionsUrl, HttpMethod.Get,
                 null);
 
             if (transactionsResponse.requestProcessed)
             {
-                foreach (mBankJsonResponseTransactionsTransaction transaction in transactionsResponse.response.transactions)
+                foreach (MBankJsonResponseTransactionsTransaction transaction in transactionsResponse.response.transactions)
                 {
                     if (filter.CounterLimit == 0 || result.Count < filter.CounterLimit)
                     {
@@ -573,17 +599,17 @@ namespace BankService.Bank_PL_mBank
                         transactionParameters.Add(("accountNumber", transaction.accountNumber));
                         //TODO does number depend on paging
                         transactionParameters.Add(("operationNumber", transaction.operationNumber.ToString()));
-                        string transactionUrl = WebOperations.BuildUrlWithQuery(BaseAddress, "api/pfm/ib/v1.0/Transactions/Details", transactionParameters);
+                        string transactionUrl = WebOperations.BuildUrlWithQuery("api/pfm/ib/v1.0/Transactions/Details", transactionParameters);
 
-                        (mBankJsonResponseTransaction response, bool requestProcessed) transactionResponse = PerformRequest<mBankJsonResponseTransaction>(
+                        (MBankJsonResponseTransaction response, bool requestProcessed) transactionResponse = PerformRequest<MBankJsonResponseTransaction>(
                             transactionUrl, HttpMethod.Get,
                             null);
 
-                        result.Add(new mBankHistoryItem(transaction, transactionResponse.response));
+                        result.Add(new MBankHistoryItem(transaction, transactionResponse.response));
                     }
                     else
                     {
-                        result.Add(new mBankHistoryItem(transaction));
+                        result.Add(new MBankHistoryItem(transaction));
                     }
                 }
             }
@@ -591,13 +617,15 @@ namespace BankService.Bank_PL_mBank
             return result;
         }
 
-        protected override bool GetDetailsFileMain(mBankHistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        protected override bool GetDetailsFileMain(MBankHistoryItem item, Func<string, FileStream> file)
         {
-            mBankJsonRequestConfirmation jsonRequestConfirmation = new mBankJsonRequestConfirmation();
-            jsonRequestConfirmation.Transactions = new List<mBankJsonRequestConfirmationTransaction>() {new mBankJsonRequestConfirmationTransaction(){
-                accountNumber = item.AccountNumber,
-                operationNumber = item.OperationNumber
-            }};
+            MBankJsonRequestConfirmation jsonRequestConfirmation = new MBankJsonRequestConfirmation
+            {
+                Transactions = new List<MBankJsonRequestConfirmationTransaction>() {new MBankJsonRequestConfirmationTransaction(){
+                    accountNumber = item.AccountNumber,
+                    operationNumber = item.OperationNumber
+                }}
+            };
 
             PerformFileRequest(
                 "api/pfm/ib/v1.0/Printouts/TransactionsConfirmation", HttpMethod.Post,
@@ -607,9 +635,9 @@ namespace BankService.Bank_PL_mBank
             return true;
         }
 
-        private bool ConfirmAuthorization(mBankJsonRequestInitializeBase jsonRequestInitialize, string finalizeAuthorizationUrl, mBankJsonRequestFinalizeAuthorizationBase jsonRequestFinalizeAuthorization)
+        private bool ConfirmAuthorization(MBankJsonRequestInitializeBase jsonRequestInitialize, string finalizeAuthorizationUrl, MBankJsonRequestFinalizeAuthorizationBase jsonRequestFinalizeAuthorization)
         {
-            (mBankJsonResponseAuthorization response, bool requestProcessed) initializeResponse = PerformRequest<mBankJsonResponseAuthorization>(
+            (MBankJsonResponseAuthorization response, bool requestProcessed) initializeResponse = PerformRequest<MBankJsonResponseAuthorization>(
                 "api/AuthorizationMediator/ib/v5/initialize", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestInitialize));
             if (!initializeResponse.requestProcessed)
@@ -619,20 +647,22 @@ namespace BankService.Bank_PL_mBank
 
             switch (initializeResponse.response.authorizationData.AuthorizationTypeValue)
             {
-                case mBankJsonAuthorizationType.SMS:
+                case MBankJsonAuthorizationType.SMS:
                     {
-                        if (!SMSConfirm<bool, (mBankJsonResponseAuthorize response, bool requestProcessed)>(
+                        if (!SMSConfirm<bool, (MBankJsonResponseAuthorize response, bool requestProcessed)>(
                             (string SMSCode) =>
                             {
-                                mBankJsonRequestConfirm jsonRequestConfirm = new mBankJsonRequestConfirm();
-                                jsonRequestConfirm.authorizationCode = SMSCode;
-                                jsonRequestConfirm.authorizationType = "SMS";
+                                MBankJsonRequestConfirm jsonRequestConfirm = new MBankJsonRequestConfirm
+                                {
+                                    authorizationCode = SMSCode,
+                                    authorizationType = "SMS"
+                                };
 
-                                return PerformRequest<mBankJsonResponseAuthorize>(
+                                return PerformRequest<MBankJsonResponseAuthorize>(
                                     "api/AuthorizationMediator/ib/v5/authorize", HttpMethod.Post,
                                     JsonConvert.SerializeObject(jsonRequestConfirm));
                             },
-                            ((mBankJsonResponseAuthorize response, bool requestProcessed) authorizeResponse) =>
+                            ((MBankJsonResponseAuthorize response, bool requestProcessed) authorizeResponse) =>
                             {
                                 if (!authorizeResponse.requestProcessed)
                                     return false;
@@ -641,45 +671,47 @@ namespace BankService.Bank_PL_mBank
                                 else
                                     return true;
                             },
-                            ((mBankJsonResponseAuthorize response, bool requestProcessed) authorizeResponse) => true,
+                            ((MBankJsonResponseAuthorize response, bool requestProcessed) authorizeResponse) => true,
                             null,
                             confirmText,
                             initializeResponse.response.authorizationData.authorizationNumber))
                             return false;
 
-                        (mBankJsonResponseFinalizeAuthorization response, bool requestProcessed) finalizeAuthorizationStatusResponse = PerformRequest<mBankJsonResponseFinalizeAuthorization>(
+                        (MBankJsonResponseFinalizeAuthorization response, bool requestProcessed) finalizeAuthorizationStatusResponse = PerformRequest<MBankJsonResponseFinalizeAuthorization>(
                             finalizeAuthorizationUrl, HttpMethod.Post,
                             JsonConvert.SerializeObject(jsonRequestFinalizeAuthorization));
 
                         return true;
                     }
-                case mBankJsonAuthorizationType.Mobile:
+                case MBankJsonAuthorizationType.Mobile:
                     {
-                        if (!MobileConfirm<bool, (mBankJsonResponseAuthorizationStatus response, bool requestProcessed)>(
+                        if (!MobileConfirm<bool, (MBankJsonResponseAuthorizationStatus response, bool requestProcessed)>(
                             () =>
                             {
-                                mBankJsonRequestAuthorizationStatus jsonRequestAuthorizationStatus = new mBankJsonRequestAuthorizationStatus();
-                                jsonRequestAuthorizationStatus.authorizationId = initializeResponse.response.authorizationData.authorizationId;
+                                MBankJsonRequestAuthorizationStatus jsonRequestAuthorizationStatus = new MBankJsonRequestAuthorizationStatus
+                                {
+                                    authorizationId = initializeResponse.response.authorizationData.authorizationId
+                                };
 
-                                return PerformRequest<mBankJsonResponseAuthorizationStatus>(
+                                return PerformRequest<MBankJsonResponseAuthorizationStatus>(
                                     "api/AuthorizationMediator/ib/v5/status", HttpMethod.Post,
                                     JsonConvert.SerializeObject(jsonRequestAuthorizationStatus));
                             },
-                            ((mBankJsonResponseAuthorizationStatus response, bool requestProcessed) authorizationStatusResponse) =>
+                            ((MBankJsonResponseAuthorizationStatus response, bool requestProcessed) authorizationStatusResponse) =>
                             {
-                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == mBankJsonAuthorizationStatus.Cancel)
+                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationStatus.Cancel)
                                     return false;
-                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == mBankJsonAuthorizationStatus.Authorized)
+                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationStatus.Authorized)
                                     return true;
 
                                 return null;
                             },
-                            ((mBankJsonResponseAuthorizationStatus response, bool requestProcessed) authorizationStatusResponse) => true,
+                            ((MBankJsonResponseAuthorizationStatus response, bool requestProcessed) authorizationStatusResponse) => true,
                             null,
                             confirmText))
                             return false;
 
-                        (mBankJsonResponseFinalizeAuthorization response, bool requestProcessed) finalizeAuthorizationStatusResponse = PerformRequest<mBankJsonResponseFinalizeAuthorization>(
+                        (MBankJsonResponseFinalizeAuthorization response, bool requestProcessed) finalizeAuthorizationStatusResponse = PerformRequest<MBankJsonResponseFinalizeAuthorization>(
                             finalizeAuthorizationUrl, HttpMethod.Post,
                             JsonConvert.SerializeObject(jsonRequestFinalizeAuthorization));
 
@@ -689,9 +721,9 @@ namespace BankService.Bank_PL_mBank
             }
         }
 
-        private bool ConfirmTransfer(mBankJsonRequestInitPrepare jsonRequestInitPrepare, ConfirmTextBase confirmText)
+        private bool ConfirmTransfer(MBankJsonRequestInitPrepare jsonRequestInitPrepare, ConfirmTextBase confirmText)
         {
-            (mBankJsonResponseInitPrepare response, bool requestProcessed) initPrepareResponse = PerformRequest<mBankJsonResponseInitPrepare>(
+            (MBankJsonResponseInitPrepare response, bool requestProcessed) initPrepareResponse = PerformRequest<MBankJsonResponseInitPrepare>(
                 "api/auth/initprepare", HttpMethod.Post,
                 JsonConvert.SerializeObject(jsonRequestInitPrepare));
             if (!initPrepareResponse.requestProcessed)
@@ -699,19 +731,21 @@ namespace BankService.Bank_PL_mBank
 
             switch (initPrepareResponse.response.AuthorizationModeValue)
             {
-                case mBankJsonAuthorizationMode.SMS:
+                case MBankJsonAuthorizationMode.SMS:
                     {
-                        return SMSConfirm<bool, (mBankJsonResponseExecute response, bool requestProcessed)>(
+                        return SMSConfirm<bool, (MBankJsonResponseExecute response, bool requestProcessed)>(
                             (string SMSCode) =>
                             {
-                                mBankJsonRequestExecute jsonRequestExecute = new mBankJsonRequestExecute();
-                                jsonRequestExecute.Auth = SMSCode;
+                                MBankJsonRequestExecute jsonRequestExecute = new MBankJsonRequestExecute
+                                {
+                                    Auth = SMSCode
+                                };
 
-                                return PerformRequest<mBankJsonResponseExecute>(
+                                return PerformRequest<MBankJsonResponseExecute>(
                                     "api/auth/execute", HttpMethod.Post,
                                     JsonConvert.SerializeObject(jsonRequestExecute));
                             },
-                            ((mBankJsonResponseExecute response, bool requestProcessed) executeResponse) =>
+                            ((MBankJsonResponseExecute response, bool requestProcessed) executeResponse) =>
                             {
                                 if (!executeResponse.requestProcessed)
                                     return false;
@@ -720,41 +754,43 @@ namespace BankService.Bank_PL_mBank
                                 else
                                     return true;
                             },
-                            ((mBankJsonResponseExecute response, bool requestProcessed) executeResponse) => true,
+                            ((MBankJsonResponseExecute response, bool requestProcessed) executeResponse) => true,
                             null,
                             //TODO use initPrepareResponse.response.Data.amount
                             confirmText,
                             initPrepareResponse.response.OperationNumber);
                     }
-                case mBankJsonAuthorizationMode.Mobile:
+                case MBankJsonAuthorizationMode.Mobile:
                     {
-                        if (!MobileConfirm<bool, (mBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed)>(
+                        if (!MobileConfirm<bool, (MBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed)>(
                             () =>
                             {
-                                mBankJsonRequestAuthorizationTransferStatus jsonRequestAuthorizationStatus = new mBankJsonRequestAuthorizationTransferStatus();
-                                jsonRequestAuthorizationStatus.TranId = initPrepareResponse.response.TranId;
+                                MBankJsonRequestAuthorizationTransferStatus jsonRequestAuthorizationStatus = new MBankJsonRequestAuthorizationTransferStatus
+                                {
+                                    TranId = initPrepareResponse.response.TranId
+                                };
 
-                                return PerformRequest<mBankJsonResponseAuthorizationTransferStatus>(
+                                return PerformRequest<MBankJsonResponseAuthorizationTransferStatus>(
                                     "api/auth/status", HttpMethod.Post,
                                     JsonConvert.SerializeObject(jsonRequestAuthorizationStatus));
                             },
-                            ((mBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed) authorizationStatusResponse) =>
+                            ((MBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed) authorizationStatusResponse) =>
                             {
-                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == mBankJsonAuthorizationTransferStatus.Cancel)
+                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationTransferStatus.Cancel)
                                     return false;
-                                if (authorizationStatusResponse.response.AuthorizationStatusValue == mBankJsonAuthorizationTransferStatus.Authorized)
+                                if (authorizationStatusResponse.response.AuthorizationStatusValue == MBankJsonAuthorizationTransferStatus.Authorized)
                                     return true;
 
                                 return null;
                             },
-                            ((mBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed) authorizationStatusResponse) => true,
+                            ((MBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed) authorizationStatusResponse) => true,
                             null,
                             confirmText))
                             return false;
 
-                        mBankJsonRequestExecute jsonRequestExecute = new mBankJsonRequestExecute();
+                        MBankJsonRequestExecute jsonRequestExecute = new MBankJsonRequestExecute();
 
-                        (mBankJsonResponseExecute response, bool requestProcessed) executeResponse = PerformRequest<mBankJsonResponseExecute>(
+                        (MBankJsonResponseExecute response, bool requestProcessed) executeResponse = PerformRequest<MBankJsonResponseExecute>(
                             "api/auth/execute", HttpMethod.Post,
                             JsonConvert.SerializeObject(jsonRequestExecute));
 
@@ -780,7 +816,7 @@ namespace BankService.Bank_PL_mBank
         }
 
         private (T, bool) PerformRequest<T>(string requestUri, HttpMethod method,
-            string jsonContent) where T : mBankJsonResponseBase
+            string jsonContent) where T : MBankJsonResponseBase
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, jsonContent))
             {
@@ -798,7 +834,7 @@ namespace BankService.Bank_PL_mBank
 
         private void PerformFileRequest(string requestUri, HttpMethod method,
             string jsonContent,
-            Func<ContentDispositionHeaderValue, FileStream> fileStream)
+            Func<string, FileStream> fileStream)
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, jsonContent))
                 ProcessFileStream(request, fileStream);

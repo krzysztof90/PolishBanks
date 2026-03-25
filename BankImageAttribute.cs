@@ -1,8 +1,8 @@
-﻿using ToolsForms;
-using System.Collections;
+﻿using System.Collections;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using ToolsForms;
 
 namespace BankService
 {

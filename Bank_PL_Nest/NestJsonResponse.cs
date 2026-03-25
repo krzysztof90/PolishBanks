@@ -66,8 +66,8 @@ namespace BankService.Bank_PL_Nest
 
             public NestJsonLoginProcess? LoginProcessValue
             {
-                get { return loginProcess.GetEnumByJsonValue<NestJsonLoginProcess>(); }
-                set { loginProcess = value.GetEnumJsonValue<NestJsonLoginProcess>(); }
+                get => loginProcess.GetEnumByJsonValue<NestJsonLoginProcess>();
+                set => loginProcess = value.GetEnumJsonValue<NestJsonLoginProcess>();
             }
         }
 
@@ -137,8 +137,8 @@ namespace BankService.Bank_PL_Nest
 
             public NestJsonAuthorizationMethod? AuthorizationMethodValue
             {
-                get { return authorizationMethod.GetEnumByJsonValue<NestJsonAuthorizationMethod>(); }
-                set { authorizationMethod = value.GetEnumJsonValue<NestJsonAuthorizationMethod>(); }
+                get => authorizationMethod.GetEnumByJsonValue<NestJsonAuthorizationMethod>();
+                set => authorizationMethod = value.GetEnumJsonValue<NestJsonAuthorizationMethod>();
             }
         }
 
@@ -286,14 +286,14 @@ namespace BankService.Bank_PL_Nest
 
             public NestJsonAuthorizationStatus? StatusValue
             {
-                get { return status.GetEnumByJsonValue<NestJsonAuthorizationStatus>(); }
-                set { status = value.GetEnumJsonValue<NestJsonAuthorizationStatus>(); }
+                get => status.GetEnumByJsonValue<NestJsonAuthorizationStatus>();
+                set => status = value.GetEnumJsonValue<NestJsonAuthorizationStatus>();
             }
 
             public NestJsonAuthorizationPushType? PushTypeValue
             {
-                get { return pushType.GetEnumByJsonValue<NestJsonAuthorizationPushType>(); }
-                set { pushType = value.GetEnumJsonValue<NestJsonAuthorizationPushType>(); }
+                get => pushType.GetEnumByJsonValue<NestJsonAuthorizationPushType>();
+                set => pushType = value.GetEnumJsonValue<NestJsonAuthorizationPushType>();
             }
         }
 
@@ -471,18 +471,18 @@ namespace BankService.Bank_PL_Nest
 
             public NestJsonOperationType? OperationTypeValue
             {
-                get { return operationType.GetEnumByJsonValue<NestJsonOperationType>(); }
-                set { operationType = value.GetEnumJsonValue<NestJsonOperationType>(); }
+                get => operationType.GetEnumByJsonValue<NestJsonOperationType>();
+                set => operationType = value.GetEnumJsonValue<NestJsonOperationType>();
             }
             public NestJsonCreditDebit? CreditDebitValue
             {
-                get { return operationSide.GetEnumByJsonValue<NestJsonCreditDebit>(); }
-                set { operationSide = value.GetEnumJsonValue<NestJsonCreditDebit>(); }
+                get => operationSide.GetEnumByJsonValue<NestJsonCreditDebit>();
+                set => operationSide = value.GetEnumJsonValue<NestJsonCreditDebit>();
             }
             public DateTime TransactionDateValue
             {
-                get { return DateTime.Parse(transactionDate); }
-                set { transactionDate = value.Display("dd.MM.yyyy"); }
+                get => DateTime.Parse(transactionDate);
+                set => transactionDate = value.Display("dd.MM.yyyy");
             }
         }
 
@@ -579,8 +579,8 @@ namespace BankService.Bank_PL_Nest
 
             public NestJsonOperatorValueType? ValueTypeValue
             {
-                get { return valueType.GetEnumByJsonValue<NestJsonOperatorValueType>(); }
-                set { valueType = value.GetEnumJsonValue<NestJsonOperatorValueType>(); }
+                get => valueType.GetEnumByJsonValue<NestJsonOperatorValueType>();
+                set => valueType = value.GetEnumJsonValue<NestJsonOperatorValueType>();
             }
         }
 

@@ -31,8 +31,8 @@ namespace BankService.Bank_PT_Santander
 
             public SantanderJsonSuccess? SuccessValue
             {
-                get { return sucesso.GetEnumByJsonValue<SantanderJsonSuccess>(); }
-                set { sucesso = value.GetEnumJsonValue<SantanderJsonSuccess>(); }
+                get => sucesso.GetEnumByJsonValue<SantanderJsonSuccess>();
+                set => sucesso = value.GetEnumJsonValue<SantanderJsonSuccess>();
             }
         }
 
@@ -43,8 +43,8 @@ namespace BankService.Bank_PT_Santander
 
             public SantanderJsonResponseStatus? MessageValue
             {
-                get { return msg.GetEnumByJsonValue<SantanderJsonResponseStatus>(); }
-                set { msg = value.GetEnumJsonValue<SantanderJsonResponseStatus>(); }
+                get => msg.GetEnumByJsonValue<SantanderJsonResponseStatus>();
+                set => msg = value.GetEnumJsonValue<SantanderJsonResponseStatus>();
             }
         }
 

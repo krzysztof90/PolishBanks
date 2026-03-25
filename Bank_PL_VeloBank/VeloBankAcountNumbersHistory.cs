@@ -11,7 +11,7 @@ namespace BankService.Bank_PL_VeloBank
         {
             VeloBankHistoryFilter filter = new VeloBankHistoryFilter()
             {
-                DateFrom = Properties.Settings.Default.VeloBankAcountNumbersDownloadDate == default(DateTime) ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
+                DateFrom = Properties.Settings.Default.VeloBankAcountNumbersDownloadDate == default ? DateTime.MinValue : Properties.Settings.Default.VeloBankAcountNumbersDownloadDate,
             };
             List<VeloBankHistoryItem> operations = veloService.GetHistory(filter).Cast<VeloBankHistoryItem>().ToList();
             SaveOperations(operations);

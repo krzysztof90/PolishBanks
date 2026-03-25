@@ -28,7 +28,7 @@ namespace BankService.Bank_PL_Nest
             ToPersonAddress = transactionDetails.creditor.address;
             Title = transactionDetails.title;
             TaxData = transactionDetails.taxData;
-            Type = (NestJsonOperationType)transaction.OperationTypeValue;
+            Type = transaction.OperationTypeValue.Value;
         }
 
         public override bool IsTransfer => Type == NestJsonOperationType.TransferIncoming || Type == NestJsonOperationType.TransferOutgoing;

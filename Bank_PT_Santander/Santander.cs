@@ -153,26 +153,27 @@ namespace BankService.Bank_PT_Santander
 
         protected override bool TryExtendSession()
         {
-            string url = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/common/utils",
+            string url = WebOperations.BuildUrlWithQuery("bepp/sanpt/common/utils",
                 new List<(string key, string value)> { ("refreshSession", "yes") });
             SantanderJsonResponseHeartbeat heartbeatResponse = PerformRequest<SantanderJsonResponseHeartbeat>(url, HttpMethod.Get,
-                false, false,
+                true, true,
                 null, false);
 
-            if (heartbeatResponse == null)
-                return false;
-
-            return true;
+            return heartbeatResponse != null;
         }
 
         protected override HtmlDocument GetAccountsDetails()
         {
+            List<KeyValuePair<string, string>> accountsDetailsParameters = new List<KeyValuePair<string, string>>() {
+                GetTokenParameter(),
+            };
+
             //TODO if more accounts, are they all in one place or uncomment below
-            HtmlDocument document = PerformHtmlRequest("bepp/sanpt/homepage/homepage/0,,,0.shtml", HttpMethod.Get,
+            HtmlDocument document = PerformHtmlRequest("bepp/sanpt/homepage/homepage/0,,,0.shtml", HttpMethod.Post,
                 false, false, false,
-                null, false);
+                accountsDetailsParameters, false);
             return document;
-            //return PerformHtmlRequest("bepp/sanpt/cuentas/detallecuenta/0,,,0.shtml", HttpMethod.Get, false, false, false, null, false);
+            //return PerformHtmlRequest("bepp/sanpt/cuentas/detallecuenta/0,,,0.shtml", HttpMethod.Post, false, false, false, accountsDetailsParameters, false);
         }
 
         private string GetAccountNumberFromShortNumber(string shortAccountNumber)
@@ -181,11 +182,14 @@ namespace BankService.Bank_PT_Santander
                 AccountNumberMap = new Dictionary<string, string>();
             if (!AccountNumberMap.ContainsKey(shortAccountNumber))
             {
-                string url = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/cuentas/detallecuenta/0,,,0.shtml",
-                    new List<(string key, string value)> { ("codigoCuenta", shortAccountNumber) });
-                HtmlDocument documentAccountDetails = PerformHtmlRequest(url, HttpMethod.Get,
+                List<KeyValuePair<string, string>> accountDetailsParameters = new List<KeyValuePair<string, string>>() {
+                    GetTokenParameter(),
+                    new KeyValuePair<string, string>("codigoCuenta", shortAccountNumber),
+                };
+
+                HtmlDocument documentAccountDetails = PerformHtmlRequest("bepp/sanpt/cuentas/detallecuenta/0,,,0.shtml", HttpMethod.Post,
                     false, false, false,
-                    null, false);
+                    accountDetailsParameters, false);
                 AccountNumberMap[shortAccountNumber] = documentAccountDetails.GetElementbyId("iban").InnerText.Trim()/*.Replace(" ", String.Empty)*/;
             }
 
@@ -229,15 +233,15 @@ namespace BankService.Bank_PT_Santander
                 GetActionParameter(SantanderActionType.TransactionsHistory),
                 new KeyValuePair<string, string>("select_account", SelectedAccountData.ShortAccountNumber),
             };
-            DateTime dateTo = filter.DateTo ?? DateTime.Today;
+            DateTime dateTo = filter.DateTo ?? Today;
             DateTime dateFrom = filter.DateFrom ?? (dateTo.AddDays(-90));
-            if (dateTo.Date == DateTime.Today)
+            if (dateTo.Date == Today)
                 //eg. if transfer added in saturday then in system it is with monday date
                 //TODO instead of 7 i -7 do next and previous working day
-                dateTo = DateTime.Today.AddDays(7);
-            if ((dateFrom.Date - DateTime.Today).Days >= 0)
+                dateTo = Today.AddDays(7);
+            if ((dateFrom.Date - Today).Days >= 0)
                 //TODO if run in sunday then needs to be set to thursady?
-                dateFrom = DateTime.Today.AddDays(-3);
+                dateFrom = Today.AddDays(-3);
             historyParameters1.Add(new KeyValuePair<string, string>("fechaInicio", dateFrom.Display("dd-MM-yyyy")));
             historyParameters1.Add(new KeyValuePair<string, string>("fechaFin", (dateTo).Display("dd-MM-yyyy")));
             HtmlDocument document = PerformHtmlRequest("bepp/sanpt/cuentas/accountbalancesandtransactions", HttpMethod.Post,
@@ -296,11 +300,14 @@ namespace BankService.Bank_PT_Santander
                         string transactionIndex = transactionNode.Attributes["onclick"].Value.SubstringFromToEx("javascript:visualizarDetalhes(this,'", "');");
                         //TODO does index work
 
-                        string url = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/cuentas/accountbalancesandtransactions",
-                            new List<(string key, string value)> { GetQueryAction(SantanderActionType.TransactionDetails), ("movIndex", transactionIndex) });
-                        HtmlDocument documentDetails = PerformHtmlRequest(url, HttpMethod.Get,
+                        List<KeyValuePair<string, string>> historyParameters3 = new List<KeyValuePair<string, string>>() {
+                            GetTokenParameter(),
+                            GetActionParameter(SantanderActionType.TransactionDetails),
+                            new KeyValuePair<string, string>("movIndex", transactionIndex)
+                        };
+                        HtmlDocument documentDetails = PerformHtmlRequest("bepp/sanpt/cuentas/accountbalancesandtransactions", HttpMethod.Post,
                             false, false, false,
-                            null, false);
+                            historyParameters3, false);
 
                         SantanderHistoryItem item = new SantanderHistoryItem(transactionNode, documentDetails);
 
@@ -335,7 +342,7 @@ namespace BankService.Bank_PT_Santander
                                                 HtmlNode sectionNodeTransfer = documentDetailsTransfer.DocumentNode.Descendants("section").Single(n => n.HasClass("section-container"));
                                                 IEnumerable<HtmlNode> blockNodes = sectionNodeTransfer.Descendants("div").Where(n => n.HasClass("data-block"));
 
-                                                //if old transfer then doesn't have details?
+                                                //jeżeli stary przelew to nie ma szczegółów?
                                                 string accountNumber = GetBlockText(blockNodes, (item.Direction == OperationDirection.Income ? "Conta origem" : "Conta destino"))?.TrimEnd()/*.SubstringFromEx(" - ")*/;
 
                                                 if (item.Direction == OperationDirection.Execute)
@@ -365,7 +372,48 @@ namespace BankService.Bank_PT_Santander
             return result;
         }
 
-        public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
+        private List<(string id, string personName, string title, double amount)> GetTransfersDetails(SantanderHistoryItem item)
+        {
+            //TODO page number
+
+            List<KeyValuePair<string, string>> historyParameters = new List<KeyValuePair<string, string>>() {
+                GetTokenParameter(),
+                GetActionParameter(SantanderActionType.TransfersHistory),
+                new KeyValuePair<string, string>("cuentaOrigen", SelectedAccountData.ShortAccountNumber),
+                new KeyValuePair<string, string>("dateInterval", "pt_historicotransferencias_option_periodo_intervalo"),
+                new KeyValuePair<string, string>("fechaInicio", (item.OrderDate.AddDays(-7)).Display("dd-MM-yyyy")),
+                new KeyValuePair<string, string>("fechaFim", (item.OrderDate.AddDays(7)).Display("dd-MM-yyyy")),
+                new KeyValuePair<string, string>("numeroPagina", "1"),
+                new KeyValuePair<string, string>("search", "si"),
+                new KeyValuePair<string, string>("TIPO_TRANSFERENCIA", (item.Direction == OperationDirection.Income ? "R" : "E")),
+            };
+
+            HtmlDocument document = PerformHtmlRequest("bepp/sanpt/cuentas/historicotransferencias", HttpMethod.Post,
+                false, false, false,
+                historyParameters, false);
+
+            HtmlNode divTableNodeTransfer = document.GetElementbyId("resultadosTable");
+            if (divTableNodeTransfer == null)
+                return null;
+
+            List<(string id, string personName, string title, double amount)> result = new List<(string id, string personName, string title, double amount)>();
+
+            List<HtmlNode> transfersNodes = divTableNodeTransfer.Where("a").ToList();
+            foreach (HtmlNode transferNode in transfersNodes)
+            {
+                List<HtmlNode> columnsNodes = transferNode.Where("span").ToList();
+                string personName = columnsNodes[1].InnerText;
+                string title = columnsNodes[2].InnerText;
+                double amount = Math.Abs(DoubleOperations.Parse(String.Join(String.Empty, columnsNodes[4].InnerText.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).Where(t => t != String.Empty)), ThousandSeparator.Dot, DecimalSeparator.Comma));
+                string id = transferNode.Attributes["href"].Value.SubstringFromToEx("javascript:detail('", "');");
+
+                result.Add((id, personName, title, amount));
+            }
+
+            return result;
+        }
+
+        protected override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
             //TODO if recipient name is too long then when sending SMS code there is always error about wrong code (ot there is different error than wrong code)?
             //27 without spaces?
@@ -389,7 +437,7 @@ namespace BankService.Bank_PT_Santander
                 new KeyValuePair<string, string>("email", ""),
                 new KeyValuePair<string, string>("tftype", "NORMAL"),
                 new KeyValuePair<string, string>("typeOfTranferChosen", "NORMAL"),
-                new KeyValuePair<string, string>("fechaInicio", DateTime.Today.Display("dd-MM-yyyy")),
+                new KeyValuePair<string, string>("fechaInicio", Today.Display("dd-MM-yyyy")),
                 new KeyValuePair<string, string>("cuentaOrigen", SelectedAccountData.ShortAccountNumber),
             };
             HtmlDocument transferResponse1 = PerformHtmlRequest("bepp/sanpt/cuentas/transferencianacionalf", HttpMethod.Post,
@@ -445,9 +493,13 @@ namespace BankService.Bank_PT_Santander
 
         protected override bool MakePrepaidTransfer(string recipient, string phoneNumber, double amount, string nif)
         {
-            HtmlDocument document1 = PerformHtmlRequest("bepp/sanpt/pagos/topup", HttpMethod.Get,
+            IEnumerable<KeyValuePair<string, string>> topupParameters = new KeyValuePair<string, string>[] {
+                GetTokenParameter(),
+            };
+
+            HtmlDocument document1 = PerformHtmlRequest("bepp/sanpt/pagos/topup", HttpMethod.Post,
                 false, false, false,
-                null, false);
+                topupParameters, false);
 
             string operatorsDataResponseStr = document1.Text.SubstringFromToEx("pagamentosInfo : JSON.parse(JSON.stringify(", ")),");
             List<SantanderJsonResponseOperator> operators = JsonConvert.DeserializeObject<List<SantanderJsonResponseOperator>>(operatorsDataResponseStr);
@@ -477,8 +529,8 @@ namespace BankService.Bank_PT_Santander
                 new KeyValuePair<string, string>("codigoEntidad", operatorItem.identificadorHost),
                 new KeyValuePair<string, string>("montante", amount.Display(DecimalSeparator.Comma)),
                 new KeyValuePair<string, string>("nif", nif),
-                new KeyValuePair<string, string>("fechaPago", DateTime.Today.Display("dd/MM/yyyy")),
-                new KeyValuePair<string, string>("fechaInicio", DateTime.Today.Display("dd/MM/yyyy")),
+                new KeyValuePair<string, string>("fechaPago", Today.Display("dd/MM/yyyy")),
+                new KeyValuePair<string, string>("fechaInicio", Today.Display("dd/MM/yyyy")),
                 new KeyValuePair<string, string>("radioCuentas", card.id),
                 new KeyValuePair<string, string>("codigoTarjeta", card.id),
                 new KeyValuePair<string, string>("contaEfetiva", card.id),
@@ -523,7 +575,7 @@ namespace BankService.Bank_PT_Santander
             return Confirm(topupResponse3, "bepp/sanpt/pagos/topup", "CARREGAMENTO_TELEMOVEL", SantanderActionType.TransferTopupConfirm, $"O seu carregamento {operatorItem.descripcion} foi efetuado", new ConfirmTextPrepaidTransfer(amount, currencyToConfirm, operatorItem.descripcion, referenceToConfirm));
         }
 
-        public override bool MakePaymentOfServicesTransfer(string entity, string reference, double amount)
+        protected override bool MakePaymentOfServicesTransfer(string entity, string reference, double amount)
         {
             //amount must be exact, otherwise response with error
 
@@ -541,8 +593,8 @@ namespace BankService.Bank_PT_Santander
                 new KeyValuePair<string, string>("referenciaPago", reference),
                 new KeyValuePair<string, string>("montante", amount.Display(DecimalSeparator.Comma)),
                 //TODO what if weekend
-                new KeyValuePair<string, string>("paymentDay", DateTime.Today.Display("dd-MM-yyyy")),
-                new KeyValuePair<string, string>("fechaPago", DateTime.Today.Display("dd/MM/yyyy")),
+                new KeyValuePair<string, string>("paymentDay", Today.Display("dd-MM-yyyy")),
+                new KeyValuePair<string, string>("fechaPago", Today.Display("dd/MM/yyyy")),
                 new KeyValuePair<string, string>("divisaMontante", SelectedAccountData.Currency),
                 new KeyValuePair<string, string>("cuentaEfectivo", SelectedAccountData.ShortAccountNumber),
                 new KeyValuePair<string, string>("codigoTarjeta", card.id),
@@ -615,14 +667,14 @@ namespace BankService.Bank_PT_Santander
                 new KeyValuePair<string, string>("codigoReciboEstado", reference),
                 new KeyValuePair<string, string>("importe", amount.Display(DecimalSeparator.Comma)),
                 new KeyValuePair<string, string>("repartoFinanzas", nif),
-                new KeyValuePair<string, string>("fechaPagoDia", DateTime.Today.Display("dd-MM-yyyy")),
+                new KeyValuePair<string, string>("fechaPagoDia", Today.Display("dd-MM-yyyy")),
                 new KeyValuePair<string, string>("nuevo", String.Empty),
                 new KeyValuePair<string, string>("codigoTarjeta", card.id),
                 new KeyValuePair<string, string>("contaSelecionada", String.Empty),
                 new KeyValuePair<string, string>("codigoEntidad", entityCode),
                 new KeyValuePair<string, string>("tipoDocumento", "1"),
                 new KeyValuePair<string, string>("isAgendamento", "false"),
-                new KeyValuePair<string, string>("fechaPago", DateTime.Today.Display("dd/MM/yyyy")),
+                new KeyValuePair<string, string>("fechaPago", Today.Display("dd/MM/yyyy")),
                 new KeyValuePair<string, string>("bancoOrigem", String.Empty),
                 new KeyValuePair<string, string>("contaEfetiva", card.id),
                 new KeyValuePair<string, string>("cartaoEfetivo", card.number),
@@ -637,7 +689,7 @@ namespace BankService.Bank_PT_Santander
             return true;
         }
 
-        protected override bool GetDetailsFileMain(SantanderHistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        protected override bool GetDetailsFileMain(SantanderHistoryItem item, Func<string, FileStream> file)
         {
             switch (item.Type)
             {
@@ -658,7 +710,7 @@ namespace BankService.Bank_PT_Santander
                                         GetActionParameter(SantanderActionType.TransferDocument),
                                         new KeyValuePair<string, string>("formatoDescarga", "pdf"),
                                     };
-                                    string url = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/cuentas/historicotransferencias/0,,,00.pdf",
+                                    string url = WebOperations.BuildUrlWithQuery("bepp/sanpt/cuentas/historicotransferencias/0,,,00.pdf",
                                         new List<(string key, string value)> { ("appInterceptor", "pdf"), ("pdfmethod", "get") });
                                     PerformFileRequest(url, HttpMethod.Post,
                                         historyPdfParameters,
@@ -677,7 +729,7 @@ namespace BankService.Bank_PT_Santander
                         PreRequest("bepp/sanpt/pagos/consultaordenespago");
 
                         //TODO page number
-                        string url1 = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/pagos/consultaordenespago",
+                        string url1 = WebOperations.BuildUrlWithQuery("bepp/sanpt/pagos/consultaordenespago",
                             new List<(string key, string value)> {
                                 GetQueryAction(SantanderActionType.TransfersPaymentOfServicesHistory),
                                 ("account", SelectedAccountData.ShortAccountNumber), 
@@ -730,7 +782,7 @@ namespace BankService.Bank_PT_Santander
                                         new KeyValuePair<string, string>("hasComprovativo", "true"),
                                         new KeyValuePair<string, string>("cuentaCargo", SelectedAccountData.ShortAccountNumber),
                                     };
-                                    string url2 = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/pagos/consultaordenespago/0,,,00.pdf",
+                                    string url2 = WebOperations.BuildUrlWithQuery("bepp/sanpt/pagos/consultaordenespago/0,,,00.pdf",
                                         new List<(string key, string value)> { ("appInterceptor", "pdf"), ("pdfmethod", "get") });
                                     PerformFileRequest(url2, HttpMethod.Post,
                                         historyPdfParameters,
@@ -746,47 +798,6 @@ namespace BankService.Bank_PT_Santander
             }
 
             return false;
-        }
-
-        private List<(string id, string personName, string title, double amount)> GetTransfersDetails(SantanderHistoryItem item)
-        {
-            //TODO page number
-
-            List<KeyValuePair<string, string>> historyParameters = new List<KeyValuePair<string, string>>() {
-                GetTokenParameter(),
-                GetActionParameter(SantanderActionType.TransfersHistory),
-                new KeyValuePair<string, string>("cuentaOrigen", SelectedAccountData.ShortAccountNumber),
-                new KeyValuePair<string, string>("dateInterval", "pt_historicotransferencias_option_periodo_intervalo"),
-                new KeyValuePair<string, string>("fechaInicio", (item.OrderDate.AddDays(-7)).Display("dd-MM-yyyy")),
-                new KeyValuePair<string, string>("fechaFim", (item.OrderDate.AddDays(7)).Display("dd-MM-yyyy")),
-                new KeyValuePair<string, string>("numeroPagina", "1"),
-                new KeyValuePair<string, string>("search", "si"),
-                new KeyValuePair<string, string>("TIPO_TRANSFERENCIA", (item.Direction == OperationDirection.Income ? "R" : "E")),
-            };
-
-            HtmlDocument document = PerformHtmlRequest("bepp/sanpt/cuentas/historicotransferencias", HttpMethod.Post,
-                false, false, false,
-                historyParameters, false);
-
-            HtmlNode divTableNodeTransfer = document.GetElementbyId("resultadosTable");
-            if (divTableNodeTransfer == null)
-                return null;
-
-            List<(string id, string personName, string title, double amount)> result = new List<(string id, string personName, string title, double amount)>();
-
-            List<HtmlNode> transfersNodes = divTableNodeTransfer.Where("a").ToList();
-            foreach (HtmlNode transferNode in transfersNodes)
-            {
-                List<HtmlNode> columnsNodes = transferNode.Where("span").ToList();
-                string personName = columnsNodes[1].InnerText;
-                string title = columnsNodes[2].InnerText;
-                double amount = Math.Abs(DoubleOperations.Parse(String.Join(String.Empty, columnsNodes[4].InnerText.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).Where(t => t != String.Empty)), ThousandSeparator.Dot, DecimalSeparator.Comma));
-                string id = transferNode.Attributes["href"].Value.SubstringFromToEx("javascript:detail('", "');");
-
-                result.Add((id, personName, title, amount));
-            }
-
-            return result;
         }
 
         private bool Confirm(HtmlDocument document, string url, string funcionType, SantanderActionType actionType, string successMessage, ConfirmTextBase confirmText)
@@ -807,7 +818,7 @@ namespace BankService.Bank_PT_Santander
             }
             else
             {
-                string url1 = WebOperations.BuildUrlWithQuery(BaseAddress, "bepp/sanpt/usuarios/autenticacaofortefunctions",
+                string url1 = WebOperations.BuildUrlWithQuery("bepp/sanpt/usuarios/autenticacaofortefunctions",
                     new List<(string key, string value)> { GetQueryAction(SantanderActionType.TransferAuthenticateSMS), ("funcionalidade", funcionType) });
                 SantanderJsonResponseAutenticacaOforteFunctions jsonResponse = PerformRequest<SantanderJsonResponseAutenticacaOforteFunctions>(url1, HttpMethod.Post,
                     true, true,
@@ -913,7 +924,7 @@ namespace BankService.Bank_PT_Santander
 
         private void PerformFileRequest(string requestUri, HttpMethod method,
             IEnumerable<KeyValuePair<string, string>> parameters,
-            Func<ContentDispositionHeaderValue, FileStream> fileStream)
+            Func<string, FileStream> fileStream)
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, false, false, false, parameters, false))
                 ProcessFileStream(request, fileStream);
@@ -985,7 +996,7 @@ namespace BankService.Bank_PT_Santander
                 label == null
                 || n.SingleOrDefaultChildNode("label")?.InnerText == label
                 || n.SingleOrDefaultChildNode("p", p => p.HasClass("data-label"))?.InnerText == label);
-            return blockNode != null ? blockNode.SingleChildNode("p", p => p.HasClass("data-value") || p.HasClass("field-data-value")).InnerText : null;
+            return blockNode?.SingleChildNode("p", p => p.HasClass("data-value") || p.HasClass("field-data-value")).InnerText;
         }
     }
 }

@@ -192,7 +192,7 @@ namespace BankService.Bank_PL_GetinBank
             }
             else
             {
-                if (!ConfirmMobile(confirmTextAuthorization))
+                if (!ConfirmMobileLocal(confirmTextAuthorization))
                     return false;
             }
 
@@ -287,7 +287,7 @@ namespace BankService.Bank_PL_GetinBank
                     }
                     else
                     {
-                        if (!ConfirmMobile(confirmTextAddDevice))
+                        if (!ConfirmMobileLocal(confirmTextAddDevice))
                             return false;
                     }
                 }
@@ -356,7 +356,7 @@ namespace BankService.Bank_PL_GetinBank
         //    return new AccountData("?", accountNumber, "?", Double.Parse(availableFunds));
         //}
 
-        public override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
+        protected override bool MakeTransfer(string recipient, string address, string accountNumber, string title, double amount)
         {
             string formattedAccountNumber = accountNumber.SimplifyAccountNumber();
 
@@ -478,10 +478,10 @@ namespace BankService.Bank_PL_GetinBank
                     SMSCodeNumber);
             }
             else
-                return ConfirmMobile(confirmText);
+                return ConfirmMobileLocal(confirmText);
         }
 
-        public override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
+        protected override bool MakeTaxTransfer(string taxType, string accountNumber, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier, string creditorName, string obligationId, double amount)
         {
             throw new NotImplementedException();
         }
@@ -626,7 +626,7 @@ namespace BankService.Bank_PL_GetinBank
             else
             {
                 //TODO does mobile authorization work
-                if (!ConfirmMobile(confirmText))
+                if (!ConfirmMobileLocal(confirmText))
                     return null;
             }
 
@@ -764,7 +764,7 @@ namespace BankService.Bank_PL_GetinBank
                     SMSCodeNumber);
             }
             else
-                return ConfirmMobile(confirmText);
+                return ConfirmMobileLocal(confirmText);
         }
 
         protected override GetinBankHistoryFilter CreateFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact)
@@ -906,7 +906,7 @@ namespace BankService.Bank_PL_GetinBank
                     {
                         (HtmlDocument response, bool requestProcessed) setFiltersRequest = PerformHtmlRequest(
                             "history/setFilters", HttpMethod.Post,
-                            filter.CreateDetailsParameters(),
+                            filter.CreateDetailsParameters(Today),
                             null);
                         if (!setFiltersRequest.requestProcessed)
                             return null;
@@ -945,14 +945,14 @@ namespace BankService.Bank_PL_GetinBank
             return result;
         }
 
-        protected override bool GetDetailsFileMain(GetinBankHistoryItem item, Func<ContentDispositionHeaderValue, FileStream> file)
+        protected override bool GetDetailsFileMain(GetinBankHistoryItem item, Func<string, FileStream> file)
         {
             PerformFileRequest($"history/printDetails/{item.Id}", HttpMethod.Get, file);
 
             return true;
         }
 
-        private bool ConfirmMobile(ConfirmTextBase confirmText)
+        private bool ConfirmMobileLocal(ConfirmTextBase confirmText)
         {
             return MobileConfirm<bool, GetinJsonResponseMobileConfirmation>(
                 () =>
@@ -1090,7 +1090,7 @@ namespace BankService.Bank_PL_GetinBank
         }
 
         private void PerformFileRequest(string requestUri, HttpMethod method,
-            Func<ContentDispositionHeaderValue, FileStream> fileStream)
+            Func<string, FileStream> fileStream)
         {
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, null))
                 ProcessFileStream(request, fileStream);
@@ -1098,16 +1098,18 @@ namespace BankService.Bank_PL_GetinBank
 
         private HttpRequestMessage CreateHttpRequestMessage(string requestUri, HttpMethod method, IEnumerable<KeyValuePair<string, string>> parameters)
         {
-            List<(string name, string value)> headers = new List<(string name, string value)>();
-            headers.Add(("User-Agent", userAgent));
-            headers.Add(("X-Requested-With", "XMLHttpRequest"));
+            List<(string name, string value)> headers = new List<(string name, string value)>
+            {
+                ("User-Agent", userAgent),
+                ("X-Requested-With", "XMLHttpRequest")
+            };
 
             return HttpOperations.CreateHttpRequestMessageForm(method, requestUri, parameters, headers);
         }
 
         private void RefreshCsrfToken()
         {
-            Int64 appStartTime = Convert.ToInt64(Math.Truncate(DateTime.Now.Subtract(new DateTime(1970, 1, 1)).Subtract(new TimeSpan(2, 0, 0)).TotalMilliseconds));
+            Int64 appStartTime = Convert.ToInt64(Math.Truncate(Now.Subtract(new DateTime(1970, 1, 1)).Subtract(new TimeSpan(2, 0, 0)).TotalMilliseconds));
             securityToken = StringEncryptor.CreateMD5(appStartTime.ToString()).ToLower();
         }
 

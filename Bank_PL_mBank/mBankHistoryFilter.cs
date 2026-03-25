@@ -1,23 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace BankService.Bank_PL_mBank
+namespace BankService.Bank_PL_MBank
 {
-    public class mBankHistoryFilter : HistoryFilter
+    public class MBankHistoryFilter : HistoryFilter
     {
-        public mBankFilterOperationType? OperationType { get; set; }
+        public MBankFilterOperationType? OperationType { get; set; }
 
-        public mBankHistoryFilter() : base()
+        public MBankHistoryFilter() : base()
         {
         }
 
-        public mBankHistoryFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact) : base(direction, title, dateFrom, dateTo, amountExact)
+        public MBankHistoryFilter(OperationDirection? direction, string title, DateTime? dateFrom, DateTime? dateTo, double? amountExact) : base(direction, title, dateFrom, dateTo, amountExact)
         {
         }
     }
 
     [Description("Rodzaj operacji")]
-    public enum mBankFilterOperationType
+    public enum MBankFilterOperationType
     {
         [Description("Wszystkie")]
         All,
