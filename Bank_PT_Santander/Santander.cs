@@ -342,7 +342,7 @@ namespace BankService.Bank_PT_Santander
                                                 HtmlNode sectionNodeTransfer = documentDetailsTransfer.DocumentNode.Descendants("section").Single(n => n.HasClass("section-container"));
                                                 IEnumerable<HtmlNode> blockNodes = sectionNodeTransfer.Descendants("div").Where(n => n.HasClass("data-block"));
 
-                                                //jeżeli stary przelew to nie ma szczegółów?
+                                                //if old transfer then doesn't have details?
                                                 string accountNumber = GetBlockText(blockNodes, (item.Direction == OperationDirection.Income ? "Conta origem" : "Conta destino"))?.TrimEnd()/*.SubstringFromEx(" - ")*/;
 
                                                 if (item.Direction == OperationDirection.Execute)

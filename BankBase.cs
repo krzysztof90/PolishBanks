@@ -269,6 +269,7 @@ namespace BankService
                 return false;
 
             //TODO run first time not imediately but after first cycle
+            //remember that extend request can (in browser) change token/cookie
             heartbeatTimer = new System.Threading.Timer((state) =>
             {
                 if (!Logged)

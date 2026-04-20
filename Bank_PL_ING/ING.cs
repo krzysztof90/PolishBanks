@@ -890,6 +890,8 @@ namespace BankService.Bank_PL_ING
 
         protected override List<INGHistoryItem> GetHistoryItems(INGHistoryFilter filter = null)
         {
+            //TODO if dateFrom is later than dateTo - swap, the same for amounts + in other banks
+
             //TODO there can be account number in title
 
             //TODO displaying 15 for getinbank, for ing editable

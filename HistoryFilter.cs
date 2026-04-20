@@ -11,7 +11,7 @@ namespace BankService
         public string AccountNumber
         {
             get => accountNumber?.SimplifyAccountNumber();
-            set => accountNumber = value; 
+            set => accountNumber = value;
         }
 
         public int CounterLimit { get; set; }
@@ -21,7 +21,7 @@ namespace BankService
         private DateTime? dateFrom;
         public DateTime? DateFrom
         {
-            get => dateFrom; 
+            get => dateFrom;
             set
             {
                 dateFrom = value;
@@ -32,7 +32,7 @@ namespace BankService
         private DateTime? dateTo;
         public DateTime? DateTo
         {
-            get => dateTo; 
+            get => dateTo;
             set
             {
                 dateTo = value;
@@ -42,7 +42,7 @@ namespace BankService
         }
         public DateTime? DateExact
         {
-            get => dateFrom == dateTo ? dateFrom : null; 
+            get => dateFrom == dateTo ? dateFrom : null;
             set
             {
                 if (value != null)
@@ -58,7 +58,7 @@ namespace BankService
         private double? amountFrom;
         public double? AmountFrom
         {
-            get => amountFrom; 
+            get => amountFrom;
             set
             {
                 amountFrom = value;
@@ -69,7 +69,7 @@ namespace BankService
         private double? amountTo;
         public double? AmountTo
         {
-            get => amountTo; 
+            get => amountTo;
             set
             {
                 amountTo = value;
@@ -79,7 +79,7 @@ namespace BankService
         }
         public double? AmountExact
         {
-            get => amountFrom == amountTo ? amountFrom : null; 
+            get => amountFrom == amountTo ? amountFrom : null;
             set
             {
                 if (value != null)

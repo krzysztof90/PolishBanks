@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HtmlAgilityPack, Version=1.12.1.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>packages\HtmlAgilityPack.1.12.1\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="HtmlAgilityPack, Version=1.12.2.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>packages\HtmlAgilityPack.1.12.2\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -45,24 +45,24 @@
       <HintPath>packages\protobuf-net.Core.3.2.56\lib\net462\protobuf-net.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.Collections.Immutable, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Collections.Immutable.7.0.0\lib\net462\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
     </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
@@ -248,29 +248,29 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Fido2\Fido2Authenticator.csproj">
+      <Project>{f155662d-687f-496a-b709-ab771b8837c0}</Project>
+      <Name>Fido2Authenticator</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Tools\ToolsForms\ToolsForms.csproj">
       <Project>{0fb4f3d3-901b-4c0d-afd2-e601ebd79943}</Project>
       <Name>ToolsForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Tools\ToolsNugetExtension\ToolsNugetExtensionNewtonsoft\ToolsNugetExtensionNewtonsoft.csproj">
-      <Project>{D9F0D349-07CB-4BB0-98D1-93F01BF56F08}</Project>
-      <Name>ToolsNugetExtensionNewtonsoft</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Tools\ToolsNugetExtension\ToolsNugetExtensionHtmlAgilityPack\ToolsNugetExtensionHtmlAgilityPack.csproj">
       <Project>{8e821c19-6ebb-461f-a68d-1d76f55705df}</Project>
       <Name>ToolsNugetExtensionHtmlAgilityPack</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Tools\Tools\Tools.csproj">
-      <Project>{0dadfc9d-9eec-4fd3-8e20-660030a98716}</Project>
-      <Name>Tools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Fido2\Fido2Authenticator.csproj">
-      <Project>{f155662d-687f-496a-b709-ab771b8837c0}</Project>
-      <Name>Fido2Authenticator</Name>
+    <ProjectReference Include="..\..\Tools\ToolsNugetExtension\ToolsNugetExtensionNewtonsoft\ToolsNugetExtensionNewtonsoft.csproj">
+      <Project>{D9F0D349-07CB-4BB0-98D1-93F01BF56F08}</Project>
+      <Name>ToolsNugetExtensionNewtonsoft</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Tools\ToolsWeb\ToolsWeb.csproj">
       <Project>{2B40BF5D-3539-4F75-AE06-A8FF6CCD2138}</Project>
       <Name>ToolsWeb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tools\Tools\Tools.csproj">
+      <Project>{0dadfc9d-9eec-4fd3-8e20-660030a98716}</Project>
+      <Name>Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
