@@ -268,8 +268,8 @@ namespace BankService
             if (!SetLogged(true))
                 return false;
 
-            //TODO run first time not imediately but after first cycle
             //remember that extend request can (in browser) change token/cookie
+            int interval = HeartbeatInterval * 1000;
             heartbeatTimer = new System.Threading.Timer((state) =>
             {
                 if (!Logged)
@@ -279,7 +279,7 @@ namespace BankService
                     if (!TryExtendSession())
                         heartbeatTimer.Dispose();
                 }
-            }, null, 0, HeartbeatInterval * 1000);
+            }, null, interval, interval);
 
             return true;
         }

@@ -274,7 +274,7 @@ namespace BankService.Bank_PT_Santander
                     },
                     (SantanderJsonResponseAccountBalancesAndTransactions jsonResponse) => true,
                     null,
-                    new SantanderConfirmTextAuthorizeGetHistory()))
+                    new ConfirmTextAuthorizeGetHistory()))
                     return new List<SantanderHistoryItem>();
 
                 List<KeyValuePair<string, string>> historyParameters2 = new List<KeyValuePair<string, string>>() {
@@ -648,7 +648,6 @@ namespace BankService.Bank_PT_Santander
             return Confirm(paymentResponse2, "bepp/sanpt/pagos/pagorecibos", "PAGAMENTO_SERVICOS", SantanderActionType.TransferPaymentOfServicesConfirm, "Para ver informação detalhada deste pagamento e outros consulte o histórico de pagamentos.", new ConfirmTextPaymentOfServices(amount, currencyToConfirm, entityNameToConfirm, entity, reference));
         }
 
-        //TODO make user interface
         public bool MakePayToTheStateTransfer(string reference, double amount, string nif)
         {
             HtmlDocument document1 = PreRequest("bepp/sanpt/pagos/pagoestado");

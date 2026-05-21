@@ -15,6 +15,7 @@ namespace BankService
         [Description("ING")]
         ING,
         [BankImage("pl_pocztowy")]
+        [BankAuthorization(new Type[] { typeof(int) }, new string[] { "Awatar" })]
         [Description("Pocztowy")]
         Pocztowy,
         [BankImage("pl_nest")]
@@ -27,9 +28,6 @@ namespace BankService
         [BankImage("pl_mBank")]
         [Description("mBank")]
         MBank,
-        [BankImage("pl_volkswagen")]
-        [Description("Volkswagen Bank")]
-        Volkswagen,
         [BankImage("pt_santander")]
         [Description("Santander PT")]
         Santander,

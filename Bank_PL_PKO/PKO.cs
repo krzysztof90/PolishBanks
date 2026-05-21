@@ -577,8 +577,7 @@ namespace BankService.Bank_PL_PKO
                 ((PKOJsonResponseSubmit response, bool requestProcessed) smsConfirmResponse) => true,
                 ((PKOJsonResponseSubmit response, bool requestProcessed) smsConfirmResponse) => ConfirmSMSLocal(smsConfirmResponse.response, url, confirmText),
                 confirmText,
-                Int32.Parse(flowResponse.response.auth.tan_index)
-                );
+                Int32.Parse(flowResponse.response.auth.tan_index));
         }
 
         private bool ConfirmMobileLocal<T>(PKOJsonResponseFlowAuthBase<T> flowResponse, string url, ConfirmTextBase confirmText) where T : PKOJsonResponseResponseAuthBase
@@ -616,8 +615,7 @@ namespace BankService.Bank_PL_PKO
                 },
                 (PKOJsonResponseMobileStatus mobileStatusResponse) => true,
                 null,
-                confirmText
-                );
+                confirmText);
         }
 
 

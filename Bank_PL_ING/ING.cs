@@ -1258,18 +1258,18 @@ namespace BankService.Bank_PL_ING
             using (HttpRequestMessage request = CreateHttpRequestMessage(requestUri, method, jsonContent))
             using (HttpResponseMessage response = HttpOperations.GetResponse(Client, request))
                 return ProcessResponse<T>(response,
-                        (string responseStr) =>
-                        {
-                            T jsonResponse = JsonConvert.DeserializeObject<T>(responseStr);
+                    (string responseStr) =>
+                    {
+                        T jsonResponse = JsonConvert.DeserializeObject<T>(responseStr);
 
-                            if (jsonResponse.StatusValue != INGJsonTransferStatus.OK)
-                            {
-                                Message(errorMessage ?? invalidResponseMessage?.Invoke(jsonResponse) ?? jsonResponse.msg);
-                                return false;
-                            }
-                            return true;
-                        },
-                        (string responseStr) => JsonConvert.DeserializeObject<T>(responseStr));
+                        if (jsonResponse.StatusValue != INGJsonTransferStatus.OK)
+                        {
+                            Message(errorMessage ?? invalidResponseMessage?.Invoke(jsonResponse) ?? jsonResponse.msg);
+                            return false;
+                        }
+                        return true;
+                    },
+                    (string responseStr) => JsonConvert.DeserializeObject<T>(responseStr));
         }
 
         private Uri PerformPlainRequest(string requestUri, HttpMethod method, IEnumerable<KeyValuePair<string, string>> parameters = null)

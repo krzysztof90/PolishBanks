@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>packages\BouncyCastle.Cryptography.2.6.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.12.2.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>packages\HtmlAgilityPack.1.12.2\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
@@ -135,13 +138,24 @@
     <Compile Include="Bank_PL_PKO\PKOHistoryItem.cs" />
     <Compile Include="Bank_PL_PKO\PKOJsonRequest.cs" />
     <Compile Include="Bank_PL_PKO\PKOJsonResponse.cs" />
+    <Compile Include="Bank_PL_Pocztowy\Pocztowy.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyAccountData.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyHistoryFilter.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyHistoryItem.cs" />
     <Compile Include="Bank_PL_Nest\NestJsonAuthorizationStatus.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonConfirmType.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonOperatorAmountType.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonOutgoingTransferType.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonRequest.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonResponse.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonCreditDebit.cs" />
+    <Compile Include="Bank_PL_Pocztowy\PocztowyJsonTransferType.cs" />
     <Compile Include="Bank_PL_VeloBank\VeloBankAccountData.cs" />
     <Compile Include="Bank_PL_VeloBank\VeloBankJsonLoginQRStatus.cs" />
     <Compile Include="Bank_PT_Santander\SantanderAccountData.cs" />
     <Compile Include="Bank_PT_Santander\SantanderActionNumberAttribute.cs" />
     <Compile Include="Bank_PT_Santander\SantanderActionType.cs" />
-    <Compile Include="Bank_PT_Santander\SantanderConfirmTextAuthorizeGetHistory.cs" />
+    <Compile Include="ConfirmText\ConfirmTextAuthorizeGetHistory.cs" />
     <Compile Include="Bank_PT_Santander\SantanderJsonSuccess.cs" />
     <Compile Include="ConfirmText\ConfirmTextAddDevice.cs" />
     <Compile Include="ConfirmText\ConfirmTextAmount.cs" />
