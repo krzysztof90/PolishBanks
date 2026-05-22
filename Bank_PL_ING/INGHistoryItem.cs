@@ -49,8 +49,8 @@ namespace BankService.Bank_PL_ING
             string[] parts = Title.Split(new string[] { "/" }, StringSplitOptions.None);
 
             return parts[6] == taxType
-                && parts[4] == ING.GetTaxPeriodValue(period)
-                && parts[2] == ING.GetTaxCreditorIdentifierTypeId(creditorIdentifier) + creditorIdentifier.GetId();
+                && parts[4] == ING.GetTaxPeriodValueShort(period)
+                && parts[2] == $"{ING.GetTaxCreditorIdentifierTypeIdShort(creditorIdentifier)}{creditorIdentifier.GetId()}";
         }
         public override bool ComparePaymentOfServicesReferenceNumber(string referenceNumber)
         {

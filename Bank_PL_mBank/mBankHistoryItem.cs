@@ -99,7 +99,7 @@ namespace BankService.Bank_PL_MBank
 
             return parts[2] == taxType
                 && parts[1] == MBank.GetTaxPeriodValueShort(period)
-                && parts[0] == MBank.GetTaxCreditorIdentifierTypeId(creditorIdentifier) + creditorIdentifier.GetId();
+                && parts[0] == MBank.GetTaxCreditorIdentifierTypeIdShort(creditorIdentifier) + creditorIdentifier.GetId();
         }
         public override bool ComparePaymentOfServicesReferenceNumber(string referenceNumber)
         {

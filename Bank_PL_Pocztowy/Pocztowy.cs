@@ -323,7 +323,7 @@ namespace BankService.Bank_PL_Pocztowy
             else if (period is TaxPeriodMonthDecade taxPeriodMonthDecade)
                 return ("DECADE", null, NumberToNumeral(taxPeriodMonthDecade.Decade), MonthToShortName(taxPeriodMonthDecade.Month), null, null, taxPeriodMonthDecade.Year);
             else if (period is TaxPeriodQuarter taxPeriodQuarter)
-                return ("QUARTER", null, null, null, $"Q{taxPeriodQuarter.Quarter.ToString("D2")}", null, taxPeriodQuarter.Year);
+                return ("QUARTER", null, null, null, $"Q{GetTaxPeriodNumberValue(taxPeriodQuarter.Quarter)}", null, taxPeriodQuarter.Year);
             else if (period is TaxPeriodYear taxPeriodYear)
                 return ("YEAR", null, null, null, null, null, taxPeriodYear.Year);
             else

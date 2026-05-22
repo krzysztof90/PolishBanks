@@ -1,4 +1,5 @@
-﻿using BankService.Tax.TaxCreditorIdentifiers;
+﻿using BankService.Bank_PL_ING;
+using BankService.Tax.TaxCreditorIdentifiers;
 using BankService.Tax.TaxPeriods;
 using System;
 using Tools;
@@ -33,8 +34,7 @@ namespace BankService.Bank_PL_Pocztowy
         }
 
         public override bool IsTransfer => Type == PocztowyJsonTransferType.Transfer;
-        //TODO
-        public override bool IsTaxTransfer => throw new NotImplementedException();
+        public override bool IsTaxTransfer => Type == PocztowyJsonTransferType.TransferTax;
         public override bool IsPaymentOfServices => false;
         public override string TransferTypeName => Type.GetEnumDescription();
         public override bool CompareTitle(string title)
@@ -43,8 +43,13 @@ namespace BankService.Bank_PL_Pocztowy
         }
         public override bool CompareTax(string taxType, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier)
         {
-            //TODO
-            throw new NotImplementedException();
+            string transferPayerIdentifier = Title.SubstringFromToEx("Id.pł.: ", "Okres: ");
+            string transferPeriod = Title.SubstringFromToEx("Okres: ", "Symbol płatności: ");
+            string transferTaxType = Title.SubstringFromToEx("Symbol płatności: ", "Przelew do US");
+
+            return transferTaxType == taxType
+                && transferPeriod == Pocztowy.GetTaxPeriodValueShort(period)
+                && transferPayerIdentifier == $"{Pocztowy.GetTaxCreditorIdentifierTypeIdShort(creditorIdentifier)}-{creditorIdentifier.GetId()}";
         }
         public override bool ComparePaymentOfServicesReferenceNumber(string referenceNumber)
         {

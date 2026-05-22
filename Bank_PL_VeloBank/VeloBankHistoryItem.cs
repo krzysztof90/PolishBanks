@@ -26,27 +26,6 @@ namespace BankService.Bank_PL_VeloBank
 
         public VeloBankJsonResponseHistoryItemUsInfo TaxData { get; }
 
-        public override bool IsTransfer => Type == VeloBankJsonCategoryType.Transfer;
-        public override bool IsTaxTransfer => Type == VeloBankJsonCategoryType.Tax;
-        public override bool IsPaymentOfServices => false;
-        public override string TransferTypeName => Type.GetEnumDescription();
-        public override bool CompareTitle(string title)
-        {
-            return Title == title;
-        }
-        public override bool CompareTax(string taxType, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier)
-        {
-            (string settlementType, string number, string year) = VeloBank.GetTaxPeriodValue(period);
-
-            return TaxData.form_type == taxType
-                && TaxData.settlement_type == settlementType && TaxData.settlement_value == number && TaxData.year == year
-                && TaxData.identifier_type == VeloBank.GetTaxCreditorIdentifierTypeId(creditorIdentifier) && TaxData.identifier_value == creditorIdentifier.GetId();
-        }
-        public override bool ComparePaymentOfServicesReferenceNumber(string referenceNumber)
-        {
-            throw new ArgumentException();
-        }
-
         public VeloBankHistoryItem(VeloBankJsonResponseHistoryItem item)
         {
             Id = item.id;
@@ -85,6 +64,27 @@ namespace BankService.Bank_PL_VeloBank
             CardNumber = item.card_number;
             CardProvider = item.card_provider;
             TaxData = item.us_info;
+        }
+
+        public override bool IsTransfer => Type == VeloBankJsonCategoryType.Transfer;
+        public override bool IsTaxTransfer => Type == VeloBankJsonCategoryType.Tax;
+        public override bool IsPaymentOfServices => false;
+        public override string TransferTypeName => Type.GetEnumDescription();
+        public override bool CompareTitle(string title)
+        {
+            return Title == title;
+        }
+        public override bool CompareTax(string taxType, TaxPeriod period, TaxCreditorIdentifier creditorIdentifier)
+        {
+            (string settlementType, string number, string year) = VeloBank.GetTaxPeriodValue(period);
+
+            return TaxData.form_type == taxType
+                && TaxData.settlement_type == settlementType && TaxData.settlement_value == number && TaxData.year == year
+                && TaxData.identifier_type == VeloBank.GetTaxCreditorIdentifierTypeId(creditorIdentifier) && TaxData.identifier_value == creditorIdentifier.GetId();
+        }
+        public override bool ComparePaymentOfServicesReferenceNumber(string referenceNumber)
+        {
+            throw new ArgumentException();
         }
     }
 }

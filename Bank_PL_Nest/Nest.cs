@@ -342,11 +342,6 @@ namespace BankService.Bank_PL_Nest
                 throw new ArgumentException();
         }
 
-        private static string GetTaxPeriodNumberValue(int number)
-        {
-            return number.ToString("D2");
-        }
-
         //TODO return (FastTransferType? type, string pblData)
         protected override string CleanFastTransferUrl(string transferId)
         {

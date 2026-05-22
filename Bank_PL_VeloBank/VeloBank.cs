@@ -496,11 +496,6 @@ namespace BankService.Bank_PL_VeloBank
                 throw new ArgumentException();
         }
 
-        private static string GetTaxPeriodNumberValue(int number)
-        {
-            return number.ToString("D2");
-        }
-
         protected override string CleanFastTransferUrl(string transferId)
         {
             string newTransferId = transferId

@@ -388,11 +388,6 @@ namespace BankService.Bank_PL_PKO
                 throw new ArgumentException();
         }
 
-        private static string GetTaxPeriodNumberValue(int number)
-        {
-            return number.ToString("D2");
-        }
-
         protected override string CleanFastTransferUrl(string transferId)
         {
             throw new NotImplementedException();

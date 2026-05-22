@@ -388,7 +388,7 @@ namespace BankService.Bank_PL_MBank
 
             jsonRequestInitPrepare.Data.usform.idType = new MBankJsonRequestInitPrepareTaxTransferDataUsformIdType()
             {
-                type = GetTaxCreditorIdentifierTypeId(creditorIdentifier),
+                type = GetTaxCreditorIdentifierTypeIdShort(creditorIdentifier),
                 series = creditorIdentifier.GetId()
             };
 
@@ -420,24 +420,6 @@ namespace BankService.Bank_PL_MBank
             return ConfirmTransfer(jsonRequestInitPrepare, new ConfirmTextTaxTransfer(amount, account.currency, taxOfficeName));
         }
 
-        public static string GetTaxCreditorIdentifierTypeId(TaxCreditorIdentifier creditorIdentifier)
-        {
-            if (creditorIdentifier is TaxCreditorIdentifierNIP)
-                return "N";
-            else if (creditorIdentifier is TaxCreditorIdentifierIDCard)
-                return "1";
-            else if (creditorIdentifier is TaxCreditorIdentifierPESEL)
-                return "P";
-            else if (creditorIdentifier is TaxCreditorIdentifierREGON)
-                return "R";
-            else if (creditorIdentifier is TaxCreditorIdentifierPassport)
-                return "2";
-            else if (creditorIdentifier is TaxCreditorIdentifierOther)
-                return "3";
-            else
-                throw new ArgumentException();
-        }
-
         public static (string symbol, string value, string month, string year) GetTaxPeriodValue(TaxPeriod period)
         {
             if (period is TaxPeriodDay taxPeriodDay)
@@ -454,34 +436,6 @@ namespace BankService.Bank_PL_MBank
                 return ("R", "0", "0", taxPeriodYear.Year.ToString());
             else
                 throw new ArgumentException();
-        }
-
-        public static string GetTaxPeriodValueShort(TaxPeriod period)
-        {
-            if (period is TaxPeriodDay taxPeriodDay)
-                return $"{GetTaxPeriodYearValue(taxPeriodDay.Day.Year)}J{GetTaxPeriodNumberValue(taxPeriodDay.Day.Day)}{GetTaxPeriodNumberValue(taxPeriodDay.Day.Month)}";
-            else if (period is TaxPeriodHalfYear taxPeriodHalfYear)
-                return $"{GetTaxPeriodYearValue(taxPeriodHalfYear.Year)}P{GetTaxPeriodNumberValue(taxPeriodHalfYear.Half)}";
-            else if (period is TaxPeriodMonth taxPeriodMonth)
-                return $"{GetTaxPeriodYearValue(taxPeriodMonth.Year)}M{GetTaxPeriodNumberValue(taxPeriodMonth.Month)}";
-            else if (period is TaxPeriodMonthDecade taxPeriodMonthDecade)
-                return $"{GetTaxPeriodYearValue(taxPeriodMonthDecade.Year)}D{GetTaxPeriodNumberValue(taxPeriodMonthDecade.Decade)}{GetTaxPeriodNumberValue(taxPeriodMonthDecade.Month)}";
-            else if (period is TaxPeriodQuarter taxPeriodQuarter)
-                return $"{GetTaxPeriodYearValue(taxPeriodQuarter.Year)}K{GetTaxPeriodNumberValue(taxPeriodQuarter.Quarter)}";
-            else if (period is TaxPeriodYear taxPeriodYear)
-                return $"{GetTaxPeriodYearValue(taxPeriodYear.Year)}R";
-            else
-                throw new ArgumentException();
-        }
-
-        private static string GetTaxPeriodNumberValue(int number)
-        {
-            return number.ToString("D2");
-        }
-
-        private static string GetTaxPeriodYearValue(int year)
-        {
-            return year.ToString().SubstringFromEx(-2);
         }
 
         protected override string CleanFastTransferUrl(string transferId)
