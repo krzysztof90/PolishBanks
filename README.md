@@ -1,5 +1,6 @@
 # PolishBanks
 Web APIs of banks in Poland
-* GetinBank (deprecated), VeloBank, ING, mBank, Nest, Pocztowy
+* GetinBank (deprecated), VeloBank, ING, mBank, Nest, PKO, Pocztowy  
+
 and Portugal
 * Santander
