@@ -9,7 +9,7 @@ namespace BankService.Bank_PL_PKO
 {
     public class PKOHistoryItem : HistoryItem
     {
-        public PKOOperationKind Type { get; }
+        public PKOJsonOperationKind Type { get; }
         public PKOJsonResponseTaxTransferResponseDataPayerIdentifier TaxPayerIdentifier { get; }
         public string TaxSymbol { get; }
         public PKOJsonResponseTaxTransferResponseDataPeriod TaxPeriod { get; }
@@ -30,12 +30,12 @@ namespace BankService.Bank_PL_PKO
             ToPersonAddress = Direction == OperationDirection.Execute ? null as string : null;
             switch (item.operation_kind.CodeValue.Value)
             {
-                case PKOOperationKind.TransferOutgoing:
-                case PKOOperationKind.TransferIncoming:
-                case PKOOperationKind.TransferBlikMobile:
+                case PKOJsonOperationKind.TransferOutgoing:
+                case PKOJsonOperationKind.TransferIncoming:
+                case PKOJsonOperationKind.PhoneTransfer:
                     Title = item.details.title;
                     break;
-                case PKOOperationKind.TaxTransfer:
+                case PKOJsonOperationKind.TransferTax:
                     Title = $"{item.details.symbol} {item.details.period.type} {item.details.period.year} {item.details.period.month} {item.details.period.number}";
                     TaxPayerIdentifier = item.details.payer_identifier;
                     TaxSymbol = item.details.symbol;
@@ -46,8 +46,8 @@ namespace BankService.Bank_PL_PKO
             Type = item.operation_kind.CodeValue.Value;
         }
 
-        public override bool IsTransfer => Type == PKOOperationKind.TransferOutgoing;
-        public override bool IsTaxTransfer => Type == PKOOperationKind.TaxTransfer;
+        public override bool IsTransfer => Type == PKOJsonOperationKind.TransferOutgoing;
+        public override bool IsTaxTransfer => Type == PKOJsonOperationKind.TransferTax;
         public override bool IsPaymentOfServices => false;
         public override string TransferTypeName => Type.GetEnumDescription();
         public override bool CompareTitle(string title)

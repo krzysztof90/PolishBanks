@@ -382,7 +382,7 @@ namespace BankService.Bank_PL_ING
         {
             [DataMember] public INGJsonRequestHistoryData data { get; set; }
 
-            public static INGJsonRequestHistory Create(string token, DateTime? fromDate, DateTime? toDate, string accountId, int maxsug, INGJsonNoYes conx, string search, double minamt, double maxamt, int skipTrn, int maxTrn, INGJsonTransferSign? sign, bool? showIncomingTransfers, bool? showInternalTransfers, bool? showExternalTransfers, bool? showCardTransactionsBlocks, bool? showCardTransactions, bool? showATM, bool? showFees, bool? showSmartSaver, bool? showBlocksAndBlockReleases)
+            public static INGJsonRequestHistory Create(string token, DateTime? fromDate, DateTime? toDate, string accountId, int maxsug, INGJsonNoYes conx, string search, double minamt, double maxamt, int skipTrn, int maxTrn, INGJsonCreditDebit? sign, bool? showIncomingTransfers, bool? showInternalTransfers, bool? showExternalTransfers, bool? showCardTransactionsBlocks, bool? showCardTransactions, bool? showATM, bool? showFees, bool? showSmartSaver, bool? showBlocksAndBlockReleases)
             {
                 return new INGJsonRequestHistory() { token = token, data = new INGJsonRequestHistoryData() { FromDateValue = fromDate, ToDateValue = toDate, accountsIds = new string[] { accountId }, maxsug = maxsug, ConxValue = conx, search = search, minamt = minamt, maxamt = maxamt, skipTrn = skipTrn, maxTrn = maxTrn, SignValue = sign, mask = "***************", ShowIncomingTransfers = showIncomingTransfers, ShowInternalTransfers = showInternalTransfers, ShowExternalTransfers = showExternalTransfers, ShowCardTransactionsBlocks = showCardTransactionsBlocks, ShowCardTransactions = showCardTransactions, ShowATM = showATM, ShowFees = showFees, ShowSmartSaver = showSmartSaver, ShowBlocksAndBlockReleases = showBlocksAndBlockReleases } };
             }
@@ -427,10 +427,10 @@ namespace BankService.Bank_PL_ING
                 set => conx = value.GetEnumJsonValue<INGJsonNoYes>();
             }
 
-            public INGJsonTransferSign? SignValue
+            public INGJsonCreditDebit? SignValue
             {
-                get => sign.GetEnumByJsonValue<INGJsonTransferSign>();
-                set => sign = value.GetEnumJsonValue<INGJsonTransferSign>();
+                get => sign.GetEnumByJsonValue<INGJsonCreditDebit>();
+                set => sign = value.GetEnumJsonValue<INGJsonCreditDebit>();
             }
 
             public bool? ShowIncomingTransfers

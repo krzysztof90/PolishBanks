@@ -5,8 +5,8 @@ namespace BankService.Bank_PL_ING
     public enum INGJsonOperatorRange
     {
         [JsonValue("T")]
-        Borders,
+        Range,
         [JsonValue("N")]
-        Enumerator
+        Constant
     }
 }

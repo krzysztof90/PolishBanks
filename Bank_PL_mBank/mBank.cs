@@ -653,9 +653,9 @@ namespace BankService.Bank_PL_MBank
                             },
                             ((MBankJsonResponseAuthorizationStatus response, bool requestProcessed) authorizationStatusResponse) =>
                             {
-                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationStatus.Cancel)
+                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationStatus.Canceled)
                                     return false;
-                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationStatus.Authorized)
+                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationStatus.Accepted)
                                     return true;
 
                                 return null;
@@ -730,9 +730,9 @@ namespace BankService.Bank_PL_MBank
                             },
                             ((MBankJsonResponseAuthorizationTransferStatus response, bool requestProcessed) authorizationStatusResponse) =>
                             {
-                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationTransferStatus.Cancel)
+                                if (authorizationStatusResponse.response?.AuthorizationStatusValue == MBankJsonAuthorizationTransferStatus.Canceled)
                                     return false;
-                                if (authorizationStatusResponse.response.AuthorizationStatusValue == MBankJsonAuthorizationTransferStatus.Authorized)
+                                if (authorizationStatusResponse.response.AuthorizationStatusValue == MBankJsonAuthorizationTransferStatus.Accepted)
                                     return true;
 
                                 return null;

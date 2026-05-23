@@ -7,6 +7,6 @@ namespace BankService.Bank_PL_Nest
         [JsonValue("SMS")]
         SMS,
         [JsonValue("FINANTEQ_TOKEN")]
-        Mobile,
+        Mobile
     }
 }

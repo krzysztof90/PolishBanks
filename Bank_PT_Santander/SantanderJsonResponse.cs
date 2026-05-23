@@ -41,10 +41,10 @@ namespace BankService.Bank_PT_Santander
         {
             [DataMember] public string msg { get; set; }
 
-            public SantanderJsonResponseStatus? MessageValue
+            public SantanderJsonStatus? MessageValue
             {
-                get => msg.GetEnumByJsonValue<SantanderJsonResponseStatus>();
-                set => msg = value.GetEnumJsonValue<SantanderJsonResponseStatus>();
+                get => msg.GetEnumByJsonValue<SantanderJsonStatus>();
+                set => msg = value.GetEnumJsonValue<SantanderJsonStatus>();
             }
         }
 

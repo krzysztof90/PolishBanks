@@ -2,10 +2,10 @@
 
 namespace BankService.Bank_PT_Santander
 {
-    public enum SantanderTransferType
+    public enum SantanderHtmlTransferType
     {
         [HtmlLabel("Normal")]
         [Description("Standardowy")]
-        Normal,
+        Normal
     }
 }

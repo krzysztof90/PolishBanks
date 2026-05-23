@@ -111,7 +111,7 @@ namespace BankService.Bank_PT_Santander
                     (SantanderJsonResponseConfirmLogin jsonResponseConfirmLogin) =>
                     {
                         //if (!jsonResponseConfirmLogin.sucesso)
-                        if (jsonResponseConfirmLogin.SuccessValue != SantanderJsonSuccess.Ok)
+                        if (jsonResponseConfirmLogin.SuccessValue != SantanderJsonSuccess.OK)
                             return false;
                         return true;
                     },
@@ -313,7 +313,7 @@ namespace BankService.Bank_PT_Santander
 
                         switch (item.Type)
                         {
-                            case SantanderTransactionType.Transfer:
+                            case SantanderHtmlTransactionType.Transfer:
                                 {
                                     PreRequest("bepp/sanpt/cuentas/historicotransferencias");
 
@@ -692,7 +692,7 @@ namespace BankService.Bank_PT_Santander
         {
             switch (item.Type)
             {
-                case SantanderTransactionType.Transfer:
+                case SantanderHtmlTransactionType.Transfer:
                     {
                         //transfers - not transactions
                         PreRequest("bepp/sanpt/cuentas/historicotransferencias");
@@ -721,7 +721,7 @@ namespace BankService.Bank_PT_Santander
                         return CheckFailed("Brak przelewu na liście przelewów");
                     }
                     break;
-                case SantanderTransactionType.PaymentOfServices when item.Card == null:
+                case SantanderHtmlTransactionType.PaymentOfServices when item.Card == null:
                     {
                         //TODO does it work if more than one row
 
@@ -822,7 +822,7 @@ namespace BankService.Bank_PT_Santander
                 SantanderJsonResponseAutenticacaOforteFunctions jsonResponse = PerformRequest<SantanderJsonResponseAutenticacaOforteFunctions>(url1, HttpMethod.Post,
                     true, true,
                     null, true);
-                if (jsonResponse.MessageValue != SantanderJsonResponseStatus.Success)
+                if (jsonResponse.MessageValue != SantanderJsonStatus.Success)
                     return CheckFailed(jsonResponse.msg);
 
                 return SMSConfirm<bool, (bool success, string transferMessage, string errorMessage)>(

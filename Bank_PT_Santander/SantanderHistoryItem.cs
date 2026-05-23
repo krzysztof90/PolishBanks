@@ -12,7 +12,7 @@ namespace BankService.Bank_PT_Santander
 {
     public class SantanderHistoryItem : HistoryItem
     {
-        public SantanderTransactionType Type { get; protected set; }
+        public SantanderHtmlTransactionType Type { get; protected set; }
         public string DescriptionId { get; protected set; }
         public string Card { get; protected set; }
         public string TransferRef { get; set; }
@@ -27,7 +27,7 @@ namespace BankService.Bank_PT_Santander
 
             Title = Santander.GetBlockText(transferNode.Descendants("div").Where(n => n.HasClass("data-block")), null);
 
-            Type = SantanderTransactionType.Empty;
+            Type = SantanderHtmlTransactionType.Empty;
         }
 
         public SantanderHistoryItem(HtmlNode transferNode, HtmlAgilityPack.HtmlDocument documentDetails) : this(transferNode)
@@ -69,22 +69,22 @@ namespace BankService.Bank_PT_Santander
                 DescriptionId = description.SubstringFromEx(title + "-");
             TransferRef = transferRef;
 
-            Type = AttributeOperations.GetEnumByAttributeNoEmpty<SantanderTransactionType, HtmlLabel, string>(transactionType, (HtmlLabel label) => label.Value);
+            Type = AttributeOperations.GetEnumByAttributeNoEmpty<SantanderHtmlTransactionType, HtmlLabel, string>(transactionType, (HtmlLabel label) => label.Value);
 
-            if (Type == SantanderTransactionType.PaymentOfServices)
+            if (Type == SantanderHtmlTransactionType.PaymentOfServices)
             {
                 ToPersonName = transferNode.Descendants("p").Single().InnerText.SubstringFromEx("Pagamento ");
-                PaymentOfServicesEntityNumber = Type != SantanderTransactionType.PaymentOfServices ? null : Title.SubstringFromToEx("Pag Servicos ", "-");
+                PaymentOfServicesEntityNumber = Type != SantanderHtmlTransactionType.PaymentOfServices ? null : Title.SubstringFromToEx("Pag Servicos ", "-");
                 if (PaymentOfServicesEntityNumber.Contains(" "))
                     PaymentOfServicesEntityNumber = PaymentOfServicesEntityNumber.SubstringFromEx(" ");
-                PaymentOfServicesReferenceNumber = Type != SantanderTransactionType.PaymentOfServices ? null : Title.SubstringFromEx("-").SubstringToEx(" ");
+                PaymentOfServicesReferenceNumber = Type != SantanderHtmlTransactionType.PaymentOfServices ? null : Title.SubstringFromEx("-").SubstringToEx(" ");
             }
         }
 
-        public override bool IsTransfer => Type == SantanderTransactionType.Transfer;
+        public override bool IsTransfer => Type == SantanderHtmlTransactionType.Transfer;
         //TODO certainly there are no tax transfers?
         public override bool IsTaxTransfer => false;
-        public override bool IsPaymentOfServices => Type == SantanderTransactionType.PaymentOfServices;
+        public override bool IsPaymentOfServices => Type == SantanderHtmlTransactionType.PaymentOfServices;
         public override string TransferTypeName => Type.GetEnumDescription();
         public override bool CompareTitle(string title)
         {

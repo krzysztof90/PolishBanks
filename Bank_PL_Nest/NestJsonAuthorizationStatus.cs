@@ -11,8 +11,8 @@ namespace BankService.Bank_PL_Nest
         [JsonValue("VERIFIED")]
         Verified,
         [JsonValue("CANCEL")]
-        Cancel,
+        Canceled,
         [JsonValue("EXPIRED")]
-        Expired,
+        Expired
     }
 }

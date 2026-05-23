@@ -25,15 +25,15 @@ namespace BankService.Bank_PL_Pocztowy
         All,
         [Description("Obciążenia")]
         [FilterEnumParameterAttribute("REMIT")]
-        Remit,
+        Outgoing,
         [Description("Uznania")]
         [FilterEnumParameterAttribute("BENEFIT")]
-        Benefit,
+        Incoming,
         [Description("Opłaty i prowizje")]
         [FilterEnumParameterAttribute("FEE")]
         Fee,
-        [Description("Transakcje kartą")]
+        [Description("Operacje kartą")]
         [FilterEnumParameterAttribute("CARD")]
-        Card,
+        Card
     }
 }

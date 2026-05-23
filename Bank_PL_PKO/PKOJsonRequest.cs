@@ -593,7 +593,7 @@ namespace BankService.Bank_PL_PKO
         [DataContract]
         public class PKOJsonRequestTransfer : PKOJsonRequestFlowBase<PKOJsonRequestTransferData>
         {
-            public static PKOJsonRequestTransfer Create(string token, string flow_id, string state_id, string action, double amount, string currency, DateTime paymentDate, PKOPaymentType paymentType, string recipient_account, string recipient_name, string recipient_address, string title, string source_account)
+            public static PKOJsonRequestTransfer Create(string token, string flow_id, string state_id, string action, double amount, string currency, DateTime paymentDate, PKOJsonPaymentType paymentType, string recipient_account, string recipient_name, string recipient_address, string title, string source_account)
             {
                 return new PKOJsonRequestTransfer() { token = token, flow_id = flow_id, state_id = state_id, action = action, data = new PKOJsonRequestTransferData() { money = new PKOJsonRequestAmount() { Amount = amount, currency = currency }, PaymentDateValue = paymentDate, PaymentTypeValue = paymentType, recipient_account = recipient_account, recipient_name = recipient_name, recipient_address = recipient_address, title = title, source_account = source_account }, };
             }
@@ -616,10 +616,10 @@ namespace BankService.Bank_PL_PKO
                 get => DateTime.Parse(payment_date);
                 set => payment_date = value?.Display("yyyy-MM-dd") ?? null;
             }
-            public PKOPaymentType? PaymentTypeValue
+            public PKOJsonPaymentType? PaymentTypeValue
             {
-                get => payment_type.GetEnumByJsonValue<PKOPaymentType>();
-                set => payment_type = value.GetEnumJsonValue<PKOPaymentType>();
+                get => payment_type.GetEnumByJsonValue<PKOJsonPaymentType>();
+                set => payment_type = value.GetEnumJsonValue<PKOJsonPaymentType>();
             }
         }
 

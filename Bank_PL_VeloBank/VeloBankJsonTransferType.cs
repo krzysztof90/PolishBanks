@@ -7,8 +7,8 @@ namespace BankService.Bank_PL_VeloBank
         [JsonValue("TRANSFER")]
         Transfer,
         [JsonValue("TAX_TRANSFER")]
-        Tax,
+        TransferTax,
         [JsonValue("PREPAID_TRANSFER")]
-        Prepaid,
+        Prepaid
     }
 }

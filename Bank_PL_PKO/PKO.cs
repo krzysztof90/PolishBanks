@@ -170,11 +170,11 @@ namespace BankService.Bank_PL_PKO
 
                 switch (authVerifyResponse.response.response.auth.AuthMethodValue)
                 {
-                    case PKOAuthMethod.SMS:
+                    case PKOJsonAuthMethod.SMS:
                         if (!ConfirmSMSLocal(authVerifyResponse.response, "ipko3/auth-verify", confirmText))
                             return false;
                         break;
-                    case PKOAuthMethod.Mobile:
+                    case PKOJsonAuthMethod.Mobile:
                         if (!ConfirmMobileLocal(authVerifyResponse.response, "ipko3/auth-verify", confirmText))
                             return false;
                         break;
@@ -230,7 +230,7 @@ namespace BankService.Bank_PL_PKO
                 return false;
 
             (PKOJsonResponseTransfer response, bool requestProcessed) transferResponse = PerformRequest<PKOJsonResponseTransfer>("ipko3/transactions/transfers/normal/shortcut", HttpMethod.Post,
-                JsonConvert.SerializeObject(PKOJsonRequestTransfer.Create(transferInitResponse.response.token, transferInitResponse.response.flow_id, "fill_form", "submit", amount, SelectedAccountData.Currency, Today, PKOPaymentType.Elixir, accountNumber, recipient, address, title, SelectedAccountData.AccountId)));
+                JsonConvert.SerializeObject(PKOJsonRequestTransfer.Create(transferInitResponse.response.token, transferInitResponse.response.flow_id, "fill_form", "submit", amount, SelectedAccountData.Currency, Today, PKOJsonPaymentType.Elixir, accountNumber, recipient, address, title, SelectedAccountData.AccountId)));
             if (!transferResponse.requestProcessed)
                 return false;
 
@@ -587,23 +587,23 @@ namespace BankService.Bank_PL_PKO
                 },
                 (PKOJsonResponseMobileStatus mobileStatusResponse) =>
                 {
-                    if (mobileStatusResponse.StatusValue == PKOMobileStatusStatus.Changed
-                        && mobileStatusResponse.ValueValue == PKOMobileStatusValue.Ready)
+                    if (mobileStatusResponse.StatusValue == PKOJsonMobileStatusStatus.Changed
+                        && mobileStatusResponse.ValueValue == PKOJsonMobileStatusValue.Ready)
                     {
                         (PKOJsonResponseSubmit response, bool requestProcessed) mobileSubmitResponse = PerformRequest<PKOJsonResponseSubmit>(url, HttpMethod.Post,
                             JsonConvert.SerializeObject(PKOJsonRequestSubmitMobile.Create(flowResponse.token, flowResponse.flow_id, flowResponse.state_id, "submit")));
 
-                        if (mobileSubmitResponse.response.response.auth?.StateValue == PKOAuthState.Cancelled)
+                        if (mobileSubmitResponse.response.response.auth?.StateValue == PKOJsonAuthState.Canceled)
                             return false;
                         return true;
                     }
 
-                    if (mobileStatusResponse.StatusValue == PKOMobileStatusStatus.Error
-                        && mobileStatusResponse.ValueValue == PKOMobileStatusValue.Error)
+                    if (mobileStatusResponse.StatusValue == PKOJsonMobileStatusStatus.Error
+                        && mobileStatusResponse.ValueValue == PKOJsonMobileStatusValue.Error)
                         return false;
 
-                    if (!(mobileStatusResponse.StatusValue == PKOMobileStatusStatus.NotChanged
-                        && mobileStatusResponse.ValueValue == PKOMobileStatusValue.Pending))
+                    if (!(mobileStatusResponse.StatusValue == PKOJsonMobileStatusStatus.NotChanged
+                        && mobileStatusResponse.ValueValue == PKOJsonMobileStatusValue.Pending))
                         throw new NotImplementedException();
 
                     return null;

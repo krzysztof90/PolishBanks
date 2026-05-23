@@ -5,14 +5,14 @@ namespace BankService.Bank_PL_MBank
 {
     public enum MBankJsonOperationCode
     {
-        [JsonValue("TRI")]
-        [Description("Transfer przychodzący")]
-        TransferIncoming,
         [JsonValue("TRO")]
-        [Description("Transfer wychodzący")]
+        [Description("Przelew wychodzący")]
         TransferOutgoing,
+        [JsonValue("TRI")]
+        [Description("Przelew przychodzący")]
+        TransferIncoming,
         [JsonValue("TUS")]
-        [Description("Transfer podatkowy")]
+        [Description("Przelew podatkowy")]
         TransferTax
     }
 }

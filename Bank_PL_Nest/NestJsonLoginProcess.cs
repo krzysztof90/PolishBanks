@@ -9,6 +9,6 @@ namespace BankService.Bank_PL_Nest
         [JsonValue("FULL_PASSWORD")]
         Full,
         [JsonValue("RESET_PASSWORD")]
-        ResetPassword,
+        ResetPassword
     }
 }

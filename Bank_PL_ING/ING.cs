@@ -813,11 +813,11 @@ namespace BankService.Bank_PL_ING
 
             switch (operatorItem.RangeValue)
             {
-                case INGJsonOperatorRange.Borders:
+                case INGJsonOperatorRange.Range:
                     if (amount < operatorItem.minAmount || amount > operatorItem.maxAmount)
                         return CheckFailed($"Kwota powinna znajdować się w zakresie {operatorItem.minAmount}-{operatorItem.maxAmount}");
                     break;
-                case INGJsonOperatorRange.Enumerator:
+                case INGJsonOperatorRange.Constant:
                     if (!operatorItem.amounts.Contains(amount))
                         return CheckFailed($"Kwota powinna być jedną z {String.Join(", ", operatorItem.amounts.Select(a => a.Display(DecimalSeparator.Dot)))}");
                     break;
@@ -856,9 +856,9 @@ namespace BankService.Bank_PL_ING
             //TODO to method
             for (int page = 1; (pageCounter == null || page <= pageCounter) && (filter.CounterLimit == 0 || result.Count < filter.CounterLimit); page++)
             {
-                INGJsonTransferSign? sign = null;
+                INGJsonCreditDebit? sign = null;
                 if (filter.Direction != null)
-                    sign = filter.Direction == OperationDirection.Execute ? INGJsonTransferSign.Debit : INGJsonTransferSign.Credit;
+                    sign = filter.Direction == OperationDirection.Execute ? INGJsonCreditDebit.Debit : INGJsonCreditDebit.Credit;
                 (INGJsonResponseHistory response, bool requestProcessed) historyResponse = PerformRequest<INGJsonResponseHistory>(
                     "rengetfury", HttpMethod.Post,
                     JsonConvert.SerializeObject(INGJsonRequestHistory.Create(Token,

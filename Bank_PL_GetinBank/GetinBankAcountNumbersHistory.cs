@@ -43,7 +43,7 @@ namespace BankService.Bank_PL_GetinBank
 
             if (operations != null)
             {
-                emptyOperations = operations.Where(o => (o.ReferenceNumber == null || o.ReferenceNumber == "-") && o.Type != OperationType.Card && !o.IsCommisionForTransfer()).OrderBy(o => o.OrderDate).ToList();
+                emptyOperations = operations.Where(o => (o.ReferenceNumber == null || o.ReferenceNumber == "-") && o.Type != GetinBankHtmlOperationType.Card && !o.IsCommisionForTransfer()).OrderBy(o => o.OrderDate).ToList();
 
                 if (emptyOperations.Count != 0)
                     Properties.Settings.Default.GetinBankAcountNumbersDownloadDate = emptyOperations.FirstOrDefault().OrderDate;

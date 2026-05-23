@@ -24,6 +24,6 @@ namespace BankService.Bank_PL_MBank
         [Description("Obciążenia")]
         Outgoing,
         [Description("Uznania")]
-        Incoming,
+        Incoming
     }
 }

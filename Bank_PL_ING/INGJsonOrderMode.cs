@@ -7,7 +7,7 @@ namespace BankService.Bank_PL_ING
         [JsonValue("OK")]
         Web,
         [JsonValue("CODE")]
-        Code,
+        SMS,
         [JsonValue("TOKEN")]
         Mobile
     }

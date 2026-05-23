@@ -548,7 +548,7 @@ namespace BankService.Bank_PL_Nest
                             case NestJsonAuthorizationStatus.Success:
                             case NestJsonAuthorizationStatus.Verified:
                                 return true;
-                            case NestJsonAuthorizationStatus.Cancel:
+                            case NestJsonAuthorizationStatus.Canceled:
                                 {
                                     Message("Anulowano");
                                     return false;

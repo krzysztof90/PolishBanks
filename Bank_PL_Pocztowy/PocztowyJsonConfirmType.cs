@@ -7,6 +7,6 @@ namespace BankService.Bank_PL_Pocztowy
         [JsonValue("SMS")]
         SMS,
         [JsonValue("TOKEN")]
-        Mobile,
+        Mobile
     }
 }

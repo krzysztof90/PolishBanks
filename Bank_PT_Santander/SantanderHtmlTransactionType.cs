@@ -2,7 +2,7 @@
 
 namespace BankService.Bank_PT_Santander
 {
-    public enum SantanderTransactionType
+    public enum SantanderHtmlTransactionType
     {
         [HtmlLabel(null)]
         [Description("Niepobrane szczegóły")]
@@ -28,9 +28,9 @@ namespace BankService.Bank_PT_Santander
         DirectDebit,
         [HtmlLabel("Encargo e imposto")]
         [Description("Opłaty i prowizje")]
-        FeeCommission,
+        FeesCharges,
         [HtmlLabel("Outros movimentos")]
         [Description("Pozostałe")]
-        Other,
+        Other
     }
 }

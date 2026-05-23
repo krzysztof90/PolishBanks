@@ -6,7 +6,7 @@ namespace BankService.Bank_PL_Nest
     public class NestHistoryFilter : HistoryFilter
     {
         public NestFilterOperationType? OperationType { get; set; }
-        
+
         public NestHistoryFilter() : base()
         {
         }
@@ -21,17 +21,17 @@ namespace BankService.Bank_PL_Nest
     {
         [Description("Uznania")]
         [FilterEnumParameterAttribute("CREDIT")]
-        Benefit,
+        Credit,
         [Description("Obciążenia")]
         [FilterEnumParameterAttribute("DEBIT")]
-        Remit,
+        Debit,
         [Description("Przelewy przychodzące")]
         [FilterEnumParameterAttribute("INCOMING_TRANSFER")]
         Incoming,
         [Description("Przelewy wychodzące")]
         [FilterEnumParameterAttribute("OUTGOING_TRANSFER")]
         Outgoing,
-        [Description("Płatności kartą")]
+        [Description("Operacje kartą")]
         [FilterEnumParameterAttribute("CARD_PAYMENT")]
         Card,
         [Description("Wypłaty z bankomatów")]
@@ -42,10 +42,10 @@ namespace BankService.Bank_PL_Nest
         CashIn,
         [Description("Wypłaty gotówkowe")]
         [FilterEnumParameterAttribute("CASH_WITHDRAWAL")]
-        CashWithdraw,
-        [Description("Płatności BLIK")]
+        CashOut,
+        [Description("Operacje BLIK")]
         [FilterEnumParameterAttribute("BLIK")]
-        BLIK,
+        Blik,
         [Description("Opłaty i prowizje")]
         [FilterEnumParameterAttribute("FEES_AND_COMMISSIONS")]
         Fee,
@@ -54,6 +54,6 @@ namespace BankService.Bank_PL_Nest
         Other,
         [Description("Transakcje partnerów")]
         [FilterEnumParameterAttribute("TPP_TRANSACTION")]
-        TppTransaction,
+        TppTransaction
     }
 }

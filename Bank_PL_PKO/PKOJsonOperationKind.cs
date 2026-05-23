@@ -3,7 +3,7 @@ using Tools;
 
 namespace BankService.Bank_PL_PKO
 {
-    public enum PKOOperationKind
+    public enum PKOJsonOperationKind
     {
         [JsonValue("TRANSFER")]
         [Description("Przelew wychodzący")]
@@ -12,10 +12,10 @@ namespace BankService.Bank_PL_PKO
         [Description("Przelew przychodzący")]
         TransferIncoming,
         [JsonValue("MOBILE_PAYMENT_C2C_EXTERNAL")]
-        [Description("Blik na telefon")]
-        TransferBlikMobile,
+        [Description("Przelew na telefon")]
+        PhoneTransfer,
         [JsonValue("US_TRANSFER")]
         [Description("Przelew podatkowy")]
-        TaxTransfer
+        TransferTax
     }
 }

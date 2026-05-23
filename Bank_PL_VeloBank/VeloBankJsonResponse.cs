@@ -547,10 +547,10 @@ namespace BankService.Bank_PL_VeloBank
                 get => operation_type.GetEnumByJsonValue<VeloBankJsonOperationType>();
                 set => operation_type = value.GetEnumJsonValue<VeloBankJsonOperationType>();
             }
-            public VeloBankJsonSideType? SideValue
+            public VeloBankJsonCreditDebit? SideValue
             {
-                get => side.GetEnumByJsonValue<VeloBankJsonSideType>();
-                set => side = value.GetEnumJsonValue<VeloBankJsonSideType>();
+                get => side.GetEnumByJsonValue<VeloBankJsonCreditDebit>();
+                set => side = value.GetEnumJsonValue<VeloBankJsonCreditDebit>();
             }
             public VeloBankJsonOperationStatusType? StatusValue
             {

@@ -5,8 +5,8 @@ namespace BankService.Bank_PL_MBank
     public enum MBankJsonAuthorizationStatus
     {
         [JsonValue("Authorized")]
-        Authorized,
+        Accepted,
         [JsonValue("AuthCancel")]
-        Cancel,
+        Canceled
     }
 }

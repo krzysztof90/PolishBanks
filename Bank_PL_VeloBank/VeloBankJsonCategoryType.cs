@@ -19,10 +19,10 @@ namespace BankService.Bank_PL_VeloBank
         [JsonValue("WEB_PURCHASE")]
         WebPurchase,
         [JsonValue("TAX_TRANSFER")]
-        Tax,
+        TransferTax,
         [JsonValue("FEES_AND_CHARGES")]
         FeesCharges,
         [JsonValue("OWN_TRANSFER")]
-        OwnTransfer,
+        OwnTransfer
     }
 }

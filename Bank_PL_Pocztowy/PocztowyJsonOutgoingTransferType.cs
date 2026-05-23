@@ -13,15 +13,15 @@ namespace BankService.Bank_PL_Pocztowy
         TransferDomestic,
         [JsonValue("TRANSFER_TOP_UP")]
         [Description("Doładowanie telefonu")]
-        TopUp,
+        Prepaid,
         [JsonValue("TRANSFER_PBL")]
-        [Description("Szybki transfer")]
+        [Description("Szybki przelew")]
         PayByLink,
         [JsonValue("TRANSFER_TAX_IRP")]
         [Description("Przelew podatkowy IRP")]
-        TaxIRP,
+        TransferTaxIRP,
         [JsonValue("TRANSFER_TAX_TO_US")]
         [Description("Przelew podatkowy US")]
-        TaxUS,
+        TransferTaxUS
     }
 }

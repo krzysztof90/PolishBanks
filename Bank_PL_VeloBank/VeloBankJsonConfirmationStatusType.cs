@@ -11,6 +11,6 @@ namespace BankService.Bank_PL_VeloBank
         [JsonValue("REJECTED")]
         Rejected,
         [JsonValue("OUTDATED")]
-        Outdated,
+        Expired
     }
 }

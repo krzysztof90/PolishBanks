@@ -32,7 +32,7 @@ namespace BankService.Bank_PL_VeloBank
             OrderDate = item.DateValue;
             Type = (VeloBankJsonCategoryType)item.CategoryValue;
             OperationType = (VeloBankJsonOperationType)item.OperationTypeValue;
-            Direction = (VeloBankJsonSideType)item.SideValue == VeloBankJsonSideType.Credit ? OperationDirection.Income : OperationDirection.Execute;
+            Direction = (VeloBankJsonCreditDebit)item.SideValue == VeloBankJsonCreditDebit.Credit ? OperationDirection.Income : OperationDirection.Execute;
             if (item.remitter != null)
             {
                 FromAccountNumber = item.remitter.nrb?.account_number;
@@ -67,7 +67,7 @@ namespace BankService.Bank_PL_VeloBank
         }
 
         public override bool IsTransfer => Type == VeloBankJsonCategoryType.Transfer;
-        public override bool IsTaxTransfer => Type == VeloBankJsonCategoryType.Tax;
+        public override bool IsTaxTransfer => Type == VeloBankJsonCategoryType.TransferTax;
         public override bool IsPaymentOfServices => false;
         public override string TransferTypeName => Type.GetEnumDescription();
         public override bool CompareTitle(string title)

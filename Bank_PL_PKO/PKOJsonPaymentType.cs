@@ -2,13 +2,13 @@
 
 namespace BankService.Bank_PL_PKO
 {
-    public enum PKOPaymentType
+    public enum PKOJsonPaymentType
     {
         [JsonValue("ELIXIR")]
         Elixir,
         [JsonValue("SORBNET")]
         Sorbnet,
         [JsonValue("EXPRESS-ELIXIR")]
-        ExpressElixir,
+        ExpressElixir
     }
 }

@@ -610,15 +610,15 @@ namespace BankService.Bank_PL_PKO
             [DataMember] public int sync_request_period { get; set; }
             [DataMember] public int warning_time { get; set; }
 
-            public PKOAuthMethod? AuthMethodValue
+            public PKOJsonAuthMethod? AuthMethodValue
             {
-                get => auth_method.GetEnumByJsonValue<PKOAuthMethod>();
-                set => auth_method = value.GetEnumJsonValue<PKOAuthMethod>();
+                get => auth_method.GetEnumByJsonValue<PKOJsonAuthMethod>();
+                set => auth_method = value.GetEnumJsonValue<PKOJsonAuthMethod>();
             }
-            public PKOAuthState? StateValue
+            public PKOJsonAuthState? StateValue
             {
-                get => state.GetEnumByJsonValue<PKOAuthState>();
-                set => state = value.GetEnumJsonValue<PKOAuthState>();
+                get => state.GetEnumByJsonValue<PKOJsonAuthState>();
+                set => state = value.GetEnumJsonValue<PKOJsonAuthState>();
             }
         }
 
@@ -708,15 +708,15 @@ namespace BankService.Bank_PL_PKO
             //TODO enum
             [DataMember] public string lp_value { get; set; }
 
-            public PKOMobileStatusStatus? StatusValue
+            public PKOJsonMobileStatusStatus? StatusValue
             {
-                get => lp_status.GetEnumByJsonValue<PKOMobileStatusStatus>();
-                set => lp_status = value.GetEnumJsonValue<PKOMobileStatusStatus>();
+                get => lp_status.GetEnumByJsonValue<PKOJsonMobileStatusStatus>();
+                set => lp_status = value.GetEnumJsonValue<PKOJsonMobileStatusStatus>();
             }
-            public PKOMobileStatusValue? ValueValue
+            public PKOJsonMobileStatusValue? ValueValue
             {
-                get => lp_value.GetEnumByJsonValue<PKOMobileStatusValue>();
-                set => lp_value = value.GetEnumJsonValue<PKOMobileStatusValue>();
+                get => lp_value.GetEnumByJsonValue<PKOJsonMobileStatusValue>();
+                set => lp_value = value.GetEnumJsonValue<PKOJsonMobileStatusValue>();
             }
         }
 
@@ -925,10 +925,10 @@ namespace BankService.Bank_PL_PKO
             //TODO enum
             [DataMember] public string side { get; set; }
 
-            public PKOOperationKind? CodeValue
+            public PKOJsonOperationKind? CodeValue
             {
-                get => code.GetEnumByJsonValue<PKOOperationKind>();
-                set => code = value.GetEnumJsonValue<PKOOperationKind>();
+                get => code.GetEnumByJsonValue<PKOJsonOperationKind>();
+                set => code = value.GetEnumJsonValue<PKOJsonOperationKind>();
             }
         }
 

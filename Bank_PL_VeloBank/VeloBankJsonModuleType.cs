@@ -9,6 +9,6 @@ namespace BankService.Bank_PL_VeloBank
         [JsonValue("PA")]
         FastTransferPA,
         [JsonValue("PBL")]
-        FastTransferPBL,
+        FastTransferPBL
     }
 }

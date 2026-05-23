@@ -9,6 +9,6 @@ namespace BankService.Bank_PL_VeloBank
         [JsonValue("PENDING")]
         Pending,
         [JsonValue("SUBMITTED")]
-        Submitted,
+        Submitted
     }
 }

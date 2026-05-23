@@ -9,12 +9,12 @@ namespace BankService.Bank_PL_MBank
         [Description("Niepobrane szczegóły")]
         Empty,
 
-        [JsonValue("PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY")]
-        [Description("Przelew zewnętrzny przychodzący")]
-        TransferExternalIncoming,
         [JsonValue("PRZELEW ZEWNĘTRZNY WYCHODZĄCY")]
         [Description("Przelew zewnętrzny wychodzący")]
         TransferExternalOutgoing,
+        [JsonValue("PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY")]
+        [Description("Przelew zewnętrzny przychodzący")]
+        TransferExternalIncoming,
         [JsonValue("PRZELEW PODATKOWY")]
         [Description("Przelew podatkowy")]
         TransferTax,
@@ -23,6 +23,6 @@ namespace BankService.Bank_PL_MBank
         MTransferOutgoing,
         [JsonValue("BLIK P2P-WYCHODZĄCY")]
         [Description("Przelew na telefon wychodzący")]
-        BlikPhoneOutgoing,
+        PhoneTransferOutgoing
     }
 }

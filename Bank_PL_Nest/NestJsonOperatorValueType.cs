@@ -7,6 +7,6 @@ namespace BankService.Bank_PL_Nest
         [JsonValue("RANGE")]
         Range,
         [JsonValue("CONSTANT")]
-        Constant,
+        Constant
     }
 }

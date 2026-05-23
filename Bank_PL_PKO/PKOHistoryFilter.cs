@@ -20,21 +20,21 @@ namespace BankService.Bank_PL_PKO
     [Description("Rodzaj operacji")]
     public enum PKOFilterOperationType
     {
-        [Description("Wszystkie operacje")]
+        [Description("Wszystkie")]
         [FilterEnumParameterAttribute("ALL")]
         All,
-        [Description("Wszystkie uznania")]
+        [Description("Uznania")]
         [FilterEnumParameterAttribute("CREDIT")]
         Credit,
-        [Description("Wszystkie obciążenia")]
+        [Description("Obciążenia")]
         [FilterEnumParameterAttribute("DEBIT")]
         Debit,
-        [Description("Przelewy na konto")]
+        [Description("Przelewy przychodzące")]
         [FilterEnumParameterAttribute("TRANSFER-IN")]
-        TransferIn,
-        [Description("Przelewy z konta")]
+        Incoming,
+        [Description("Przelewy wychodzące")]
         [FilterEnumParameterAttribute("TRANSFER-OUT")]
-        TransferOut,
+        Outgoing,
         [Description("Przelewy do ZUS")]
         [FilterEnumParameterAttribute("ZUS")]
         ZUS,
@@ -50,9 +50,21 @@ namespace BankService.Bank_PL_PKO
         [Description("Podzielona płatność (split payment)")]
         [FilterEnumParameterAttribute("SPLIT-PAYMENT")]
         SplitPayment,
+        [Description("Płatności kartą")]
+        [FilterEnumParameterAttribute("CARD-PAYMENT")]
+        CardPayment,
+        [Description("Transakcje kartą")]
+        [FilterEnumParameterAttribute("CARD-TX")]
+        Card,
         [Description("Przelewy na kartę")]
         [FilterEnumParameterAttribute("CARDMONEY")]
         CardMoney,
+        [Description("Przelewy z karty")]
+        [FilterEnumParameterAttribute("PAYCARD-TRANSFER")]
+        CardTransfer,
+        [Description("Rozliczenie karty")]
+        [FilterEnumParameterAttribute("CARD-CALCULATE")]
+        CardCalculate,
         [Description("Opłaty i prowizje")]
         [FilterEnumParameterAttribute("FEE-AND-COMMISSION")]
         FeeCommission,
@@ -62,9 +74,9 @@ namespace BankService.Bank_PL_PKO
         [Description("Wpłaty gotówkowe")]
         [FilterEnumParameterAttribute("CASH-IN")]
         CashIn,
-        [Description("Płatności kartą")]
-        [FilterEnumParameterAttribute("CARD-PAYMENT")]
-        CardPayment,
+        [Description("Wypłaty gotówkowe")]
+        [FilterEnumParameterAttribute("CASH-OUT")]
+        CashOut,
         [Description("Otwarcie lokaty")]
         [FilterEnumParameterAttribute("DEPOSIT-OPEN")]
         DepositOpen,
@@ -80,15 +92,6 @@ namespace BankService.Bank_PL_PKO
         [Description("Korekty")]
         [FilterEnumParameterAttribute("CORRECTION")]
         Correction,
-        [Description("Wypłaty gotówkowe")]
-        [FilterEnumParameterAttribute("CASH-OUT")]
-        CashOut,
-        [Description("Transakcje kartą")]
-        [FilterEnumParameterAttribute("CARD-TX")]
-        Card,
-        [Description("Rozliczenie karty")]
-        [FilterEnumParameterAttribute("CARD-CALCULATE")]
-        CardCalculate,
         [Description("Dyspozycja telefoniczna")]
         [FilterEnumParameterAttribute("PHONE-DISPOSAL")]
         PhoneDisposal,
@@ -128,12 +131,9 @@ namespace BankService.Bank_PL_PKO
         [Description("Przelewy zagraniczne")]
         [FilterEnumParameterAttribute("FOREIGN-TRANSFER")]
         ForeignTransfer,
-        [Description("Przelewy z karty")]
-        [FilterEnumParameterAttribute("PAYCARD-TRANSFER")]
-        CardTransfer,
         [Description("Autooszczędzanie")]
         [FilterEnumParameterAttribute("AUTOSAVER")]
-        Autosaver,
+        Autosaver
     }
 
     [Description("Sposób szukania")]
@@ -147,6 +147,6 @@ namespace BankService.Bank_PL_PKO
         Title,
         [Description("Numery kont")]
         [FilterEnumParameterAttribute("OTHER_SIDE_NUMBER")]
-        Number,
+        Number
     }
 }

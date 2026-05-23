@@ -3,7 +3,6 @@ using BankService.Tax.TaxPeriods;
 using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Tools;
@@ -13,13 +12,13 @@ namespace BankService.Bank_PL_GetinBank
 {
     public class GetinBankHistoryItem : HistoryItem
     {
-        public OperationType Type { get; }
+        public GetinBankHtmlOperationType Type { get; }
         public string MainTitle { get; }
         public string MainTitleSubtitle { get; }
-        public OperationStatus Status { get; }
+        public GetinBankHtmlOperationStatus Status { get; }
         public DateTime? PostingDate { get; }
         public string ReferenceNumber { get; }
-        public CommissionCosts? CommissionCosts { get; }
+        public GetinBankHtmlCommissionCosts? CommissionCosts { get; }
         public string PaymentSystem { get; }
         public string PaymentRecommendationAccountNumber { get; }
         public string CommissionsChargedAccountNumber { get; }
@@ -30,7 +29,7 @@ namespace BankService.Bank_PL_GetinBank
         public string ToAccountBankName { get; }
         public string ToAccountBankSwiftCode { get; }
 
-        public override bool IsTransfer => Type == OperationType.Transfer;
+        public override bool IsTransfer => Type == GetinBankHtmlOperationType.Transfer;
         public override bool IsTaxTransfer => throw new NotImplementedException();
         public override bool IsPaymentOfServices => false;
         public override string TransferTypeName => Type.GetEnumDescription();
@@ -75,22 +74,7 @@ namespace BankService.Bank_PL_GetinBank
             HtmlNode nodeDetailsInfo = nodeDetails.Descendants("div").Single(n => n.HasClass("details-info"));
             HtmlNode nodeTransferStatus = nodeDetailsInfo.Descendants("div").SingleOrDefault(n => n.HasClass("transfer-status"));
             if (nodeTransferStatus != null)
-            {
-                switch (nodeTransferStatus.Descendants("dt").Single().InnerText)
-                {
-                    case "zrealizowany":
-                        Status = OperationStatus.Realized;
-                        break;
-                    case "blokada":
-                        Status = OperationStatus.Block;
-                        break;
-                    case "oczekujący":
-                        Status = OperationStatus.Pending;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-            }
+                Status = AttributeOperations.GetEnumByAttributeNoEmpty<GetinBankHtmlOperationStatus, HtmlLabel, string>(nodeTransferStatus.Descendants("dt").Single().InnerText, (HtmlLabel label) => label.Value);
             OrderDate = DateTime.ParseExact(GetTextFromNodeWithTitle(GetNodeByTitle(nodeDetailsInfo, "data zlecenia")), "dd.MM.yyyy", null);
             string postingDateString = GetTextFromNodeWithTitle(GetNodeByTitle(nodeDetailsInfo, "data księgowania"));
             if (postingDateString != "-")
@@ -101,42 +85,10 @@ namespace BankService.Bank_PL_GetinBank
             ReferenceNumber = GetTextFromNodeWithTitle(GetNodeByTitle(nodeDetailsInfo, "ref"));
             HtmlNode typeNode = GetNodeByTitle(nodeDetailsInfo, "typ operacji");
             if (typeNode != null)
-                switch (GetTextFromNodeWithTitle(typeNode))
-                {
-                    case "Przelew":
-                        Type = OperationType.Transfer;
-                        break;
-                    case "Operacja kartą":
-                        Type = OperationType.Card;
-                        break;
-                    case "Express Elixir":
-                        Type = OperationType.Elixir;
-                        break;
-                    case "PRZELEW ZAGRANICZNY":
-                        Type = OperationType.Foreign;
-                        break;
-                    case "us":
-                        Type = OperationType.TaxOffice;
-                        break;
-                    case "Przelew na telefon":
-                        Type = OperationType.PhoneTransfer;
-                        break;
-                    case "Operacja BLIK":
-                        Type = OperationType.Blik;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                Type = AttributeOperations.GetEnumByAttributeNoEmpty<GetinBankHtmlOperationType, HtmlLabel, string>(GetTextFromNodeWithTitle(typeNode), (HtmlLabel label) => label.Value);
             HtmlNode commissionCostsNode = GetNodeByTitle(nodeDetailsInfo, "koszty prowizyjne");
             if (commissionCostsNode != null)
-                switch (GetTextFromNodeWithTitle(commissionCostsNode, true))
-                {
-                    case "OUR":
-                        CommissionCosts = Bank_PL_GetinBank.CommissionCosts.Our;
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
+                CommissionCosts = AttributeOperations.GetEnumByAttributeNoEmpty<GetinBankHtmlCommissionCosts, HtmlLabel, string>(GetTextFromNodeWithTitle(commissionCostsNode, true), (HtmlLabel label) => label.Value);
             PaymentSystem = GetTextFromNodeWithTitle(GetNodeByTitle(nodeDetailsInfo, "system płatniczy"));
             PaymentRecommendationAccountNumber = GetTextFromNodeWithTitle(GetNodeByTitle(nodeDetailsInfo, "NALEŻNOŚĆ Z TYTUŁU POLECENIA WYPŁATY"));
             CommissionsChargedAccountNumber = GetTextFromNodeWithTitle(GetNodeByTitle(nodeDetailsInfo, "koszty i prowizje naliczone przez bank"));
@@ -196,33 +148,5 @@ namespace BankService.Bank_PL_GetinBank
                 && ToAccountBankName == null && ToAccountBankSwiftCode == null && ToAccountNumber == null && ToPersonAddress == null && ToPersonName == null
                 && FromAccountBankName == null && FromAccountNumber == null && FromPersonAddress == null && FromPersonName == null;
         }
-    }
-
-    public enum OperationStatus
-    {
-        Realized,
-        Block,
-        Pending
-    }
-    public enum OperationType
-    {
-        [Description("Przelew")]
-        Transfer,
-        [Description("Operacja kartą")]
-        Card,
-        [Description("Express Elixir")]
-        Elixir,
-        [Description("Przelew zagraniczny")]
-        Foreign,
-        [Description("Urząd skarbowy")]
-        TaxOffice,
-        [Description("Przelew na telefon")]
-        PhoneTransfer,
-        [Description("Operacja BLIK")]
-        Blik
-    }
-    public enum CommissionCosts
-    {
-        Our
     }
 }

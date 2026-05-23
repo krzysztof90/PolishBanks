@@ -2,9 +2,9 @@
 
 namespace BankService.Bank_PT_Santander
 {
-    public enum SantanderJsonResponseStatus
+    public enum SantanderJsonStatus
     {
         [JsonValue("SUCCESS")]
-        Success,
+        Success
     }
 }

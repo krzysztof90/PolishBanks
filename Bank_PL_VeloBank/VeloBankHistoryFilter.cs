@@ -51,8 +51,9 @@ namespace BankService.Bank_PL_VeloBank
         Incoming,
         [Description("Wydatki")]
         [FilterEnumParameterAttribute("OUT")]
-        Outgoing,
+        Outgoing
     }
+
     [Description("Typ operacji")]
     public enum VeloBankFilterKind
     {
@@ -65,7 +66,7 @@ namespace BankService.Bank_PL_VeloBank
         [Description("Operacje BLIK")]
         [FilterEnumParameterAttribute("BLIK_OPERATIONS")]
         Blik,
-        [Description("Wpłaty / Wypłaty")]
+        [Description("Wpłaty / Wypłaty gotówkowe")]
         [FilterEnumParameterAttribute("CASH_OPERATIONS")]
         Cash,
         [Description("Opłaty i prowizje")]
@@ -73,8 +74,9 @@ namespace BankService.Bank_PL_VeloBank
         FeeCommission,
         [Description("Inne")]
         [FilterEnumParameterAttribute("OTHERS")]
-        Other,
+        Other
     }
+
     [Description("Status operacji")]
     public enum VeloBankFilterStatus
     {

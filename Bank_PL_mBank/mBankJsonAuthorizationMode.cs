@@ -7,6 +7,6 @@ namespace BankService.Bank_PL_MBank
         [JsonValue("SMS")]
         SMS,
         [JsonValue("NAM")]
-        Mobile,
+        Mobile
     }
 }

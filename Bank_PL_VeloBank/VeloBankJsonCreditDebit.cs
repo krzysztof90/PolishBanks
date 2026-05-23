@@ -2,11 +2,11 @@
 
 namespace BankService.Bank_PL_VeloBank
 {
-    public enum VeloBankJsonSideType
+    public enum VeloBankJsonCreditDebit
     {
         [JsonValue("DEBIT")]
         Debit,
         [JsonValue("CREDIT")]
-        Credit,
+        Credit
     }
 }

@@ -2,9 +2,9 @@
 
 namespace BankService.Bank_PL_PKO
 {
-    public enum PKOAuthState
+    public enum PKOJsonAuthState
     {
         [JsonValue("AUTH_CANCELLED")]
-        Cancelled,
+        Canceled
     }
 }

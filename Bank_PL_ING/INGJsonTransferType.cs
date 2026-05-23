@@ -6,11 +6,11 @@ namespace BankService.Bank_PL_ING
     public enum INGJsonTransferType
     {
         [JsonValueInt(1)]
-        [Description("Przelew - obciążenie")]
-        TransferCharge,
+        [Description("Przelew wychodzący")]
+        TransferOutgoing,
         [JsonValueInt(4)]
-        [Description("Przelew - uznanie")]
-        TransferCredit,
+        [Description("Przelew przychodzący")]
+        TransferIncoming,
         [JsonValueInt(5)]
         [Description("Uznanie Elixir")]
         CreditElixir,
@@ -18,7 +18,7 @@ namespace BankService.Bank_PL_ING
         [Description("BLIK TR ZAKUPU INTERNETOWA")]
         BlikInternet,
         [JsonValueInt(22)]
-        [Description("Wypłata Bankomat")]
+        [Description("Wypłata z bankomatu")]
         ATMWithdraw,
         [JsonValueInt(24)]
         [Description("Zwrot płatności kartą")]
@@ -60,8 +60,8 @@ namespace BankService.Bank_PL_ING
         [Description("Przelew walutowy")]
         CurrencyTransfer,
         [JsonValueInt(180)]
-        [Description("Prowizje i opłaty")]
-        CommissionsAndFees,
+        [Description("Opłaty i prowizje")]
+        FeesCharges,
         [JsonValueInt(200)]
         [Description("Blokada kartowa")]
         BlockCard,

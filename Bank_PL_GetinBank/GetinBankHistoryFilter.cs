@@ -145,13 +145,14 @@ namespace BankService.Bank_PL_GetinBank
         Date,
         LastOperations
     }
+
     [Description("Rodzaj operacji")]
     public enum GetinBankFilterOperation
     {
-        [Description("Wszystkie uznania")]
+        [Description("Uznania")]
         [FilterEnumParameterAttribute("CREDIT")]
         Incoming,
-        [Description("Wszystkie obciążenia")]
+        [Description("Obciążenia")]
         [FilterEnumParameterAttribute("DEBIT")]
         Outgoing,
         [Description("Przelewy")]
@@ -169,16 +170,17 @@ namespace BankService.Bank_PL_GetinBank
         [Description("Transakcje iKasa")]
         [FilterEnumParameterAttribute("IKASA_TRANSACTION")]
         IKasa,
-        [Description("Wpłata kasowa")]
+        [Description("Wpłaty gotówkowe")]
         [FilterEnumParameterAttribute("CASH_TRANSACTION_IN")]
         CashIn,
-        [Description("Wypłata kasowa")]
+        [Description("Wypłaty gotówkowe")]
         [FilterEnumParameterAttribute("CASH_TRANSACTION_OUT")]
         CashOut,
         [Description("Operacje BLIK")]
         [FilterEnumParameterAttribute("BLIK")]
         Blik
     }
+
     [Description("Kanał operacji")]
     public enum GetinBankFilterChannel
     {
@@ -198,6 +200,7 @@ namespace BankService.Bank_PL_GetinBank
         [FilterEnumParameterAttribute("TPP")]
         External
     }
+
     [Description("Status operacji")]
     public enum GetinBankFilterStatus
     {
@@ -210,7 +213,7 @@ namespace BankService.Bank_PL_GetinBank
         [Description("Blokady kartowe")]
         [FilterEnumParameterAttribute("is_authorizations_only")]
         AuthorizationsOnly,
-        [Description("Niezrealizowane")]
+        [Description("Odrzucone")]
         [FilterEnumParameterAttribute("REJECTED")]
         Rejected
     }

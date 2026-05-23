@@ -252,7 +252,7 @@ namespace BankService.Bank_PL_Pocztowy
             string cityCode = null;
             if (selectedTax.irp)
             {
-                typeValue = PocztowyJsonOutgoingTransferType.TaxIRP;
+                typeValue = PocztowyJsonOutgoingTransferType.TransferTaxIRP;
                 //TODO use in other banks
                 nrb = accountNumber.SimplifyAccountNumber();
             }
@@ -262,7 +262,7 @@ namespace BankService.Bank_PL_Pocztowy
                 if (taxOffice == default)
                     return false;
 
-                typeValue = PocztowyJsonOutgoingTransferType.TaxUS;
+                typeValue = PocztowyJsonOutgoingTransferType.TransferTaxUS;
                 nrb = taxOffice.account.nrb;
                 cityCode = taxOffice.city;
             }
@@ -465,7 +465,7 @@ namespace BankService.Bank_PL_Pocztowy
 
             PocztowyJsonRequestTransferPrepaidPrepare requestTransfer = new PocztowyJsonRequestTransferPrepaidPrepare
             {
-                TypeValue = PocztowyJsonOutgoingTransferType.TopUp,
+                TypeValue = PocztowyJsonOutgoingTransferType.Prepaid,
                 fromProductId = SelectedAccountData.Id,
                 amount = new PocztowyJsonRequestAmountCurrency() { amount = amount, currencyCode = SelectedAccountData.Currency },
                 operatorCode = operatorItem.operatorCode,

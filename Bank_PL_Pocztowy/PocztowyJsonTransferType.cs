@@ -15,7 +15,7 @@ namespace BankService.Bank_PL_Pocztowy
         [Description("Doładowanie telefonu")]
         Prepaid,
         [JsonValue("PRZELEW_NA_TELEFON_BLIK")]
-        [Description("Blik na telefon")]
-        TransferBlikMobile,
+        [Description("Przelew na telefon")]
+        PhoneTransfer
     }
 }

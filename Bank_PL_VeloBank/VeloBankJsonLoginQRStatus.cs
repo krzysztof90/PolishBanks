@@ -8,11 +8,11 @@ namespace BankService.Bank_PL_VeloBank
         Pending,
         [JsonValue("PROCESSING")]
         Processing,
-        [JsonValue("ERROR_TIMED_OUT")]
-        TimedOut,
-        [JsonValue("REJECTED")]
-        Rejected,
         [JsonValue("ACCEPTED")]
         Accepted,
+        [JsonValue("REJECTED")]
+        Rejected,
+        [JsonValue("ERROR_TIMED_OUT")]
+        Expired
     }
 }
